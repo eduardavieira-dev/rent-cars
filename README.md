@@ -1,38 +1,26 @@
-# Rent Cars -  Aluguel de carros
+# 🚗 Rent Cars -  Aluguel de carros
 
-> [!NOTE]
-> Breve descrição do projeto. **Foque no principal valor/benefício.**  
-> Crie uma **logo** para o projeto que represente a aplicação em questão.
+O Rent Cars é um sistema web voltado à gestão de aluguel de automóveis, desenvolvido por estudantes de Engenharia de Software da PUC Minas — Artur Bomtempo Colen, Eduarda Vieira Gonçalves e Vitor Azevedo — como projeto acadêmico sob orientação do Prof. Dr. João Paulo Aramuni.
 
-<table>
-  <tr>
-    <td width="800px">
-      <div align="justify">
-        Este <b>README.md</b> apresenta um template organizado, ideal para servir como referência acadêmica e profissional em projetos de desenvolvimento, desde trabalhos da faculdade até projetos desenvolvidos para etapas técnicas de processos seletivos. Ele reúne as <i>seções essenciais</i> recomendadas pelo <a href="https://github.com/joaopauloaramuni">Prof. Dr. João Paulo Aramuni</a>, permitindo <i>organização clara</i>, <i>documentação eficiente</i> e <i>padronização</i> entre diferentes trabalhos. O objetivo deste esqueleto é <b>facilitar a construção de projetos bem documentados</b>, oferecendo um <i>guia completo</i> que inclui <b>boas práticas</b>, instruções de execução, tecnologias utilizadas, arquitetura, estruturas de pastas, testes, links úteis e orientações para colaboração. Esse template ajuda estudantes a desenvolverem <b>documentação de qualidade profissional</b> desde os primeiros períodos, promovendo <i>clareza</i>, <i>reprodutibilidade</i> e <i>padronização</i> nos projetos.
-      </div>
-    </td>
-    <td>
-      <div>
-        <img src="https://joaopauloaramuni.github.io/image/logo_ES_vertical.png" alt="Logo do Projeto" width="120px"/>
-      </div>
-    </td>
-  </tr> 
-</table>
+A aplicação permite que empresas e clientes cadastrem, consultem e gerenciem veículos, clientes, contratos e pedidos de aluguel de forma centralizada e organizada, contribuindo para maior eficiência no controle das operações.
+
+Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamentais da Engenharia de Software, como arquitetura MVC, modelagem UML e boas práticas de desenvolvimento. Além disso, o projeto proporciona experiência com tecnologias modernas, documentação técnica e trabalho colaborativo em equipe.
 
 ---
 
-## 🚧 Status do Projeto
+## 🚧 Status do Projeto e Tecnologias
 
-### Exemplos de badges básicos:
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow?style=for-the-badge)
+![Versão](https://img.shields.io/badge/versão-1.0.0-blue?style=for-the-badge)
+![Licença](https://img.shields.io/github/license/eduardavieira-dev/rent-cars?style=for-the-badge)
 
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/joaopauloaramuni/joaopauloaramuni/main.yml?branch=main)](https://github.com/joaopauloaramuni/joaopauloaramuni/actions/workflows/main.yml)
-[![Test Coverage](https://codecov.io/gh/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software/branch/main/graph/badge.svg)](https://codecov.io/gh/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software)
-[![Versão](https://img.shields.io/badge/Versão-v1.0.0-blue)](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software/releases)
-[![Licença](https://img.shields.io/github/license/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software)](#licença)
-
-### Outros exemplos de badges:
-
-[![Versão](https://img.shields.io/badge/Versão-v1.0.0-blue?style=for-the-badge)](https://github.com/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software/releases) ![React](https://img.shields.io/badge/React-19.1.1-007ec6?style=for-the-badge&logo=react&logoColor=white) ![Vite](https://img.shields.io/badge/Vite-7.1.2-007ec6?style=for-the-badge&logo=vite&logoColor=white) ![Java](https://img.shields.io/badge/Java-17-007ec6?style=for-the-badge&logo=openjdk&logoColor=white) ![Maven](https://img.shields.io/badge/Maven-3.9.9-007ec6?style=for-the-badge&logo=apachemaven&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.5-007ec6?style=for-the-badge&logo=springboot&logoColor=white) ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3.1.1-007ec6?style=for-the-badge&logo=thymeleaf&logoColor=white) ![GitHub repo size](https://img.shields.io/github/repo-size/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&logo=files) ![GitHub directory file count](https://img.shields.io/github/directory-file-count/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&logo=files) ![GitHub stars](https://img.shields.io/github/stars/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&logo=github) ![GitHub forks](https://img.shields.io/github/forks/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&logo=git) ![GitHub language count](https://img.shields.io/github/languages/count/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&logo=python) ![GitHub license](https://img.shields.io/github/license/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&color=007ec6&logo=opensourceinitiative) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&color=007ec6&logo=gitkraken) ![GitHub last commit](https://img.shields.io/github/last-commit/joaopauloaramuni/laboratorio-de-desenvolvimento-de-software?style=for-the-badge&logo=clockify) ![Vercel](https://vercelbadge.vercel.app/api/joaopauloaramuni/joaopauloaramuni-portfolio?style=for-the-badge) ![Views Counter](https://views-counter.vercel.app/badge?pageId=https%3A%2F%2Fgithub%2Ecom%2Fjoaopauloaramuni%2Flaboratorio-de-desenvolvimento-de-software&leftColor=555555&rightColor=007ec6&type=total&label=RepoViews)
+![Java](https://img.shields.io/badge/Java-21-007ec6?style=for-the-badge&logo=openjdk&logoColor=white)
+![Micronaut](https://img.shields.io/badge/Micronaut-4.x-007ec6?style=for-the-badge&logo=micronaut&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-3.9+-007ec6?style=for-the-badge&logo=apachemaven&logoColor=white)
+![Vue.js](https://img.shields.io/badge/Vue.js-3.x-007ec6?style=for-the-badge&logo=vue.js&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5.x-007ec6?style=for-the-badge&logo=vite&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.x-007ec6?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-24.x-007ec6?style=for-the-badge&logo=docker&logoColor=white)
 
 ---
 
@@ -124,19 +112,18 @@ As seguintes ferramentas, frameworks e bibliotecas foram utilizados na construç
 
 ### 💻 Front-end
 
-* **Framework/Biblioteca:** [Ex: React v18, Vue.js v3, Angular v17]
-* **Linguagem/Superset:** [Ex: TypeScript, JavaScript ES6+]
-* **Estilização:** [Ex: Tailwind CSS, Sass, Styled Components, Material UI]
-* **Gerenciamento de Estado:** [Ex: Redux Toolkit, Zustand, Context API]
-* **Build Tool:** [Ex: Vite, Webpack]
+* **Framework/Biblioteca:** Vue.js
+* **Linguagem/Superset:** TypeScript
+* **Estilização:** Tailwind CSS
+* **Build Tool:** Vite
 
 ### 🖥️ Back-end
 
-* **Linguagem/Runtime:** [Ex: Java 17 (JDK), Node.js v20, Python 3.11]
-* **Framework:** [Ex: Spring Boot 3.x, NestJS, Express, Django]
-* **Banco de Dados:** [Ex: PostgreSQL, MySQL, MongoDB]
-* **ORM / Query Builder:** [Ex: Hibernate/JPA, Prisma, TypeORM]
-* **Autenticação:** [Ex: JWT, OAuth2, Spring Security]
+* **Linguagem:** Java 17
+* **Framework:** Micronaut
+* **Banco de Dados:** PostgreSQL
+* **ORM:** JPA / Hibernate
+* **Autenticação:** JWT
 
 ### 📱 Mobile (Opcional)
 
@@ -145,7 +132,7 @@ As seguintes ferramentas, frameworks e bibliotecas foram utilizados na construç
 
 ### ⚙️ Infraestrutura & DevOps
 
-* **Containerização:** [Ex: Docker, Docker Compose]
+* **Containerização:** Docker
 * **Orquestração:** [Ex: Kubernetes (K8s)]
 * **Cloud:** [Ex: AWS (EC2, RDS, S3), Vercel, Heroku, Google Cloud]
 * **CI/CD:** [Ex: GitHub Actions, Jenkins, SonarQube]
