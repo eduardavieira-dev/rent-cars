@@ -1,0 +1,11 @@
+### Create a new user
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+    "name": "Eduarda",
+    "email": "eduarda@example.com"
+}
+
+### Get all users
+GET http://localhost:8080/users

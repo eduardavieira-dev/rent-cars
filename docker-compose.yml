@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: rentcars-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?DB_NAME not set in .env}
+      POSTGRES_USER: ${DB_USER:?DB_USER not set in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD not set in .env}
+    ports:
+      - "${DB_PORT_HOST:-5432}:5432"
+    volumes:
+      - rentcars-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: rentcars-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_PORT: ${APP_PORT:-8080}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:?DB_NAME not set in .env}
+      DB_USER: ${DB_USER:?DB_USER not set in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD not set in .env}
+      SECURITY_ENABLED: ${SECURITY_ENABLED:-false}
+      JWT_GENERATOR_SIGNATURE_SECRET: ${JWT_GENERATOR_SIGNATURE_SECRET:?JWT_GENERATOR_SIGNATURE_SECRET not set in .env}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  rentcars-db-data:

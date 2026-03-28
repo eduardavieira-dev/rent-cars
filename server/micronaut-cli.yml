@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: br.pucminas
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [app-name, data, data-jpa, http-client-test, http-server-jdk, java, java-application, jdbc-hikari, junit, logback, maven, maven-enforcer-plugin, micronaut-aot, micronaut-http-validation, micronaut-processing-compiler-args, postgres, properties, readme, security-annotations, security-jwt, serialization-jackson, shade, spring, spring-data-jpa, static-resources, test-resources]
