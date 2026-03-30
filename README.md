@@ -17,10 +17,9 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 ![Java](https://img.shields.io/badge/Java-21-007ec6?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Micronaut](https://img.shields.io/badge/Micronaut-4.x-007ec6?style=for-the-badge&logo=micronaut&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-3.9+-007ec6?style=for-the-badge&logo=apachemaven&logoColor=white)
-![Vue.js](https://img.shields.io/badge/Vue.js-3.x-007ec6?style=for-the-badge&logo=vue.js&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-5.x-007ec6?style=for-the-badge&logo=vite&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.x-007ec6?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-24.x-007ec6?style=for-the-badge&logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker%20Compose-2.x-007ec6?style=for-the-badge&logo=docker&logoColor=white)
 
 ---
 
@@ -34,20 +33,12 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 - [Instalação e Execução](#-instalação-e-execução)
   - [Pré-requisitos](#pré-requisitos)
   - [Variáveis de Ambiente](#-variáveis-de-ambiente)
-     - [1 Back-end (Spring Boot)](#1-back-end-spring-boot)
-     - [2 Front-end (React, Vite)](#2-front-end-react-vite)
-     - [3 Exemplos de Variáveis de Ambiente na Vercel](#3-exemplos-de-variáveis-de-ambiente-na-vercel)
-  - [Instalação de Dependências](#-instalação-de-dependências)
-    - [Front-end (React)](#front-end-react)
-    - [Back-end (Spring Boot)](#back-end-spring-boot)
-  - [Inicialização do Banco de Dados (PostgreSQL)](#-inicialização-do-banco-de-dados-postgresql)
+  - [Preparação do Projeto](#-preparação-do-projeto)
+  - [Banco de Dados](#-banco-de-dados)
   - [Como Executar a Aplicação](#-como-executar-a-aplicação)
-    - [Terminal 1: Back-end (Spring Boot)](#terminal-1-back-end-spring-boot)
-    - [Terminal 2: Front-end (React, Vite)](#terminal-2-front-end-react-vite)
-    - [Execução Local Completa com Docker Compose (Incluindo Banco de Dados)](#-execução-local-completa-com-docker-compose-incluindo-banco-de-dados)
-    - [Passos para build, inicialização e execução](#-passos-para-build-inicialização-e-execução)
 - [Deploy](#-deploy)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
+- [Testes](#-testes)
 - [Demonstração](#-demonstração)
   - [Aplicativo Mobile](#-aplicativo-mobile)
   - [Aplicação Web](#-aplicação-web)
@@ -171,118 +162,54 @@ Para melhor visualização e entendimento da estrutura do sistema, os diagramas 
 ## 🔧 Instalação e Execução
 
 ### Pré-requisitos
-Certifique-se de que o usuário tenha o ambiente configurado.
+Certifique-se de que o usuário tenha o ambiente configurado:
 
-* **Java JDK:** Versão **17** ou superior (Necessário para o **Back-end Spring Boot**)
-* **Node.js:** Versão LTS (v18.x ou superior) (Necessário para o **Front-end React**)
-* **Gerenciador de Pacotes:** npm ou yarn
-* **Docker** (Opcional, mas **altamente recomendado** para rodar o Banco de Dados)
+* **Docker** (Necessário) — [Instale o Docker Desktop](https://www.docker.com/products/docker-desktop)
+* **Docker Compose** (Incluído no Docker Desktop) — Para orquestração de múltiplos serviços
+* **Git** (Opcional) — Para clonar o repositório
 
 ---
 
 ### 🔑 Variáveis de Ambiente
 
-Crie arquivos `.env` específicos e/ou configure as variáveis de ambiente no seu sistema para cada parte da aplicação.
+Crie um arquivo **`.env`** na raiz do projeto (mesmo nível do `docker-compose.yml`) com as configurações necessárias para o banco de dados e aplicação.
 
-#### 1 Back-end (Spring Boot)
+#### Back-end (Micronaut + PostgreSQL)
 
-Configure estas variáveis como **variáveis de ambiente do sistema** ou em um arquivo de configuração do Spring (ex: `application.properties`/`application.yml`).
+O arquivo `.env` precisa conter as seguintes variáveis:
 
-| Variável | Descrição | Exemplo |
-| :--- | :--- | :--- |
-| `SERVER_PORT` | Porta onde o Back-end será executado. | `8080` |
-| `SPRING_DATASOURCE_URL` | URL de conexão JDBC (PostgreSQL). | `jdbc:postgresql://localhost:5432/meubanco` |
-| `SPRING_DATASOURCE_USERNAME` | Usuário do banco de dados. | `postgres` |
-| `SPRING_DATASOURCE_PASSWORD` | Senha do banco de dados. | `senha-segura-123` |
-| `JWT_SECRET` | Chave secreta para assinatura de tokens (Opcional). | `chave_super_segura_base64` |
+| Variável | Descrição | Exemplo | Padrão |
+| :--- | :--- | :--- | :--- |
+| `DB_NAME` | Nome do banco de dados PostgreSQL. | `rentcars` | `rentcars` |
+| `DB_USER` | Usuário do banco de dados. | `postgres` | `postgres` |
+| `DB_PASSWORD` | Senha do banco de dados. | `postgres123` | `postgres` |
+| `DB_PORT_HOST` | Porta exposta do PostgreSQL na máquina host. | `5432` | `5432` |
+| `APP_PORT` | Porta onde a aplicação Micronaut será executada. | `8080` | `8080` |
+| `SECURITY_ENABLED` | Ativar/desativar segurança JWT. | `false` ou `true` | `false` |
+| `JWT_GENERATOR_SIGNATURE_SECRET` | Chave secreta para assinatura de tokens JWT. | `sua_chave_secreta_aqui` | (Obrigatório) |
 
-#### 2 Front-end (React, Vite)
+**Exemplo de arquivo `.env`:**
 
-Crie um arquivo **`.env`** na raiz da pasta `/frontend` e use o prefixo `VITE_` (ou `REACT_APP_` se estiver usando CRA) para expor as variáveis ao *bundle* da aplicação.
+```bash
+# Database Configuration
+DB_NAME=rentcars
+DB_USER=postgres
+DB_PASSWORD=postgres123
+DB_PORT_HOST=5432
 
-| Variável | Descrição | Exemplo |
-| :--- | :--- | :--- |
-| `VITE_API_URL` | URL base do endpoint do Backend Spring Boot. | `http://localhost:8080/api` |
-| `VITE_EMAILJS_PUBLIC_KEY` | Chave pública para serviços de e-mail (Exemplo). | `sua_public_key_aqui` |
-| `VITE_GOOGLE_MAPS_KEY` | Chave de API para serviços de mapas (Opcional). | `AIzaSy...` |
+# Application Configuration
+APP_PORT=8080
 
----
-
-#### 3. Exemplos de Variáveis de Ambiente na Vercel
-
-A Vercel permite configurar variáveis no painel (Project Settings > Environment Variables).
-Aqui estão exemplos comuns utilizadas em aplicações front-end e full-stack:
-
----
-
-##### **Exemplo 1 – Front-end com Next.js usando API externa**
-
-```
-NEXT_PUBLIC_API_URL=https://meu-backend.vercel.app/api
-NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=G-seu_google_analytics_id_aqui
+# Security Configuration
+SECURITY_ENABLED=false
+JWT_GENERATOR_SIGNATURE_SECRET=my-secret-key-change-in-production
 ```
 
----
+> ⚠️ **Segurança:** Altere a senha do banco de dados e a chave JWT em **produção**. Nunca cometa o arquivo `.env` com valores reais em um repositório público.
 
-##### **Exemplo 2 – Aplicação Full-stack (Next.js + Prisma + PostgreSQL)**
+### 📦 Preparação do Projeto
 
-```
-DATABASE_URL=postgresql://admin:senha-super-segura@ep-meu-banco.aws.neon.tech:5432/verceldb
-NEXTAUTH_SECRET=uma_chave_muito_longa_e_segura
-NEXTAUTH_URL=https://meu-sistema.vercel.app
-```
-
----
-
-##### **Exemplo 3 – Integração com APIs externas**
-
-```
-STRIPE_SECRET_KEY=sk_live_seu_stripe_key_aqui
-OPENAI_API_KEY=sk-sua_openai_key_aqui
-SENDGRID_API_KEY=SG.sua_sendgrid_key_aqui
-```
-
----
-
-##### **Exemplo 4 – Frontend com Vite (EmailJS)**
-
-```
-VITE_EMAILJS_SERVICE_ID=seu_service_id_aqui
-VITE_EMAILJS_TEMPLATE_ID_FOR_ME=seu_template_id_for_me_aqui
-VITE_EMAILJS_TEMPLATE_ID_FOR_SENDER=seu_template_id_for_sender_aqui
-VITE_EMAILJS_PUBLIC_KEY=sua_public_key_aqui
-```
-
-> **Obs:** As variáveis de ambiente em projetos **Vite** precisam começar com `VITE_` para que o Vite as reconheça e as inclua no *bundle* do frontend; variáveis sem esse prefixo não ficam disponíveis no código do cliente.
-
----
-
-Para adicionar essas variáveis:
-
-1.  Acesse a página de Environment Variables do seu projeto no Vercel (ex.: `https://vercel.com/<seu-usuario>/<seu-projeto>/settings/environment-variables`)
-2.  Clique em **"Add"** para adicionar cada variável com o nome e valor correspondente.
-
-Alternativamente, se estiver desenvolvendo localmente, crie um arquivo **`.env.local`** dentro da pasta **`frontend`** do seu projeto com o seguinte conteúdo:
-
-```
-# Variável essencial para conectar ao Back-end Spring Boot rodando localmente (normalmente na porta 8080)
-VITE_API_URL=http://localhost:8080/api
-
-# Variáveis para integrações externas de serviço de e-mail
-VITE_EMAILJS_SERVICE_ID=seu_service_id_aqui
-VITE_EMAILJS_TEMPLATE_ID_FOR_ME=seu_template_id_for_me_aqui
-VITE_EMAILJS_TEMPLATE_ID_FOR_SENDER=seu_template_id_for_sender_aqui
-VITE_EMAILJS_PUBLIC_KEY=sua_public_key_aqui
-
-# Outras chaves de serviço
-VITE_GOOGLE_MAPS_KEY=AIzaSy...
-```
-
-> 💡 **Localização:** Garanta que este arquivo esteja em **`/frontend/.env.local`** para que o **Vite** consiga carregá-lo e disponibilizar as variáveis para o Front-end durante o desenvolvimento.
-
-### 📦 Instalação de Dependências
-
-Clone o repositório e instale as dependências.
+Clone o repositório e configure o arquivo de variáveis de ambiente.
 
 1.  **Clone o Repositório:**
 
@@ -291,190 +218,171 @@ git clone <URL_DO_SEU_REPOSITÓRIO>
 cd <pasta-do-projeto>
 ```
 
-2.  **Instale as Dependências (Monorepo):**
+2.  **Crie o arquivo `.env`:**
 
-Como o projeto está dividido, você precisa instalar as dependências separadamente para o Front-end (React, usando NPM/Yarn) e garantir que o Back-end (Spring Boot, usando Maven/Gradle Wrapper) tenha suas dependências resolvidas.
-
-#### Front-end (React)
-
-Acesse a pasta do Front-end e instale as dependências do Node.js:
+Na raiz do projeto (mesmo nível do `docker-compose.yml`), crie um arquivo `.env` com as variáveis listadas na seção anterior.
 
 ```bash
-cd frontend
-npm install
-# ou
-yarn install
-cd .. # Retorna para a raiz
+# Exemplo:
+DB_NAME=rentcars
+DB_USER=postgres
+DB_PASSWORD=postgres123
+DB_PORT_HOST=5432
+APP_PORT=8080
+SECURITY_ENABLED=false
+JWT_GENERATOR_SIGNATURE_SECRET=minha-chave-secreta
 ```
 
-#### Back-end (Spring Boot)
-
-O Spring Boot utiliza o **Maven Wrapper** (`./mvnw`) ou **Gradle Wrapper** (`./gradlew`) para gerenciar dependências. Execute o comando de instalação/build limpo antes de rodar.
-
-* **Usando Maven (`pom.xml`):**
-    ```bash
-    cd backend
-    ./mvnw clean install
-    cd ..
-    ```
-
-* **Usando Gradle (`build.gradle`):**
-    ```bash
-    cd backend
-    ./gradlew clean build
-    cd ..
-    ```
+> 💡 **Dica:** Se o arquivo `.env` já existir no repositório, verifique se os valores estão corretos para seu ambiente.
 
 ---
 
-### 💾 Inicialização do Banco de Dados (PostgreSQL)
+### 💾 Banco de Dados (PostgreSQL)
 
-O projeto utiliza **PostgreSQL**. A forma mais fácil de inicializar o banco é via Docker (para execução sem `docker-compose`):
+O projeto utiliza **PostgreSQL 16** como banco de dados. O banco é automaticamente inicializado e gerenciado via **Docker Compose**.
 
-1. **Rode o Container do PostgreSQL:**  
-   (Certifique-se que o Docker está em execução)
+**Schema do Banco:**
+O Micronaut gerencia o schema automaticamente via **Hibernate** (`hbm2ddl.auto=update`), criando e atualizando as tabelas conforme necessário no startup da aplicação.
 
-```bash
-docker run --name minha_db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=senha-segura-123 -e POSTGRES_DB=nome_do_banco -p 5432:5432 -d postgres:16
-```
+> ✅ **Nenhuma ação manual de migração é necessária** — o banco será criado automaticamente quando você rodar `docker-compose up`.
 
-2. **Execute as Migrações:**  
-   O Back-end **Spring Boot** geralmente gerencia o schema do banco de dados automaticamente no startup (via Hibernate `ddl-auto`) ou utilizando ferramentas como **Flyway** ou **Liquibase**.
-
-* **Se o Spring Boot gerencia o schema (padrão):** Nenhuma ação manual é necessária, basta rodar o Back-end (veja a próxima seção).
-* **Se usar Flyway/Liquibase via Maven:**
-    ```bash
-    cd backend
-    ./mvnw flyway:migrate
-    # ou
-    ./mvnw liquibase:update
-    ```
 ---
 
 ### ⚡ Como Executar a Aplicação
-Execute a aplicação em modo de desenvolvimento em **dois terminais separados**.
 
-#### Terminal 1: Back-end (Spring Boot)
+A aplicação roda completamente em Docker Compose com a API Micronaut e o banco de dados PostgreSQL.
 
-Inicie a API do Spring Boot. Ela tentará se conectar ao banco de dados rodando no Docker.
+#### 🐳 Docker Compose (Recomendado)
+
+Esta é a forma mais simples e recomendada para rodar a aplicação completa localmente.
+
+1. **Acesse a raiz do projeto:**
 
 ```bash
-cd backend
-./mvnw spring-boot:run
+cd /Users/artur/Desktop/rent-cars
 ```
-🚀 *O Back-end estará disponível em **http://localhost:8080**.*
+
+2. **Suba app + banco:**
+
+```bash
+docker-compose up -d --build
+```
+
+> 💡 O parâmetro `--build` reconstrói as imagens Docker com o código mais recente, e `-d` executa em segundo plano.
+
+3. **Verifique se os containers estão rodando:**
+
+```bash
+docker-compose ps
+```
+
+Você deve ver:
+- `rentcars-db` (PostgreSQL) com status `Healthy`
+- `rentcars-app` (Micronaut API) com status `Running`
+
+4. **Visualize os logs da aplicação:**
+
+```bash
+# Ver logs em tempo real
+docker-compose logs -f app
+
+# Ver apenas os últimos logs
+docker-compose logs app
+```
+
+🚀 *A API estará disponível em **http://localhost:8080***
 
 ---
 
-#### Terminal 2: Front-end (React, Vite)
+#### 📝 Testes Rápidos com cURL
 
-Inicie o servidor de desenvolvimento do Front-end.
+Depois que a aplicação estiver rodando, você pode testar as rotas:
+
+**Criar um novo usuário:**
 
 ```bash
-cd frontend
-npm run dev
-# ou
-yarn dev
+curl -X POST http://localhost:8080/users \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"João Silva","email":"joao@example.com"}'
 ```
-🎨 *O Front-end estará disponível em **http://localhost:5173** (ou a porta configurada no Vite/CRA).*
 
----
-
-#### 🐳 Execução Local Completa com Docker Compose (Incluindo Banco de Dados)
-
-Para uma execução local que inclui o serviço de Back-end (**Spring Boot**), Front-end (**React**) e o banco de dados **PostgreSQL**, usaremos o **`docker-compose`** para orquestração.
-
-Antes de tudo, certifique-se de que o **Docker Desktop** (no Mac/Windows) ou o **serviço Docker** (em Linux) está em execução.
-
-- **No Mac/Windows**: basta abrir o aplicativo **Docker Desktop**.
-- **No Linux**: rode o comando abaixo para iniciar o serviço:
+**Listar todos os usuários:**
 
 ```bash
-sudo systemctl start docker
+curl http://localhost:8080/users
 ```
 
 ---
 
-#### 📦 Passos para build, inicialização e execução
+#### 🛑 Como Parar a Aplicação
 
-1. Acesse a pasta raiz do projeto (onde o arquivo `docker-compose.yml` está localizado):
-
-```bash
-cd /caminho/do/projeto/nome-do-projeto
-```
-
-2. Suba todos os serviços (Back-end, Front-end e Banco de Dados) definidos no `docker-compose.yml`:
+**Parar containers (manter dados):**
 
 ```bash
-docker-compose up --build -d
+docker-compose stop
 ```
 
-> [!NOTE]
-> 💡 O parâmetro `--build` garante que as imagens mais recentes do projeto sejam geradas, e `-d` executa em segundo plano.
-
-3. Verifique se os containers estão rodando:
-
-```bash
-docker ps
-```
-
-4. **Execute as Migrações do Banco de Dados:**
-   O Back-end **Spring Boot** geralmente gerencia o schema do banco de dados (via Flyway/Liquibase ou Hibernate) na **inicialização do serviço**.
-
-* **Verificação:** Se o serviço de Back-end (`backend` ou `api`) for o responsável pelas migrações, verifique os logs para confirmar se o processo foi concluído.
-    ```bash
-    docker logs <nome_do_container_backend>
-    ```
-* *Atenção:* O comando `npm run db:migrate` é exclusivo para Node.js e **não** deve ser usado.
-
-5. Abra no navegador:
-   O Front-end deve estar acessível na porta configurada no `docker-compose` (Exemplo: <http://localhost:3000> ou <http://localhost:5173>)
-
-6. Para parar e remover todos os containers, redes e volumes (exceto volumes nomeados):
+**Parar e remover containers:**
 
 ```bash
 docker-compose down
 ```
 
-✅ **Em resumo:** Usar **`docker-compose`** simplifica a execução do ambiente completo, isolando as dependências de **Java (Spring Boot)** e **Node.js (React)** e garantindo que o PostgreSQL esteja disponível.
+**Reset completo (limpar todos os dados):**
+
+```bash
+docker-compose down -v
+docker-compose up -d --build
+```
+
+> ⚠️ O parâmetro `-v` remove os volumes, apagando todos os dados do banco de dados.
 
 ---
 
+#### 🔧 Troubleshooting Rápido
+
+| Problema | Solução |
+| :--- | :--- |
+| Erro: "no configuration file provided" | Execute o comando na raiz do projeto (onde está `docker-compose.yml`) |
+| Erro: "port 8080 is already in use" | Altere `APP_PORT` no arquivo `.env` para outra porta (ex: `9090`) |
+| Containers não iniciam | Verifique se o Docker Desktop está rodando e execute: `docker system prune` |
+| Erro de conexão com banco | Verifique os logs: `docker-compose logs db` |
+
+---
+
+#### 📱 Verificar Saúde do Sistema
+
+```bash
+# Ver status detalhado
+docker-compose ps
+
+# Ver logs de um serviço específico
+docker-compose logs app    # API
+docker-compose logs db     # Banco de dados
+
+# Acessar o banco PostgreSQL diretamente
+docker-compose exec db psql -U postgres -d rentcars -c "\dt"
+```
+---
+
 ## 🚀 Deploy
-Instruções claras para deploy em produção.
 
-1.  **Build do Projeto:**
-    Execute o build separadamente para os dois artefatos (JAR para o Back-end e arquivos estáticos para o Front-end).
+Instruções para deploy em produção usando Docker.
 
-```bash
-# 1. Build do Front-end (React/Vite) - Gera a pasta /dist com arquivos estáticos
-cd frontend
-npm run build
-
-# 2. Build do Back-end (Spring Boot/Maven) - Gera o arquivo .jar executável em /target
-cd ../backend
-./mvnw clean package
-```
-
-2.  **Configuração do Ambiente de Produção:** Defina as variáveis de ambiente no seu provedor (e.g., Vercel, Railway, Heroku, DigitalOcean).
-
-> 🔑 **Variáveis Cruciais:** Certifique-se de configurar as variáveis de **conexão com o banco de dados** (`SPRING_DATASOURCE_URL`, etc.) para o Back-end e a **URL da API de produção** (`VITE_API_URL`) para o Front-end.
-
-3.  **Execução em Produção:**
-    A forma de execução depende do seu provedor, mas geralmente envolve o seguinte:
+1.  **Build das Imagens Docker:**
+    Execute o build das imagens Docker.
 
 ```bash
-# ☕ Execução do Back-end Spring Boot (Java JAR)
-# Este comando inicia a API usando o artefato JAR gerado.
-java -jar backend/target/nome-do-do-projeto-0.0.1-SNAPSHOT.jar
-
-# 🟢 Execução do Front-end (React/Vite)
-# O Front-end (arquivos estáticos) não é executado via Node, mas servido por um servidor web.
-# Exemplo de servidor de arquivos estáticos (usando Nginx, Vercel, Netlify, etc.)
-# Para simular a produção localmente ou rodar em uma VPS simples, use o pacote 'serve':
-npm install -g serve
-serve -s frontend/dist
+# Na raiz do projeto, construir as imagens
+cd /caminho/do/projeto
+docker-compose build
 ```
+
+2.  **Configuração do Ambiente de Produção:** Configure as variáveis de ambiente no arquivo `.env`.
+
+> 🔑 **Variáveis Cruciais:** Configure credenciais seguras usando secret managers.
+
+3.  **Execução em Produção:** A forma de execução depende do seu provedor (Docker, Kubernetes, Cloud Platforms).
 
 ---
 
@@ -485,100 +393,52 @@ Descreva o propósito das pastas principais.
 ```
 .
 ├── .editorconfig                # ✍️ Padronização de estilo de código.
-├── .env.local                   # 🔒 Variáveis SENSÍVEIS do ambiente LOCAL (não versionado).
-├── .env.test                    # 🧪 Variáveis de ambiente para TESTES AUTOMATIZADOS.
-├── .env.staging                 # ☁️ Variáveis de ambiente para STAGING/HOMOLOGAÇÃO.
-├── .env.example                 # 🧩 Exemplo de TODAS as variáveis necessárias (sem valores sensíveis).
-├── .gitignore                   # 🧹 Ignora arquivos/pastas não versionadas (.env, node_modules, target, etc.).
-├── .vscode/                     # ⚙️ Configurações de ambiente da IDE (opcional).
+├── .env                         # 🔑 Variáveis de ambiente (NÃO versionado - adicionar ao .gitignore).
+├── .env.example                 # 🧩 Exemplo de variáveis de ambiente necessárias.
+├── .gitignore                   # 🧹 Ignora arquivos/pastas não versionadas (.env, target, etc.).
 ├── .github/                     # 🤖 CI/CD (Actions), templates de Issues e Pull Requests.
 ├── README.md                    # 📘 Documentação principal do projeto.
 ├── CONTRIBUTING.md              # 🤝 Guia de contribuição.
 ├── LICENSE                      # ⚖️ Licença do projeto.
-├── docker-compose.yml           # 🐳 Orquestração dos containers (front/back/db/etc).
-├── docker-compose.override.yml  # 🐳 Configurações extras apenas para desenvolvimento.
+├── docker-compose.yml           # 🐳 Orquestração dos containers (Micronaut API + PostgreSQL).
 │
-├── /frontend                    # 📁 Aplicação React
-│   ├── .env.example             # 🧩 Variáveis de ambiente do Front-end.
-│   ├── Dockerfile               # 🐳 Docker build do Front-end.
-│   ├── .eslintrc.js             # ✨ Regras do ESLint.
-│   ├── .prettierrc              # 🎨 Configuração do Prettier.
-│   ├── /public                  # 📂 Arquivos estáticos e index.html.
-│   ├── /src                     # 📂 Código-fonte React
-│   │   ├── /components          # 🧱 Componentes reutilizáveis (UI).
-│   │   ├── /pages               # 📄 Páginas/rotas da aplicação.
-│   │   ├── /services            # 🔌 Serviços e chamadas HTTP.
-│   │   ├── /hooks               # 🎣 Hooks personalizados.
-│   │   ├── /styles              # 🎨 Estilos globais, temas, Design System.
-│   │   ├── /assets              # 🖼️ Recursos estáticos importados
-│   │   │   ├── /images          # 🖼️ Imagens.
-│   │   │   ├── /icons           # 💡 Ícones.
-│   │   │   └── /fonts           # ✒️ Fontes personalizadas.
-│   │   └── /utils               # 🛠️ Funções utilitárias.
-│   ├── package.json             # 📦 Dependências e scripts.
-│   └── yarn.lock / package-lock.json # 🔒 Lockfile das dependências.
-│
-├── /backend                     # 📁 Aplicação Spring Boot
-│   ├── .env.example             # 🧩 Variáveis de ambiente do Back-end.
-│   ├── Dockerfile               # 🐳 Docker build do Back-end.
+├── /server                      # 📁 API Micronaut (Back-end)
+│   ├── pom.xml                  # 📦 Dependências Maven.
+│   ├── Dockerfile               # 🐳 Build multi-stage: Maven + Java 21.
+│   ├── mvnw / mvnw.bat          # 🔧 Maven Wrapper (cross-platform).
 │   │
-│   ├── /src/main/java           # 📂 Código-fonte Java
-│   │   └── /com/exemplo/app
-│   │       ├── /controller      # 🎮 Endpoints REST.
-│   │       ├── /service         # ⚙️ Regras e lógica de negócio.
-│   │       ├── /repository      # 🗄️ Repositórios (JPA/Hibernate).
-│   │       ├── /model           # 🧬 Entidades persistentes (JPA).
-│   │       ├── /domain          # 🌐 Objetos de Domínio puro (sem anotações).
-│   │       ├── /dto             # ✉️ Data Transfer Objects.
-│   │       ├── /config          # 🔧 Configurações gerais (DB, Swagger, CORS, etc.).
-│   │       ├── /exception       # 💥 Exceptions e handlers globais.
-│   │       └── /security        # 🛡️ Autenticação e Autorização (Spring Security).
-│   │
-│   ├── /src/main/resources      # 📂 Recursos do Spring Boot
-│   │   ├── application.yml         # ⚙️ Configuração principal da aplicação
-│   │   ├── application-dev.yml     # 🧪 Configurações específicas do ambiente de DESENVOLVIMENTO
-│   │   ├── application-prod.yml    # 🚀 Configurações específicas para PRODUÇÃO
-│   │   ├── application-test.yml    # 🧪 Configurações usadas nos testes automatizados
-│   │   ├── /static                # 🌐 Arquivos estáticos (HTML/CSS/JS).
-│   │   ├── /templates             # 🖼️ Templates Thymeleaf/Freemarker.
-│   │   ├── /messages              # 🌎 Arquivos de internacionalização (i18n).
-│   │   └── /db                    # 💾 Scripts de banco usados pela aplicação
-│   │       └── /migration         # 📜 Migrações do banco (Flyway/Liquibase).
-│   │
-│   ├── /src/test/java            # 🧪 Testes unitários e de integração.
-│   └── pom.xml / build.gradle    # 🛠️ Build e dependências.
+│   └── /src                     # 📂 Código-fonte
+│       ├── /main/java/br/pucminas                # 📁 Código principal
+│       │   ├── Application.java                  # 🚀 Ponto de entrada.
+│       │   ├── /controller      # 🎛️ Controllers REST (endpoints).
+│       │   ├── /service         # 🔧 Lógica de negócio.
+│       │   ├── /repository      # 💾 Acesso a dados (JPA).
+│       │   ├── /model           # 📋 Entidades/DTOs.
+│       │   └── /...             # Outras camadas conforme necessário.
+│       │
+│       ├── /main/resources                       # 📁 Recursos
+│       │   ├── application.properties            # ⚙️ Configurações da aplicação.
+│       │   ├── logback.xml                       # 📝 Configuração de logs.
+│       │   └── db/migration/                     # 📊 Scripts SQL (se usar Flyway/Liquibase).
+│       │
+│       └── /test/java                           # 🧪 Testes unitários e de integração.
 │
-├── /scripts                      # 📜 Scripts de automação
-│   ├── dev.sh                    # 🚀 Ambiente de desenvolvimento completo.
-│   ├── build_all.sh              # 🛠️ Build geral (front + back).
-│   └── deploy.sh                 # ☁️ Deploy em produção/homologação.
+├── /docs                        # 📚 Documentação do projeto
+│   ├── /diagrams                # 📊 Diagramas (UML, arquitetura, etc.).
+│   │   ├── /class-diagram       # 🏗️ Diagrama de classes.
+│   │   ├── /package-diagram     # 📦 Diagrama de pacotes.
+│   │   └── /use-case            # 👥 Diagramas de caso de uso.
+│   │
+│   └── /user-history            # 📖 Histórias de usuário e requisitos.
 │
-├── /docs                         # 📚 Documentação, arquitetura, modelos C4, Swagger/OpenAPI.
-└── /tests                        # 🧪 Testes End-to-End (Cypress/Playwright).
+└── .vscode/                     # ⚙️ Configurações recomendadas do VS Code (opcional).
 ```
 
 ---
 
-## 🎥 Demonstração
+## 🧪 Testes
 
-Use GIFs e prints para mostrar o projeto em ação.  
-
-> [!WARNING]
-> Dê preferência a hospedar suas imagens em um **CDN** (Content Delivery Network) ou no **GitHub Pages** para garantir que elas carreguem rapidamente e não quebrem. Saiba mais sobre o GitHub Pages clicando [aqui](https://github.com/joaopauloaramuni/joaopauloaramuni.github.io).
-
-### 📱 Aplicativo Mobile
-
-- GIF de demonstração (exemplo de fluxo de usuário):  
-
-| Demonstração 1 | Demonstração 2 | Demonstração 3 | Demonstração 4 |
-|----------------|----------------|----------------|----------------|
-| <img src="https://joaopauloaramuni.github.io/image/fundo_mobile_engsoft.jpeg" alt="Demonstração 1" height="400"> | <img src="https://joaopauloaramuni.github.io/image/fundo_mobile_engsoft.jpeg" alt="Demonstração 2" height="400"> | <img src="https://joaopauloaramuni.github.io/image/fundo_mobile_engsoft.jpeg" alt="Demonstração 3" height="400"> | <img src="https://joaopauloaramuni.github.io/image/fundo_mobile_engsoft.jpeg" alt="Demonstração 4" height="400"> |
-| _Sua gif aqui_ | _Sua gif aqui_ | _Sua gif aqui_ | _Sua gif aqui_ |
-
-Para melhor visualização, as telas principais estão organizadas lado a lado.
-
-| Tela | Captura de Tela |
-| :---: | :---: |
+Execute os testes unitários da API Micronaut:
 | **Tela Inicial (Home)** | **Tela de Perfil / Settings** |
 | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 1 do Mobile" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 2 do Mobile" width="120px" height="120px"> |
 | **Tela de Cadastro** | **Tela de Lista / Detalhes** |
