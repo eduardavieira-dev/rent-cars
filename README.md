@@ -38,11 +38,11 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
   - [Como Executar a Aplicação](#-como-executar-a-aplicação)
 - [Deploy](#-deploy)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
-- [Testes](#-testes)
 - [Demonstração](#-demonstração)
   - [Aplicativo Mobile](#-aplicativo-mobile)
   - [Aplicação Web](#-aplicação-web)
   - [Exemplo de saída no Terminal (para Back-end, API, CLI)](#-exemplo-de-saída-no-terminal-para-back-end-api-cli)
+- [Endpoints da API](#-endpoints-da-api)
 - [Testes](#-testes)
 - [Documentações utilizadas](#-documentações-utilizadas)
 - [Autores](#-autores)
@@ -296,20 +296,27 @@ docker-compose logs app
 
 #### 📝 Testes Rápidos com cURL
 
-Depois que a aplicação estiver rodando, você pode testar as rotas:
+Com a aplicação rodando, você pode verificar rapidamente o funcionamento básico.
+Para a lista completa de todos os endpoints com exemplos detalhados, consulte a seção [Endpoints da API](#-endpoints-da-api).
 
-**Criar um novo usuário:**
-
+**Registrar um cliente:**
 ```bash
-curl -X POST http://localhost:8080/users \
+curl -X POST http://localhost:8080/auth/register/client \
   -H "Content-Type: application/json" \
-  -d '{"nome":"João Silva","email":"joao@example.com"}'
+  -d '{"name":"João Silva","email":"joao@example.com","phone":"(31) 99999-9999","password":"senha123","cpf":"123.456.789-09"}'
 ```
 
-**Listar todos os usuários:**
-
+**Fazer login:**
 ```bash
-curl http://localhost:8080/users
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"joao@example.com","password":"senha123"}'
+```
+
+**Listar todos os usuários (autenticado):**
+```bash
+curl http://localhost:8080/users \
+  -H "Authorization: Bearer <access_token>"
 ```
 
 ---
@@ -436,9 +443,10 @@ Descreva o propósito das pastas principais.
 
 ---
 
-## 🧪 Testes
+## 📺 Demonstração
 
-Execute os testes unitários da API Micronaut:
+### 📱 Aplicativo Mobile
+
 | **Tela Inicial (Home)** | **Tela de Perfil / Settings** |
 | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 1 do Mobile" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 2 do Mobile" width="120px" height="120px"> |
 | **Tela de Cadastro** | **Tela de Lista / Detalhes** |
@@ -514,23 +522,274 @@ Tempo de execução: 1.25s
 
 ---
 
+## 🔌 Endpoints da API
+
+A API disponibiliza os seguintes endpoints. Os endpoints marcados com 🔒 requerem autenticação via **Bearer Token JWT**.
+
+> 💡 **Como obter o token:** autentique-se via `POST /login` e utilize o `access_token` retornado nas requisições protegidas com o cabeçalho `Authorization: Bearer <access_token>`.
+
+> **Nota:** quando `SECURITY_ENABLED=false` no `.env`, a segurança é desabilitada e o cabeçalho de autorização pode ser omitido.
+
+---
+
+### 🔓 Autenticação
+
+**Login**
+```bash
+curl -X POST http://localhost:8080/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"joao@example.com","password":"senha123"}'
+```
+
+**Registrar cliente**
+```bash
+curl -X POST http://localhost:8080/auth/register/client \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "João Silva",
+    "email": "joao@example.com",
+    "phone": "(31) 99999-9999",
+    "password": "senha123",
+    "cpf": "123.456.789-09",
+    "rg": "MG-12.345",
+    "address": "Rua das Flores, 100",
+    "profession": "Engenheiro"
+  }'
+```
+
+**Registrar banco**
+```bash
+curl -X POST http://localhost:8080/auth/register/bank \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Banco Exemplo S.A.",
+    "email": "contato@banco.com",
+    "phone": "(31) 3333-3333",
+    "password": "senha123",
+    "cnpj": "12.345.678/0001-99",
+    "code": "341"
+  }'
+```
+
+**Registrar empresa**
+```bash
+curl -X POST http://localhost:8080/auth/register/company \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Empresa Exemplo LTDA",
+    "email": "contato@empresa.com",
+    "phone": "(31) 3333-4444",
+    "password": "senha123",
+    "cnpj": "98.765.432/0001-10",
+    "corporateName": "Empresa Exemplo Comércio LTDA"
+  }'
+```
+
+---
+
+### 👤 Usuários 🔒
+
+**Listar todos os usuários**
+```bash
+curl http://localhost:8080/users \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Buscar usuário por ID**
+```bash
+curl http://localhost:8080/users/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Atualizar cliente**
+```bash
+curl -X PUT http://localhost:8080/users/client/<uuid> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "name": "João Silva Atualizado",
+    "email": "joao.novo@example.com",
+    "phone": "(31) 98888-8888",
+    "cpf": "123.456.789-09",
+    "address": "Av. Principal, 200",
+    "profession": "Analista de Sistemas"
+  }'
+```
+
+**Atualizar banco**
+```bash
+curl -X PUT http://localhost:8080/users/bank/<uuid> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "name": "Banco Atualizado S.A.",
+    "email": "novo@banco.com",
+    "phone": "(31) 3333-5555",
+    "cnpj": "12.345.678/0001-99",
+    "code": "341"
+  }'
+```
+
+**Atualizar empresa**
+```bash
+curl -X PUT http://localhost:8080/users/company/<uuid> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "name": "Empresa Atualizada LTDA",
+    "email": "novo@empresa.com",
+    "phone": "(31) 3333-6666",
+    "cnpj": "98.765.432/0001-10",
+    "corporateName": "Empresa Atualizada Comércio LTDA"
+  }'
+```
+
+**Excluir usuário**
+```bash
+curl -X DELETE http://localhost:8080/users/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
+
+### 🏢 Entidades Empregadoras 🔒
+
+**Criar entidade empregadora**
+```bash
+curl -X POST http://localhost:8080/employer-entities \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "name": "Tech Solutions LTDA",
+    "cnpj": "11.222.333/0001-44"
+  }'
+```
+
+**Listar todas as entidades empregadoras**
+```bash
+curl http://localhost:8080/employer-entities \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Buscar entidade empregadora por ID**
+```bash
+curl http://localhost:8080/employer-entities/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Atualizar entidade empregadora**
+```bash
+curl -X PUT http://localhost:8080/employer-entities/<uuid> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "name": "Tech Solutions Atualizada LTDA",
+    "cnpj": "11.222.333/0001-44"
+  }'
+```
+
+**Excluir entidade empregadora**
+```bash
+curl -X DELETE http://localhost:8080/employer-entities/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
+
+### 💼 Vínculos Empregatícios 🔒
+
+**Criar vínculo empregatício**
+```bash
+curl -X POST http://localhost:8080/employments \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "earnedIncome": 5000.00,
+    "jobTitle": "Desenvolvedor Backend",
+    "clientId": "<uuid-do-cliente>",
+    "employerEntityId": "<uuid-da-entidade>"
+  }'
+```
+
+**Listar todos os vínculos empregatícios**
+```bash
+curl http://localhost:8080/employments \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Buscar vínculo por ID**
+```bash
+curl http://localhost:8080/employments/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Listar vínculos por cliente**
+```bash
+curl http://localhost:8080/employments/client/<uuid-do-cliente> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Atualizar vínculo empregatício**
+```bash
+curl -X PUT http://localhost:8080/employments/<uuid> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{
+    "earnedIncome": 6500.00,
+    "jobTitle": "Desenvolvedor Sênior",
+    "employerEntityId": "<uuid-da-entidade>"
+  }'
+```
+
+**Excluir vínculo empregatício**
+```bash
+curl -X DELETE http://localhost:8080/employments/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
+
 ## 🧪 Testes
 
-### Testes Unitários e de Integração
-Para rodar os testes da unidade e integração:
+O projeto utiliza **JUnit 5** como framework de testes e **Mockito** para mocking, executados via **Micronaut Test** — que provisiona um contexto de aplicação Micronaut completo para testes de integração com banco H2 em memória.
+
+### Estrutura dos testes
+
+| Tipo | Descrição | Exemplos |
+| :--- | :--- | :--- |
+| **Unitários** | Testam a lógica de negócio de forma isolada, com mocks dos repositórios via Mockito | `UserServiceTest`, `EmployerEntityServiceTest`, `EmploymentServiceTest` |
+| **Integração** | Testam os endpoints HTTP com servidor Micronaut real e banco H2 em memória | `UserControllerTest`, `EmployerEntityControllerTest`, `EmploymentControllerTest`, `AuthControllerTest`, `AuthenticationTest` |
+
+### Como executar os testes
+
+Entre na pasta `server` e execute via Maven Wrapper:
+
+```bash
+cd server
+./mvnw test
+```
+
+Para rodar um arquivo de teste específico:
+```bash
+./mvnw test -Dtest=UserServiceTest
+```
+
+Para rodar um método de teste específico:
+```bash
+./mvnw test -Dtest=UserServiceTest#shouldCreateUserSuccessfully
+```
+
+### Resultado esperado
 
 ```
-npm run test
+Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
 ```
-*Ferramenta utilizada: Jest, Vitest, Mocha, etc.*
 
-### Testes End-to-End (E2E)
-Para rodar os testes de ponta a ponta (E2E):
-
+Os relatórios detalhados em XML e TXT ficam disponíveis em:
 ```
-npm run test:e2e
+server/target/surefire-reports/
 ```
-*Ferramenta utilizada: Cypress, Playwright, Selenium, etc.*
 
 ---
 
