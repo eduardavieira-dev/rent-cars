@@ -21,9 +21,6 @@ public class EmployerEntity {
     @Column(nullable = false, unique = true)
     private String cnpj;
 
-    protected EmployerEntity() {
-    }
-
     public EmployerEntity(String name, String cnpj) {
         this.name = name;
         this.cnpj = cnpj;
