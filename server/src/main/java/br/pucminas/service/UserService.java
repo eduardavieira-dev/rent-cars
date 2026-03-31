@@ -11,6 +11,7 @@ import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -50,7 +51,7 @@ public class UserService {
         return toResponse(userRepository.save(company));
     }
 
-    public UserResponse findById(Long id) {
+    public UserResponse findById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         return toResponse(user);
@@ -63,7 +64,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateClient(Long id, UpdateClientRequest request) {
+    public UserResponse updateClient(UUID id, UpdateClientRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         if (!(user instanceof Client client)) {
@@ -81,7 +82,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateBank(Long id, UpdateBankRequest request) {
+    public UserResponse updateBank(UUID id, UpdateBankRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         if (!(user instanceof Bank bank)) {
@@ -97,7 +98,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateCompany(Long id, UpdateCompanyRequest request) {
+    public UserResponse updateCompany(UUID id, UpdateCompanyRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
         if (!(user instanceof Company company)) {
@@ -113,7 +114,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException(id);
         }
@@ -126,7 +127,7 @@ public class UserService {
         }
     }
 
-    private void validateEmailUniquenessForUpdate(String email, Long currentUserId) {
+    private void validateEmailUniquenessForUpdate(String email, UUID currentUserId) {
         if (userRepository.existsByEmailAndIdNot(email, currentUserId)) {
             throw new EmailAlreadyExistsException(email);
         }

@@ -18,6 +18,7 @@ import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -59,7 +60,7 @@ public class EmploymentService {
         return toResponse(employmentRepository.save(employment));
     }
 
-    public EmploymentResponse findById(Long id) {
+    public EmploymentResponse findById(UUID id) {
         Employment employment = employmentRepository.findById(id)
                 .orElseThrow(() -> new EmploymentNotFoundException(id));
         return toResponse(employment);
@@ -71,14 +72,14 @@ public class EmploymentService {
                 .collect(Collectors.toList());
     }
 
-    public List<EmploymentResponse> listByClientId(Long clientId) {
+    public List<EmploymentResponse> listByClientId(UUID clientId) {
         return employmentRepository.findByClientId(clientId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public EmploymentResponse update(Long id, UpdateEmploymentRequest request) {
+    public EmploymentResponse update(UUID id, UpdateEmploymentRequest request) {
         Employment employment = employmentRepository.findById(id)
                 .orElseThrow(() -> new EmploymentNotFoundException(id));
 
@@ -92,7 +93,7 @@ public class EmploymentService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         if (!employmentRepository.existsById(id)) {
             throw new EmploymentNotFoundException(id);
         }

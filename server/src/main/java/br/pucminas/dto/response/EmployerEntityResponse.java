@@ -3,10 +3,12 @@ package br.pucminas.dto.response;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 
+import java.util.UUID;
+
 @Serdeable
 @Introspected
 public record EmployerEntityResponse(
-        Long id,
+        UUID id,
         String nome,
         String cnpj) {
 }

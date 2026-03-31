@@ -13,6 +13,7 @@ import io.micronaut.validation.Validated;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller("/employer-entities")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -40,19 +41,19 @@ public class EmployerEntityController {
 
     @Get("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public EmployerEntityResponse findById(Long id) {
+    public EmployerEntityResponse findById(UUID id) {
         return service.findById(id);
     }
 
     @Put("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public EmployerEntityResponse update(Long id, @Valid @Body UpdateEmployerEntityRequest request) {
+    public EmployerEntityResponse update(UUID id, @Valid @Body UpdateEmployerEntityRequest request) {
         return service.update(id, request);
     }
 
     @Delete("/{id}")
-    public HttpResponse<Void> delete(Long id) {
+    public HttpResponse<Void> delete(UUID id) {
         service.delete(id);
         return HttpResponse.noContent();
     }

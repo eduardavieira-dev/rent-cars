@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -103,7 +104,7 @@ class EmployerEntityControllerTest {
         HttpResponse<EmployerEntityResponse> createResp = client.toBlocking()
                 .exchange(HttpRequest.POST("/employer-entities", request).bearerAuth(accessToken),
                         EmployerEntityResponse.class);
-        Long id = createResp.body().id();
+        UUID id = createResp.body().id();
 
         var response = client.toBlocking()
                 .exchange(HttpRequest.GET("/employer-entities/" + id).bearerAuth(accessToken),
@@ -117,7 +118,7 @@ class EmployerEntityControllerTest {
     void shouldReturn404ForNonExistentEmployerEntity() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking()
-                        .exchange(HttpRequest.GET("/employer-entities/99999").bearerAuth(accessToken),
+                        .exchange(HttpRequest.GET("/employer-entities/" + UUID.randomUUID()).bearerAuth(accessToken),
                                 EmployerEntityResponse.class));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -129,7 +130,7 @@ class EmployerEntityControllerTest {
         HttpResponse<EmployerEntityResponse> createResp = client.toBlocking()
                 .exchange(HttpRequest.POST("/employer-entities", createReq).bearerAuth(accessToken),
                         EmployerEntityResponse.class);
-        Long id = createResp.body().id();
+        UUID id = createResp.body().id();
 
         var updateReq = new UpdateEmployerEntityRequest("Emp Updated", "50555666000100");
         var response = client.toBlocking()
@@ -146,7 +147,7 @@ class EmployerEntityControllerTest {
         HttpResponse<EmployerEntityResponse> createResp = client.toBlocking()
                 .exchange(HttpRequest.POST("/employer-entities", createReq).bearerAuth(accessToken),
                         EmployerEntityResponse.class);
-        Long id = createResp.body().id();
+        UUID id = createResp.body().id();
 
         try {
             client.toBlocking()
@@ -165,7 +166,8 @@ class EmployerEntityControllerTest {
     void shouldReturn404WhenDeletingNonExistentEmployerEntity() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking()
-                        .exchange(HttpRequest.DELETE("/employer-entities/99999").bearerAuth(accessToken)));
+                        .exchange(
+                                HttpRequest.DELETE("/employer-entities/" + UUID.randomUUID()).bearerAuth(accessToken)));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }

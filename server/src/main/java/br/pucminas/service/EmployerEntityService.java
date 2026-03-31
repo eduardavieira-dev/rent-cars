@@ -11,6 +11,7 @@ import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,7 +33,7 @@ public class EmployerEntityService {
         return toResponse(repository.save(entity));
     }
 
-    public EmployerEntityResponse findById(Long id) {
+    public EmployerEntityResponse findById(UUID id) {
         EmployerEntity entity = repository.findById(id)
                 .orElseThrow(() -> new EmployerEntityNotFoundException(id));
         return toResponse(entity);
@@ -45,7 +46,7 @@ public class EmployerEntityService {
     }
 
     @Transactional
-    public EmployerEntityResponse update(Long id, UpdateEmployerEntityRequest request) {
+    public EmployerEntityResponse update(UUID id, UpdateEmployerEntityRequest request) {
         EmployerEntity entity = repository.findById(id)
                 .orElseThrow(() -> new EmployerEntityNotFoundException(id));
         if (repository.existsByCnpjAndIdNot(request.cnpj(), id)) {
@@ -57,7 +58,7 @@ public class EmployerEntityService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         if (!repository.existsById(id)) {
             throw new EmployerEntityNotFoundException(id);
         }

@@ -14,6 +14,7 @@ import io.micronaut.validation.Validated;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller("/users")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -34,33 +35,33 @@ public class UserController {
 
     @Get("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserResponse getUser(Long id) {
+    public UserResponse getUser(UUID id) {
         return userService.findById(id);
     }
 
     @Put("/client/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserResponse updateClient(Long id, @Valid @Body UpdateClientRequest request) {
+    public UserResponse updateClient(UUID id, @Valid @Body UpdateClientRequest request) {
         return userService.updateClient(id, request);
     }
 
     @Put("/bank/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserResponse updateBank(Long id, @Valid @Body UpdateBankRequest request) {
+    public UserResponse updateBank(UUID id, @Valid @Body UpdateBankRequest request) {
         return userService.updateBank(id, request);
     }
 
     @Put("/company/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserResponse updateCompany(Long id, @Valid @Body UpdateCompanyRequest request) {
+    public UserResponse updateCompany(UUID id, @Valid @Body UpdateCompanyRequest request) {
         return userService.updateCompany(id, request);
     }
 
     @Delete("/{id}")
-    public HttpResponse<Void> deleteUser(Long id) {
+    public HttpResponse<Void> deleteUser(UUID id) {
         userService.deleteUser(id);
         return HttpResponse.noContent();
     }

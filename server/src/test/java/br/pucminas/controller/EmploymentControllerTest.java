@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +34,7 @@ class EmploymentControllerTest {
     HttpClient client;
 
     private String accessToken;
-    private Long employerEntityId;
+    private UUID employerEntityId;
 
     private static final AtomicInteger COUNTER = new AtomicInteger(1);
 
@@ -69,7 +70,7 @@ class EmploymentControllerTest {
         }
     }
 
-    private Long createFreshClient() {
+    private UUID createFreshClient() {
         int n = COUNTER.getAndIncrement();
         String cpf = String.format("5%010d", n);
         String email = "empclient" + n + "@email.com";
@@ -83,7 +84,7 @@ class EmploymentControllerTest {
 
     @Test
     void shouldCreateEmployment() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(5000.0, "Analista de Sistemas", cid, employerEntityId);
 
         HttpResponse<EmploymentResponse> response = client.toBlocking()
@@ -102,7 +103,7 @@ class EmploymentControllerTest {
 
     @Test
     void shouldListAllEmployments() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(6000.0, "Dev ListAll", cid, employerEntityId);
         client.toBlocking().exchange(
                 HttpRequest.POST("/employments", request).bearerAuth(accessToken),
@@ -119,12 +120,12 @@ class EmploymentControllerTest {
 
     @Test
     void shouldGetEmploymentById() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(7000.0, "Dev FindById", cid, employerEntityId);
         HttpResponse<EmploymentResponse> createResp = client.toBlocking()
                 .exchange(HttpRequest.POST("/employments", request).bearerAuth(accessToken),
                         EmploymentResponse.class);
-        Long empId = createResp.body().id();
+        UUID empId = createResp.body().id();
 
         var response = client.toBlocking()
                 .exchange(HttpRequest.GET("/employments/" + empId).bearerAuth(accessToken),
@@ -136,7 +137,7 @@ class EmploymentControllerTest {
 
     @Test
     void shouldListEmploymentsByClient() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(3000.0, "Dev ByClient", cid, employerEntityId);
         client.toBlocking().exchange(
                 HttpRequest.POST("/employments", request).bearerAuth(accessToken),
@@ -156,7 +157,7 @@ class EmploymentControllerTest {
     void shouldReturn404ForNonExistentEmployment() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking()
-                        .exchange(HttpRequest.GET("/employments/99999").bearerAuth(accessToken),
+                        .exchange(HttpRequest.GET("/employments/" + UUID.randomUUID()).bearerAuth(accessToken),
                                 EmploymentResponse.class));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -164,12 +165,12 @@ class EmploymentControllerTest {
 
     @Test
     void shouldUpdateEmployment() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var createReq = new CreateEmploymentRequest(4000.0, "Dev Junior", cid, employerEntityId);
         HttpResponse<EmploymentResponse> createResp = client.toBlocking()
                 .exchange(HttpRequest.POST("/employments", createReq).bearerAuth(accessToken),
                         EmploymentResponse.class);
-        Long empId = createResp.body().id();
+        UUID empId = createResp.body().id();
 
         var updateReq = new UpdateEmploymentRequest(8000.0, "Dev Senior", employerEntityId);
 
@@ -184,12 +185,12 @@ class EmploymentControllerTest {
 
     @Test
     void shouldDeleteEmployment() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var createReq = new CreateEmploymentRequest(2000.0, "Dev Delete", cid, employerEntityId);
         HttpResponse<EmploymentResponse> createResp = client.toBlocking()
                 .exchange(HttpRequest.POST("/employments", createReq).bearerAuth(accessToken),
                         EmploymentResponse.class);
-        Long empId = createResp.body().id();
+        UUID empId = createResp.body().id();
 
         try {
             client.toBlocking()
@@ -208,14 +209,14 @@ class EmploymentControllerTest {
     void shouldReturn404WhenDeletingNonExistentEmployment() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking()
-                        .exchange(HttpRequest.DELETE("/employments/99999").bearerAuth(accessToken)));
+                        .exchange(HttpRequest.DELETE("/employments/" + UUID.randomUUID()).bearerAuth(accessToken)));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
 
     @Test
     void shouldRejectInvalidRendimentoAuferido() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(-1.0, "Dev", cid, employerEntityId);
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
@@ -228,7 +229,7 @@ class EmploymentControllerTest {
 
     @Test
     void shouldRejectBlankCargo() {
-        Long cid = createFreshClient();
+        UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(5000.0, "", cid, employerEntityId);
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
@@ -250,7 +251,7 @@ class EmploymentControllerTest {
 
     @Test
     void shouldRejectNonExistentClientId() {
-        var request = new CreateEmploymentRequest(5000.0, "Dev", 99999L, employerEntityId);
+        var request = new CreateEmploymentRequest(5000.0, "Dev", UUID.randomUUID(), employerEntityId);
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking().exchange(
@@ -262,8 +263,8 @@ class EmploymentControllerTest {
 
     @Test
     void shouldRejectNonExistentEmployerEntityId() {
-        Long cid = createFreshClient();
-        var request = new CreateEmploymentRequest(5000.0, "Dev", cid, 99999L);
+        UUID cid = createFreshClient();
+        var request = new CreateEmploymentRequest(5000.0, "Dev", cid, UUID.randomUUID());
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking().exchange(

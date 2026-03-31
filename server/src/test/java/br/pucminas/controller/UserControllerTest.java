@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,7 +67,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/client", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         var response = client.toBlocking()
                 .exchange(HttpRequest.GET("/users/" + userId).bearerAuth(accessToken), UserResponse.class);
@@ -82,7 +83,8 @@ class UserControllerTest {
     void shouldReturn404ForNonExistentUser() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking()
-                        .exchange(HttpRequest.GET("/users/99999").bearerAuth(accessToken), UserResponse.class));
+                        .exchange(HttpRequest.GET("/users/" + UUID.randomUUID()).bearerAuth(accessToken),
+                                UserResponse.class));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
@@ -95,7 +97,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/client", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         var updateRequest = new UpdateClientRequest(
                 "Updated Client", "updateclient@email.com", "31999990203",
@@ -119,7 +121,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/bank", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         var updateRequest = new UpdateBankRequest(
                 "Updated Bank", "updatebank@email.com", "31999990205",
@@ -141,7 +143,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/company", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         var updateRequest = new UpdateCompanyRequest(
                 "Updated Company", "updatecomp@email.com", "31999990207",
@@ -163,7 +165,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/client", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         try {
             client.toBlocking()
@@ -181,7 +183,7 @@ class UserControllerTest {
     void shouldReturn404WhenDeletingNonExistentUser() {
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
                 () -> client.toBlocking()
-                        .exchange(HttpRequest.DELETE("/users/99999").bearerAuth(accessToken)));
+                        .exchange(HttpRequest.DELETE("/users/" + UUID.randomUUID()).bearerAuth(accessToken)));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
     }
@@ -198,7 +200,7 @@ class UserControllerTest {
                 "88899900011", null, null, null);
         HttpResponse<UserResponse> response2 = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/client", request2), UserResponse.class);
-        Long user2Id = response2.body().id();
+        UUID user2Id = response2.body().id();
 
         var updateRequest = new UpdateClientRequest(
                 "User Two", "userone@email.com", "31999990210",
@@ -220,7 +222,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/client", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         var updateRequest = new UpdateClientRequest(
                 "Same Email Updated", "sameemail@email.com", "31999990212",
@@ -242,7 +244,7 @@ class UserControllerTest {
 
         HttpResponse<UserResponse> createResponse = client.toBlocking()
                 .exchange(HttpRequest.POST("/auth/register/client", registerRequest), UserResponse.class);
-        Long userId = createResponse.body().id();
+        UUID userId = createResponse.body().id();
 
         var updateRequest = new UpdateClientRequest(
                 "AB", "not-email", "123",

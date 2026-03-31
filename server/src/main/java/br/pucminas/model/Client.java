@@ -17,6 +17,9 @@ public class Client extends User {
 
     private String profession;
 
+    protected Client() {
+    }
+
     public Client(String name, String email, String phone, String password,
             String cpf, String rg, String address, String profession) {
         super(name, email, phone, password);

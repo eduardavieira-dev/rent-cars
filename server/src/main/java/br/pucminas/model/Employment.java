@@ -3,14 +3,17 @@ package br.pucminas.model;
 import io.micronaut.core.annotation.Introspected;
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "employments")
 @Introspected
 public class Employment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID id;
 
     @Column(name = "rendimento_auferido", nullable = false)
     private Double rendimentoAuferido;
@@ -26,6 +29,9 @@ public class Employment {
     @JoinColumn(name = "employer_entity_id", nullable = false)
     private EmployerEntity employerEntity;
 
+    protected Employment() {
+    }
+
     public Employment(Double rendimentoAuferido, String cargo, Client client, EmployerEntity employerEntity) {
         this.rendimentoAuferido = rendimentoAuferido;
         this.cargo = cargo;
@@ -33,7 +39,7 @@ public class Employment {
         this.employerEntity = employerEntity;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

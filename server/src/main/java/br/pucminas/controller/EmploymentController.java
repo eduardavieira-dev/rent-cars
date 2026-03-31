@@ -13,6 +13,7 @@ import io.micronaut.validation.Validated;
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller("/employments")
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -40,25 +41,25 @@ public class EmploymentController {
 
     @Get("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public EmploymentResponse findById(Long id) {
+    public EmploymentResponse findById(UUID id) {
         return service.findById(id);
     }
 
     @Get("/client/{clientId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<EmploymentResponse> listByClient(Long clientId) {
+    public List<EmploymentResponse> listByClient(UUID clientId) {
         return service.listByClientId(clientId);
     }
 
     @Put("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public EmploymentResponse update(Long id, @Valid @Body UpdateEmploymentRequest request) {
+    public EmploymentResponse update(UUID id, @Valid @Body UpdateEmploymentRequest request) {
         return service.update(id, request);
     }
 
     @Delete("/{id}")
-    public HttpResponse<Void> delete(Long id) {
+    public HttpResponse<Void> delete(UUID id) {
         service.delete(id);
         return HttpResponse.noContent();
     }

@@ -3,6 +3,8 @@ package br.pucminas.model;
 import io.micronaut.core.annotation.Introspected;
 import jakarta.persistence.*;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -10,8 +12,9 @@ import jakarta.persistence.*;
 public abstract class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
+    private UUID id;
 
     @Column(nullable = false)
     private String name;
@@ -25,6 +28,9 @@ public abstract class User {
     @Column(nullable = false)
     private String password;
 
+    protected User() {
+    }
+
     protected User(String name, String email, String phone, String password) {
         this.name = name;
         this.email = email;
@@ -32,7 +38,7 @@ public abstract class User {
         this.password = password;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 

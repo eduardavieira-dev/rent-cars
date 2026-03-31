@@ -11,6 +11,9 @@ public abstract class Agent extends User {
     @Column(nullable = false, unique = true)
     private String cnpj;
 
+    protected Agent() {
+    }
+
     protected Agent(String name, String email, String phone, String password, String cnpj) {
         super(name, email, phone, password);
         this.cnpj = cnpj;

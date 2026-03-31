@@ -3,14 +3,16 @@ package br.pucminas.dto.response;
 import io.micronaut.core.annotation.Introspected;
 import io.micronaut.serde.annotation.Serdeable;
 
+import java.util.UUID;
+
 @Serdeable
 @Introspected
 public record EmploymentResponse(
-        Long id,
+        UUID id,
         Double rendimentoAuferido,
         String cargo,
-        Long clientId,
+        UUID clientId,
         String clientName,
-        Long employerEntityId,
+        UUID employerEntityId,
         String employerEntityNome) {
 }

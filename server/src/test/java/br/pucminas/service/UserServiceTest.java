@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -32,10 +33,11 @@ class UserServiceTest {
 
     @Test
     void shouldRegisterClientSuccessfully() {
+        UUID savedId = UUID.randomUUID();
         when(userRepository.existsByEmail("test@email.com")).thenReturn(false);
         Client savedClient = new Client("Test", "test@email.com", "31999990001", "hashed",
                 "12345678901", null, null, null);
-        setId(savedClient, 1L);
+        setId(savedClient, savedId);
         when(userRepository.save(any(Client.class))).thenReturn(savedClient);
 
         var request = new RegisterClientRequest(
@@ -44,7 +46,7 @@ class UserServiceTest {
         UserResponse response = userService.registerClient(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.id());
+        assertEquals(savedId, response.id());
         assertEquals("Test", response.name());
         assertEquals("Client", response.type());
         verify(userRepository).existsByEmail("test@email.com");
@@ -65,9 +67,10 @@ class UserServiceTest {
 
     @Test
     void shouldRegisterBankSuccessfully() {
+        UUID savedId = UUID.randomUUID();
         when(userRepository.existsByEmail("bank@email.com")).thenReturn(false);
         Bank savedBank = new Bank("Bank", "bank@email.com", "31999990001", "hashed", "12345678000190", "001");
-        setId(savedBank, 2L);
+        setId(savedBank, savedId);
         when(userRepository.save(any(Bank.class))).thenReturn(savedBank);
 
         var request = new RegisterBankRequest(
@@ -76,15 +79,16 @@ class UserServiceTest {
         UserResponse response = userService.registerBank(request);
 
         assertEquals("Bank", response.type());
-        assertEquals(2L, response.id());
+        assertEquals(savedId, response.id());
     }
 
     @Test
     void shouldRegisterCompanySuccessfully() {
+        UUID savedId = UUID.randomUUID();
         when(userRepository.existsByEmail("company@email.com")).thenReturn(false);
         Company savedCompany = new Company("Co", "company@email.com", "31999990001", "hashed",
                 "12345678000190", "Co Ltda");
-        setId(savedCompany, 3L);
+        setId(savedCompany, savedId);
         when(userRepository.save(any(Company.class))).thenReturn(savedCompany);
 
         var request = new RegisterCompanyRequest(
@@ -93,35 +97,37 @@ class UserServiceTest {
         UserResponse response = userService.registerCompany(request);
 
         assertEquals("Company", response.type());
-        assertEquals(3L, response.id());
+        assertEquals(savedId, response.id());
     }
 
     @Test
     void shouldFindUserById() {
+        UUID userId = UUID.randomUUID();
         Client client = new Client("Found", "found@email.com", "31999990001", "hashed",
                 "12345678901", null, null, null);
-        setId(client, 10L);
-        when(userRepository.findById(10L)).thenReturn(Optional.of(client));
+        setId(client, userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(client));
 
-        UserResponse response = userService.findById(10L);
+        UserResponse response = userService.findById(userId);
 
-        assertEquals(10L, response.id());
+        assertEquals(userId, response.id());
         assertEquals("Found", response.name());
     }
 
     @Test
     void shouldThrowWhenUserNotFoundById() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+        UUID randomId = UUID.randomUUID();
+        when(userRepository.findById(randomId)).thenReturn(Optional.empty());
 
-        assertThrows(UserNotFoundException.class, () -> userService.findById(99L));
+        assertThrows(UserNotFoundException.class, () -> userService.findById(randomId));
     }
 
     @Test
     void shouldListAllUsers() {
         Client c1 = new Client("C1", "c1@email.com", "31999990001", "h", "12345678901", null, null, null);
         Bank b1 = new Bank("B1", "b1@email.com", "31999990002", "h", "12345678000190", "001");
-        setId(c1, 1L);
-        setId(b1, 2L);
+        setId(c1, UUID.randomUUID());
+        setId(b1, UUID.randomUUID());
         when(userRepository.findAll()).thenReturn(List.of(c1, b1));
 
         List<UserResponse> responses = userService.listAllUsers();
@@ -142,18 +148,19 @@ class UserServiceTest {
 
     @Test
     void shouldUpdateClientSuccessfully() {
+        UUID userId = UUID.randomUUID();
         Client existing = new Client("Old", "old@email.com", "31999990001", "hashed",
                 "12345678901", "MG123", "Old address", "Old Prof");
-        setId(existing, 5L);
-        when(userRepository.findById(5L)).thenReturn(Optional.of(existing));
-        when(userRepository.existsByEmailAndIdNot("new@email.com", 5L)).thenReturn(false);
+        setId(existing, userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existing));
+        when(userRepository.existsByEmailAndIdNot("new@email.com", userId)).thenReturn(false);
         when(userRepository.update(any(Client.class))).thenAnswer(inv -> inv.getArgument(0));
 
         var request = new UpdateClientRequest(
                 "New Name", "new@email.com", "31999990002",
                 "99988877766", "SP456", "New address", "New Prof");
 
-        UserResponse response = userService.updateClient(5L, request);
+        UserResponse response = userService.updateClient(userId, request);
 
         assertEquals("New Name", response.name());
         assertEquals("new@email.com", response.email());
@@ -161,54 +168,59 @@ class UserServiceTest {
 
     @Test
     void shouldThrowWhenUpdatingNonExistentClient() {
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+        UUID randomId = UUID.randomUUID();
+        when(userRepository.findById(randomId)).thenReturn(Optional.empty());
 
         var request = new UpdateClientRequest(
                 "Name", "e@email.com", "31999990001", "12345678901", null, null, null);
 
-        assertThrows(UserNotFoundException.class, () -> userService.updateClient(99L, request));
+        assertThrows(UserNotFoundException.class, () -> userService.updateClient(randomId, request));
     }
 
     @Test
     void shouldThrowWhenUpdatingWrongTypeAsClient() {
+        UUID userId = UUID.randomUUID();
         Bank bank = new Bank("Bank", "bank@email.com", "31999990001", "hashed", "12345678000190", "001");
-        setId(bank, 5L);
-        when(userRepository.findById(5L)).thenReturn(Optional.of(bank));
+        setId(bank, userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(bank));
 
         var request = new UpdateClientRequest(
                 "Name", "e@email.com", "31999990001", "12345678901", null, null, null);
 
-        assertThrows(IllegalArgumentException.class, () -> userService.updateClient(5L, request));
+        assertThrows(IllegalArgumentException.class, () -> userService.updateClient(userId, request));
     }
 
     @Test
     void shouldRejectDuplicateEmailOnUpdate() {
+        UUID userId = UUID.randomUUID();
         Client existing = new Client("Old", "old@email.com", "31999990001", "hashed",
                 "12345678901", null, null, null);
-        setId(existing, 5L);
-        when(userRepository.findById(5L)).thenReturn(Optional.of(existing));
-        when(userRepository.existsByEmailAndIdNot("taken@email.com", 5L)).thenReturn(true);
+        setId(existing, userId);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(existing));
+        when(userRepository.existsByEmailAndIdNot("taken@email.com", userId)).thenReturn(true);
 
         var request = new UpdateClientRequest(
                 "Name", "taken@email.com", "31999990001", "12345678901", null, null, null);
 
-        assertThrows(EmailAlreadyExistsException.class, () -> userService.updateClient(5L, request));
+        assertThrows(EmailAlreadyExistsException.class, () -> userService.updateClient(userId, request));
     }
 
     @Test
     void shouldDeleteUserSuccessfully() {
-        when(userRepository.existsById(5L)).thenReturn(true);
+        UUID userId = UUID.randomUUID();
+        when(userRepository.existsById(userId)).thenReturn(true);
 
-        userService.deleteUser(5L);
+        userService.deleteUser(userId);
 
-        verify(userRepository).deleteById(5L);
+        verify(userRepository).deleteById(userId);
     }
 
     @Test
     void shouldThrowWhenDeletingNonExistentUser() {
-        when(userRepository.existsById(99L)).thenReturn(false);
+        UUID randomId = UUID.randomUUID();
+        when(userRepository.existsById(randomId)).thenReturn(false);
 
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(99L));
+        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(randomId));
         verify(userRepository, never()).deleteById(any());
     }
 
@@ -217,7 +229,7 @@ class UserServiceTest {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(userRepository.save(any(Client.class))).thenAnswer(inv -> {
             Client c = inv.getArgument(0);
-            setId(c, 1L);
+            setId(c, UUID.randomUUID());
             return c;
         });
 
@@ -232,7 +244,7 @@ class UserServiceTest {
         }));
     }
 
-    private void setId(User user, Long id) {
+    private void setId(User user, UUID id) {
         try {
             var field = User.class.getDeclaredField("id");
             field.setAccessible(true);

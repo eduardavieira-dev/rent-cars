@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -30,16 +31,17 @@ class EmployerEntityServiceTest {
 
     @Test
     void shouldCreateEmployerEntitySuccessfully() {
+        UUID savedId = UUID.randomUUID();
         when(repository.existsByCnpj("12345678000190")).thenReturn(false);
         EmployerEntity saved = new EmployerEntity("Empresa ABC", "12345678000190");
-        setId(saved, 1L);
+        setId(saved, savedId);
         when(repository.save(any(EmployerEntity.class))).thenReturn(saved);
 
         var request = new CreateEmployerEntityRequest("Empresa ABC", "12345678000190");
         EmployerEntityResponse response = service.create(request);
 
         assertNotNull(response);
-        assertEquals(1L, response.id());
+        assertEquals(savedId, response.id());
         assertEquals("Empresa ABC", response.nome());
         assertEquals("12345678000190", response.cnpj());
         verify(repository).existsByCnpj("12345678000190");
@@ -58,29 +60,31 @@ class EmployerEntityServiceTest {
 
     @Test
     void shouldFindEmployerEntityById() {
+        UUID entityId = UUID.randomUUID();
         EmployerEntity entity = new EmployerEntity("Empresa XYZ", "99887766000155");
-        setId(entity, 1L);
-        when(repository.findById(1L)).thenReturn(Optional.of(entity));
+        setId(entity, entityId);
+        when(repository.findById(entityId)).thenReturn(Optional.of(entity));
 
-        EmployerEntityResponse response = service.findById(1L);
+        EmployerEntityResponse response = service.findById(entityId);
 
-        assertEquals(1L, response.id());
+        assertEquals(entityId, response.id());
         assertEquals("Empresa XYZ", response.nome());
     }
 
     @Test
     void shouldThrowWhenEmployerEntityNotFound() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        UUID randomId = UUID.randomUUID();
+        when(repository.findById(randomId)).thenReturn(Optional.empty());
 
-        assertThrows(EmployerEntityNotFoundException.class, () -> service.findById(99L));
+        assertThrows(EmployerEntityNotFoundException.class, () -> service.findById(randomId));
     }
 
     @Test
     void shouldListAllEmployerEntities() {
         EmployerEntity e1 = new EmployerEntity("Emp1", "11111111000100");
-        setId(e1, 1L);
+        setId(e1, UUID.randomUUID());
         EmployerEntity e2 = new EmployerEntity("Emp2", "22222222000200");
-        setId(e2, 2L);
+        setId(e2, UUID.randomUUID());
         when(repository.findAll()).thenReturn(List.of(e1, e2));
 
         List<EmployerEntityResponse> result = service.listAll();
@@ -90,14 +94,15 @@ class EmployerEntityServiceTest {
 
     @Test
     void shouldUpdateEmployerEntitySuccessfully() {
+        UUID entityId = UUID.randomUUID();
         EmployerEntity existing = new EmployerEntity("Old Name", "12345678000190");
-        setId(existing, 1L);
-        when(repository.findById(1L)).thenReturn(Optional.of(existing));
-        when(repository.existsByCnpjAndIdNot("99887766000155", 1L)).thenReturn(false);
+        setId(existing, entityId);
+        when(repository.findById(entityId)).thenReturn(Optional.of(existing));
+        when(repository.existsByCnpjAndIdNot("99887766000155", entityId)).thenReturn(false);
         when(repository.update(any(EmployerEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
         var request = new UpdateEmployerEntityRequest("New Name", "99887766000155");
-        EmployerEntityResponse response = service.update(1L, request);
+        EmployerEntityResponse response = service.update(entityId, request);
 
         assertEquals("New Name", response.nome());
         assertEquals("99887766000155", response.cnpj());
@@ -105,43 +110,47 @@ class EmployerEntityServiceTest {
 
     @Test
     void shouldThrowWhenUpdatingNonExistentEmployerEntity() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
+        UUID randomId = UUID.randomUUID();
+        when(repository.findById(randomId)).thenReturn(Optional.empty());
 
         var request = new UpdateEmployerEntityRequest("Name", "12345678000190");
 
-        assertThrows(EmployerEntityNotFoundException.class, () -> service.update(99L, request));
+        assertThrows(EmployerEntityNotFoundException.class, () -> service.update(randomId, request));
     }
 
     @Test
     void shouldRejectDuplicateCnpjOnUpdate() {
+        UUID entityId = UUID.randomUUID();
         EmployerEntity existing = new EmployerEntity("Old", "12345678000190");
-        setId(existing, 1L);
-        when(repository.findById(1L)).thenReturn(Optional.of(existing));
-        when(repository.existsByCnpjAndIdNot("99887766000155", 1L)).thenReturn(true);
+        setId(existing, entityId);
+        when(repository.findById(entityId)).thenReturn(Optional.of(existing));
+        when(repository.existsByCnpjAndIdNot("99887766000155", entityId)).thenReturn(true);
 
         var request = new UpdateEmployerEntityRequest("Name", "99887766000155");
 
-        assertThrows(CnpjAlreadyExistsException.class, () -> service.update(1L, request));
+        assertThrows(CnpjAlreadyExistsException.class, () -> service.update(entityId, request));
     }
 
     @Test
     void shouldDeleteEmployerEntitySuccessfully() {
-        when(repository.existsById(1L)).thenReturn(true);
+        UUID entityId = UUID.randomUUID();
+        when(repository.existsById(entityId)).thenReturn(true);
 
-        service.delete(1L);
+        service.delete(entityId);
 
-        verify(repository).deleteById(1L);
+        verify(repository).deleteById(entityId);
     }
 
     @Test
     void shouldThrowWhenDeletingNonExistentEmployerEntity() {
-        when(repository.existsById(99L)).thenReturn(false);
+        UUID randomId = UUID.randomUUID();
+        when(repository.existsById(randomId)).thenReturn(false);
 
-        assertThrows(EmployerEntityNotFoundException.class, () -> service.delete(99L));
+        assertThrows(EmployerEntityNotFoundException.class, () -> service.delete(randomId));
         verify(repository, never()).deleteById(any());
     }
 
-    private void setId(EmployerEntity entity, Long id) {
+    private void setId(EmployerEntity entity, UUID id) {
         try {
             var field = EmployerEntity.class.getDeclaredField("id");
             field.setAccessible(true);
