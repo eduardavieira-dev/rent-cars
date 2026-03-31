@@ -12,7 +12,7 @@ import java.util.UUID;
 @Serdeable
 @Introspected
 public record UpdateEmploymentRequest(
-        @NotNull @Positive Double rendimentoAuferido,
-        @NotBlank @Size(min = 2, max = 100) String cargo,
+        @NotNull @Positive Double earnedIncome,
+        @NotBlank @Size(min = 2, max = 100) String jobTitle,
         @NotNull UUID employerEntityId) {
 }

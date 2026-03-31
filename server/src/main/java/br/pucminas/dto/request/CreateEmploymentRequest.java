@@ -12,8 +12,8 @@ import java.util.UUID;
 @Serdeable
 @Introspected
 public record CreateEmploymentRequest(
-        @NotNull @Positive Double rendimentoAuferido,
-        @NotBlank @Size(min = 2, max = 100) String cargo,
+        @NotNull @Positive Double earnedIncome,
+        @NotBlank @Size(min = 2, max = 100) String jobTitle,
         @NotNull UUID clientId,
         @NotNull UUID employerEntityId) {
 }

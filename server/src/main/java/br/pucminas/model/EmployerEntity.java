@@ -16,7 +16,7 @@ public class EmployerEntity {
     private UUID id;
 
     @Column(nullable = false)
-    private String nome;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String cnpj;
@@ -24,8 +24,8 @@ public class EmployerEntity {
     protected EmployerEntity() {
     }
 
-    public EmployerEntity(String nome, String cnpj) {
-        this.nome = nome;
+    public EmployerEntity(String name, String cnpj) {
+        this.name = name;
         this.cnpj = cnpj;
     }
 
@@ -33,12 +33,12 @@ public class EmployerEntity {
         return id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getCnpj() {

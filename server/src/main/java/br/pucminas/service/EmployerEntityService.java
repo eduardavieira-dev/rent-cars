@@ -29,7 +29,7 @@ public class EmployerEntityService {
         if (repository.existsByCnpj(request.cnpj())) {
             throw new CnpjAlreadyExistsException(request.cnpj());
         }
-        EmployerEntity entity = new EmployerEntity(request.nome(), request.cnpj());
+        EmployerEntity entity = new EmployerEntity(request.name(), request.cnpj());
         return toResponse(repository.save(entity));
     }
 
@@ -52,20 +52,19 @@ public class EmployerEntityService {
         if (repository.existsByCnpjAndIdNot(request.cnpj(), id)) {
             throw new CnpjAlreadyExistsException(request.cnpj());
         }
-        entity.setNome(request.nome());
+        entity.setName(request.name());
         entity.setCnpj(request.cnpj());
         return toResponse(repository.update(entity));
     }
 
     @Transactional
     public void delete(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new EmployerEntityNotFoundException(id);
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
         }
-        repository.deleteById(id);
     }
 
     private EmployerEntityResponse toResponse(EmployerEntity entity) {
-        return new EmployerEntityResponse(entity.getId(), entity.getNome(), entity.getCnpj());
+        return new EmployerEntityResponse(entity.getId(), entity.getName(), entity.getCnpj());
     }
 }

@@ -9,6 +9,6 @@ import java.util.UUID;
 @Introspected
 public record EmployerEntityResponse(
         UUID id,
-        String nome,
+        String name,
         String cnpj) {
 }

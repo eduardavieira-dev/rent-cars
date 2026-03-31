@@ -115,10 +115,9 @@ public class UserService {
 
     @Transactional
     public void deleteUser(UUID id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException(id);
+        if (userRepository.existsById(id)) {
+            userRepository.deleteById(id);
         }
-        userRepository.deleteById(id);
     }
 
     private void validateEmailUniqueness(String email) {

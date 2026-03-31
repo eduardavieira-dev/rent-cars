@@ -9,10 +9,10 @@ import java.util.UUID;
 @Introspected
 public record EmploymentResponse(
         UUID id,
-        Double rendimentoAuferido,
-        String cargo,
+        Double earnedIncome,
+        String jobTitle,
         UUID clientId,
         String clientName,
         UUID employerEntityId,
-        String employerEntityNome) {
+        String employerEntityName) {
 }

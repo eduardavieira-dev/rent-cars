@@ -65,12 +65,12 @@ class EmploymentServiceTest {
 
         assertNotNull(response);
         assertEquals(employmentId, response.id());
-        assertEquals(5000.0, response.rendimentoAuferido());
-        assertEquals("Analista", response.cargo());
+        assertEquals(5000.0, response.earnedIncome());
+        assertEquals("Analista", response.jobTitle());
         assertEquals(clientId, response.clientId());
         assertEquals("João", response.clientName());
         assertEquals(employerEntityId, response.employerEntityId());
-        assertEquals("Empresa ABC", response.employerEntityNome());
+        assertEquals("Empresa ABC", response.employerEntityName());
     }
 
     @Test
@@ -149,7 +149,7 @@ class EmploymentServiceTest {
         EmploymentResponse response = service.findById(employmentId);
 
         assertEquals(employmentId, response.id());
-        assertEquals("Analista", response.cargo());
+        assertEquals("Analista", response.jobTitle());
     }
 
     @Test
@@ -207,8 +207,8 @@ class EmploymentServiceTest {
         var request = new UpdateEmploymentRequest(8000.0, "Gerente", newEmployerEntityId);
         EmploymentResponse response = service.update(employmentId, request);
 
-        assertEquals(8000.0, response.rendimentoAuferido());
-        assertEquals("Gerente", response.cargo());
+        assertEquals(8000.0, response.earnedIncome());
+        assertEquals("Gerente", response.jobTitle());
         assertEquals(newEmployerEntityId, response.employerEntityId());
     }
 
@@ -234,11 +234,12 @@ class EmploymentServiceTest {
     }
 
     @Test
-    void shouldThrowWhenDeletingNonExistentEmployment() {
+    void shouldDeleteIdempotentlyWhenEmploymentNotFound() {
         UUID missingId = UUID.randomUUID();
         when(employmentRepository.existsById(missingId)).thenReturn(false);
 
-        assertThrows(EmploymentNotFoundException.class, () -> service.delete(missingId));
+        service.delete(missingId);
+
         verify(employmentRepository, never()).deleteById(any());
     }
 

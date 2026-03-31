@@ -216,11 +216,12 @@ class UserServiceTest {
     }
 
     @Test
-    void shouldThrowWhenDeletingNonExistentUser() {
+    void shouldDeleteIdempotentlyWhenUserNotFound() {
         UUID randomId = UUID.randomUUID();
         when(userRepository.existsById(randomId)).thenReturn(false);
 
-        assertThrows(UserNotFoundException.class, () -> userService.deleteUser(randomId));
+        userService.deleteUser(randomId);
+
         verify(userRepository, never()).deleteById(any());
     }
 

@@ -62,7 +62,7 @@ class EmployerEntityControllerTest {
         EmployerEntityResponse body = response.body();
         assertNotNull(body);
         assertNotNull(body.id());
-        assertEquals("Empresa Teste", body.nome());
+        assertEquals("Empresa Teste", body.name());
         assertEquals("10111222000100", body.cnpj());
     }
 
@@ -111,7 +111,7 @@ class EmployerEntityControllerTest {
                         EmployerEntityResponse.class);
 
         assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals("Emp FindById", response.body().nome());
+        assertEquals("Emp FindById", response.body().name());
     }
 
     @Test
@@ -138,7 +138,7 @@ class EmployerEntityControllerTest {
                         EmployerEntityResponse.class);
 
         assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals("Emp Updated", response.body().nome());
+        assertEquals("Emp Updated", response.body().name());
     }
 
     @Test
@@ -163,13 +163,16 @@ class EmployerEntityControllerTest {
     }
 
     @Test
-    void shouldReturn404WhenDeletingNonExistentEmployerEntity() {
-        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
-                () -> client.toBlocking()
-                        .exchange(
-                                HttpRequest.DELETE("/employer-entities/" + UUID.randomUUID()).bearerAuth(accessToken)));
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    void shouldDeleteIdempotentlyWhenEmployerEntityNotFound() {
+        try {
+            client.toBlocking()
+                    .exchange(
+                            HttpRequest.DELETE("/employer-entities/" + UUID.randomUUID()).bearerAuth(accessToken));
+        } catch (HttpClientResponseException e) {
+            fail("Expected 204 No Content but got: " + e.getStatus());
+        } catch (Exception ignored) {
+            // Micronaut's Netty client may throw ResponseClosedException for 204 No Content
+        }
     }
 
     @Test
@@ -185,7 +188,7 @@ class EmployerEntityControllerTest {
     }
 
     @Test
-    void shouldRejectBlankNome() {
+    void shouldRejectBlankName() {
         var request = new CreateEmployerEntityRequest("", "12345678000190");
 
         HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,

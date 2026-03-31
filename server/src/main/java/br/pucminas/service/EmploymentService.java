@@ -56,7 +56,7 @@ public class EmploymentService {
                 .orElseThrow(() -> new EmployerEntityNotFoundException(request.employerEntityId()));
 
         Employment employment = new Employment(
-                request.rendimentoAuferido(), request.cargo(), client, employerEntity);
+                request.earnedIncome(), request.jobTitle(), client, employerEntity);
         return toResponse(employmentRepository.save(employment));
     }
 
@@ -86,28 +86,27 @@ public class EmploymentService {
         EmployerEntity employerEntity = employerEntityRepository.findById(request.employerEntityId())
                 .orElseThrow(() -> new EmployerEntityNotFoundException(request.employerEntityId()));
 
-        employment.setRendimentoAuferido(request.rendimentoAuferido());
-        employment.setCargo(request.cargo());
+        employment.setEarnedIncome(request.earnedIncome());
+        employment.setJobTitle(request.jobTitle());
         employment.setEmployerEntity(employerEntity);
         return toResponse(employmentRepository.update(employment));
     }
 
     @Transactional
     public void delete(UUID id) {
-        if (!employmentRepository.existsById(id)) {
-            throw new EmploymentNotFoundException(id);
+        if (employmentRepository.existsById(id)) {
+            employmentRepository.deleteById(id);
         }
-        employmentRepository.deleteById(id);
     }
 
     private EmploymentResponse toResponse(Employment employment) {
         return new EmploymentResponse(
                 employment.getId(),
-                employment.getRendimentoAuferido(),
-                employment.getCargo(),
+                employment.getEarnedIncome(),
+                employment.getJobTitle(),
                 employment.getClient().getId(),
                 employment.getClient().getName(),
                 employment.getEmployerEntity().getId(),
-                employment.getEmployerEntity().getNome());
+                employment.getEmployerEntity().getName());
     }
 }

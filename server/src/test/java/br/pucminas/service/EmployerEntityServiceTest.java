@@ -42,7 +42,7 @@ class EmployerEntityServiceTest {
 
         assertNotNull(response);
         assertEquals(savedId, response.id());
-        assertEquals("Empresa ABC", response.nome());
+        assertEquals("Empresa ABC", response.name());
         assertEquals("12345678000190", response.cnpj());
         verify(repository).existsByCnpj("12345678000190");
         verify(repository).save(any(EmployerEntity.class));
@@ -68,7 +68,7 @@ class EmployerEntityServiceTest {
         EmployerEntityResponse response = service.findById(entityId);
 
         assertEquals(entityId, response.id());
-        assertEquals("Empresa XYZ", response.nome());
+        assertEquals("Empresa XYZ", response.name());
     }
 
     @Test
@@ -104,7 +104,7 @@ class EmployerEntityServiceTest {
         var request = new UpdateEmployerEntityRequest("New Name", "99887766000155");
         EmployerEntityResponse response = service.update(entityId, request);
 
-        assertEquals("New Name", response.nome());
+        assertEquals("New Name", response.name());
         assertEquals("99887766000155", response.cnpj());
     }
 
@@ -142,11 +142,12 @@ class EmployerEntityServiceTest {
     }
 
     @Test
-    void shouldThrowWhenDeletingNonExistentEmployerEntity() {
+    void shouldDeleteIdempotentlyWhenEmployerEntityNotFound() {
         UUID randomId = UUID.randomUUID();
         when(repository.existsById(randomId)).thenReturn(false);
 
-        assertThrows(EmployerEntityNotFoundException.class, () -> service.delete(randomId));
+        service.delete(randomId);
+
         verify(repository, never()).deleteById(any());
     }
 

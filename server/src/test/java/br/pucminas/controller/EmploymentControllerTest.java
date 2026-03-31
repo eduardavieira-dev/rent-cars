@@ -95,8 +95,8 @@ class EmploymentControllerTest {
         EmploymentResponse body = response.body();
         assertNotNull(body);
         assertNotNull(body.id());
-        assertEquals(5000.0, body.rendimentoAuferido());
-        assertEquals("Analista de Sistemas", body.cargo());
+        assertEquals(5000.0, body.earnedIncome());
+        assertEquals("Analista de Sistemas", body.jobTitle());
         assertEquals(cid, body.clientId());
         assertEquals(employerEntityId, body.employerEntityId());
     }
@@ -132,7 +132,7 @@ class EmploymentControllerTest {
                         EmploymentResponse.class);
 
         assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals("Dev FindById", response.body().cargo());
+        assertEquals("Dev FindById", response.body().jobTitle());
     }
 
     @Test
@@ -179,8 +179,8 @@ class EmploymentControllerTest {
                         EmploymentResponse.class);
 
         assertEquals(HttpStatus.OK, response.getStatus());
-        assertEquals(8000.0, response.body().rendimentoAuferido());
-        assertEquals("Dev Senior", response.body().cargo());
+        assertEquals(8000.0, response.body().earnedIncome());
+        assertEquals("Dev Senior", response.body().jobTitle());
     }
 
     @Test
@@ -206,16 +206,19 @@ class EmploymentControllerTest {
     }
 
     @Test
-    void shouldReturn404WhenDeletingNonExistentEmployment() {
-        HttpClientResponseException exception = assertThrows(HttpClientResponseException.class,
-                () -> client.toBlocking()
-                        .exchange(HttpRequest.DELETE("/employments/" + UUID.randomUUID()).bearerAuth(accessToken)));
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    void shouldDeleteIdempotentlyWhenEmploymentNotFound() {
+        try {
+            client.toBlocking()
+                    .exchange(HttpRequest.DELETE("/employments/" + UUID.randomUUID()).bearerAuth(accessToken));
+        } catch (HttpClientResponseException e) {
+            fail("Expected 204 No Content but got: " + e.getStatus());
+        } catch (Exception ignored) {
+            // Micronaut's Netty client may throw ResponseClosedException for 204 No Content
+        }
     }
 
     @Test
-    void shouldRejectInvalidRendimentoAuferido() {
+    void shouldRejectInvalidEarnedIncome() {
         UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(-1.0, "Dev", cid, employerEntityId);
 
@@ -228,7 +231,7 @@ class EmploymentControllerTest {
     }
 
     @Test
-    void shouldRejectBlankCargo() {
+    void shouldRejectBlankJobTitle() {
         UUID cid = createFreshClient();
         var request = new CreateEmploymentRequest(5000.0, "", cid, employerEntityId);
 

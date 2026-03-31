@@ -15,11 +15,11 @@ public class Employment {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "rendimento_auferido", nullable = false)
-    private Double rendimentoAuferido;
+    @Column(name = "earned_income", nullable = false)
+    private Double earnedIncome;
 
-    @Column(nullable = false)
-    private String cargo;
+    @Column(name = "job_title", nullable = false)
+    private String jobTitle;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "client_id", nullable = false)
@@ -32,9 +32,9 @@ public class Employment {
     protected Employment() {
     }
 
-    public Employment(Double rendimentoAuferido, String cargo, Client client, EmployerEntity employerEntity) {
-        this.rendimentoAuferido = rendimentoAuferido;
-        this.cargo = cargo;
+    public Employment(Double earnedIncome, String jobTitle, Client client, EmployerEntity employerEntity) {
+        this.earnedIncome = earnedIncome;
+        this.jobTitle = jobTitle;
         this.client = client;
         this.employerEntity = employerEntity;
     }
@@ -43,20 +43,20 @@ public class Employment {
         return id;
     }
 
-    public Double getRendimentoAuferido() {
-        return rendimentoAuferido;
+    public Double getEarnedIncome() {
+        return earnedIncome;
     }
 
-    public void setRendimentoAuferido(Double rendimentoAuferido) {
-        this.rendimentoAuferido = rendimentoAuferido;
+    public void setEarnedIncome(Double earnedIncome) {
+        this.earnedIncome = earnedIncome;
     }
 
-    public String getCargo() {
-        return cargo;
+    public String getJobTitle() {
+        return jobTitle;
     }
 
-    public void setCargo(String cargo) {
-        this.cargo = cargo;
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     public Client getClient() {
