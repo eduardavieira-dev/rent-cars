@@ -21,7 +21,6 @@ import { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import api from '@/lib/axios';
 
-// ── Input masks ──────────────────────────────────────────────
 function maskCpf(v: string): string {
     const d = v.replace(/\D/g, '').slice(0, 11);
     if (d.length <= 3) return d;
@@ -47,7 +46,6 @@ function maskRg(v: string): string {
     return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
 }
 
-// ── Animation variants ───────────────────────────────────────
 const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
@@ -58,7 +56,6 @@ const item = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
 };
 
-// ── Shared class strings ─────────────────────────────────────
 const inputBase =
     'w-full rounded-lg border border-border bg-input py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors';
 const inputWithIcon = `${inputBase} pl-10 pr-3`;
@@ -87,7 +84,6 @@ const INITIAL_FORM: FormState = {
     profession: '',
 };
 
-// ── Page ─────────────────────────────────────────────────────
 export default function CadastroClientePage() {
     const router = useRouter();
 
@@ -149,8 +145,6 @@ export default function CadastroClientePage() {
 
     return (
         <main className="min-h-screen flex bg-background">
-
-            {/* ── Left branding panel (lg+) ──────────────────────── */}
             <motion.aside
                 initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -187,7 +181,6 @@ export default function CadastroClientePage() {
                 </p>
             </motion.aside>
 
-            {/* ── Right form panel (scrollable) ───────────────────── */}
             <div className="w-full lg:w-[62%] flex justify-center px-6 py-12">
                 <motion.div
                     variants={container}
@@ -195,7 +188,6 @@ export default function CadastroClientePage() {
                     animate="visible"
                     className="w-full max-w-lg"
                 >
-                    {/* Mobile-only logo */}
                     <motion.div variants={item} className="flex lg:hidden items-center gap-2.5 mb-10">
                         <div className="w-9 h-9 rounded-xl bg-gradient-gold shadow-gold flex items-center justify-center">
                             <Car size={17} className="text-primary-foreground" />
@@ -203,7 +195,6 @@ export default function CadastroClientePage() {
                         <span className="font-heading text-lg font-bold text-foreground">Rent Cars</span>
                     </motion.div>
 
-                    {/* Heading */}
                     <motion.div variants={item} className="mb-8">
                         <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Criar conta</h1>
                         <p className="text-sm text-muted-foreground">
@@ -212,8 +203,6 @@ export default function CadastroClientePage() {
                     </motion.div>
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-
-                        {/* Nome */}
                         <motion.div variants={item}>
                             <label htmlFor="name" className={labelBase}>
                                 Nome completo {requiredMark}
@@ -238,7 +227,6 @@ export default function CadastroClientePage() {
                             </div>
                         </motion.div>
 
-                        {/* E-mail + Senha */}
                         <motion.div variants={item} className="grid grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="email" className={labelBase}>
@@ -287,7 +275,6 @@ export default function CadastroClientePage() {
                             </div>
                         </motion.div>
 
-                        {/* CPF + Telefone */}
                         <motion.div variants={item} className="grid grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="cpf" className={labelBase}>
@@ -337,7 +324,6 @@ export default function CadastroClientePage() {
                             </div>
                         </motion.div>
 
-                        {/* RG + Profissão */}
                         <motion.div variants={item} className="grid grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="rg" className={labelBase}>RG</label>
@@ -379,7 +365,6 @@ export default function CadastroClientePage() {
                             </div>
                         </motion.div>
 
-                        {/* Endereço */}
                         <motion.div variants={item}>
                             <label htmlFor="address" className={labelBase}>Endereço</label>
                             <div className="relative">
@@ -400,7 +385,6 @@ export default function CadastroClientePage() {
                             </div>
                         </motion.div>
 
-                        {/* Erro */}
                         {error && (
                             <motion.p
                                 role="alert"
@@ -413,7 +397,6 @@ export default function CadastroClientePage() {
                             </motion.p>
                         )}
 
-                        {/* Botão */}
                         <motion.div variants={item} className="pt-1">
                             <button
                                 type="submit"
@@ -431,7 +414,6 @@ export default function CadastroClientePage() {
                         </motion.div>
                     </form>
 
-                    {/* Link de login */}
                     <motion.p variants={item} className="mt-6 text-center text-sm text-muted-foreground">
                         Já tem conta?{' '}
                         <Link href="/login" className="text-primary hover:opacity-80 font-medium transition-opacity">
