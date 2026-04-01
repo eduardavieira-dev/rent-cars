@@ -4,8 +4,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { ArrowRight, Car, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { type FormEvent, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { type FormEvent, Suspense, useState } from 'react';
 
 import { useAuth } from '@/hooks/useAuth';
 import type { LoginResponse } from '@/types/auth';
@@ -24,8 +24,9 @@ const item = {
 };
 
 // ── Page ─────────────────────────────────────────────────────
-export default function LoginPage() {
+function LoginForm() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { login } = useAuth();
 
     const [email, setEmail] = useState('');
@@ -47,7 +48,7 @@ export default function LoginPage() {
             });
 
             login(data.access_token);
-            router.push('/dashboard');
+            router.push(searchParams.get('redirect') ?? '/dashboard');
         } catch (err) {
             if (axios.isAxiosError(err) && err.response?.status === 401) {
                 setError('E-mail ou senha inválidos.');
@@ -214,5 +215,13 @@ export default function LoginPage() {
                 </motion.div>
             </div>
         </main>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense>
+            <LoginForm />
+        </Suspense>
     );
 }

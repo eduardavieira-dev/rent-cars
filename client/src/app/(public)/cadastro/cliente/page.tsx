@@ -1,17 +1,13 @@
 'use client';
 
 import axios from 'axios';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     ArrowRight,
     Briefcase,
-    Building,
-    Building2,
     Car,
-    ChevronDown,
     CreditCard,
     FileText,
-    Hash,
     Lock,
     Mail,
     MapPin,
@@ -21,50 +17,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
+import { type ChangeEvent, type FormEvent, useState } from 'react';
 
 import api from '@/lib/axios';
-import type { LoginResponse } from '@/types/auth';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// ── Types ────────────────────────────────────────────────────
-interface EmployerEntity {
-    id: string;
-    name: string;
-    cnpj: string;
-}
-
-interface FormState {
-    name: string;
-    email: string;
-    password: string;
-    phone: string;
-    cpf: string;
-    rg: string;
-    address: string;
-    profession: string;
-    employerEntityId: string;
-    newEmployerName: string;
-    newEmployerCnpj: string;
-}
-
-const INITIAL_FORM: FormState = {
-    name: '',
-    email: '',
-    password: '',
-    phone: '',
-    cpf: '',
-    rg: '',
-    address: '',
-    profession: '',
-    employerEntityId: '',
-    newEmployerName: '',
-    newEmployerCnpj: '',
-};
-
-const EMPLOYER_OPTION_NONE = '';
-const EMPLOYER_OPTION_OTHER = 'outra';
 
 // ── Input masks ──────────────────────────────────────────────
 function maskCpf(v: string): string {
@@ -92,15 +47,6 @@ function maskRg(v: string): string {
     return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
 }
 
-function maskCnpj(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 14);
-    if (d.length <= 2) return d;
-    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
-    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
-    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
-    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
-}
-
 // ── Animation variants ───────────────────────────────────────
 const container = {
     hidden: {},
@@ -119,34 +65,42 @@ const inputWithIcon = `${inputBase} pl-10 pr-3`;
 const labelBase = 'block text-sm font-medium text-secondary-foreground mb-1.5';
 const requiredMark = <span className="text-primary ml-0.5">*</span>;
 
+interface FormState {
+    name: string;
+    email: string;
+    password: string;
+    phone: string;
+    cpf: string;
+    rg: string;
+    address: string;
+    profession: string;
+}
+
+const INITIAL_FORM: FormState = {
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    cpf: '',
+    rg: '',
+    address: '',
+    profession: '',
+};
+
 // ── Page ─────────────────────────────────────────────────────
 export default function CadastroClientePage() {
     const router = useRouter();
 
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
-    const [employerEntities, setEmployerEntities] = useState<EmployerEntity[]>([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    useEffect(() => {
-        // Usa axios sem interceptors: o endpoint requer JWT e esta é uma página pública.
-        // Se a requisição falhar (401 ou qualquer outro erro), o select ficará
-        // apenas com a opção "Outra", sem redirecionar o usuário.
-        axios
-            .get<EmployerEntity[]>(`${BASE_URL}/employer-entities`)
-            .then((res) => setEmployerEntities(res.data))
-            .catch(() => {
-                // Falha silenciosa — "Outra" sempre estará disponível
-            });
-    }, []);
-
-    function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
+    function handleChange(e: ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target;
         let masked = value;
         if (name === 'cpf') masked = maskCpf(value);
         else if (name === 'phone') masked = maskPhone(value);
         else if (name === 'rg') masked = maskRg(value);
-        else if (name === 'newEmployerCnpj') masked = maskCnpj(value);
         setForm((prev) => ({ ...prev, [name]: masked }));
     }
 
@@ -156,7 +110,6 @@ export default function CadastroClientePage() {
         setIsLoading(true);
 
         try {
-            // Passo 1: Cadastrar o cliente
             await api.post('/auth/register/client', {
                 name: form.name,
                 email: form.email,
@@ -168,52 +121,31 @@ export default function CadastroClientePage() {
                 profession: form.profession || null,
             });
 
-            // Passo 2: Se o usuário escolheu "Outra", criar a entidade empregadora.
-            // Requer JWT — faz auto-login com as credenciais recém-cadastradas.
-            if (form.employerEntityId === EMPLOYER_OPTION_OTHER) {
-                try {
-                    const { data: loginData } = await axios.post<LoginResponse>(`${BASE_URL}/login`, {
-                        username: form.email,
-                        password: form.password,
-                    });
-                    await axios.post(
-                        `${BASE_URL}/employer-entities`,
-                        { name: form.newEmployerName, cnpj: form.newEmployerCnpj },
-                        {
-                            headers: {
-                                Authorization: `Bearer ${loginData.access_token}`,
-                                'Content-Type': 'application/json',
-                            },
-                        },
-                    );
-                } catch {
-                    // A entidade empregadora não foi criada, mas o cliente foi cadastrado.
-                    // O usuário poderá criá-la após fazer login.
-                }
-            }
-
             router.push('/login');
         } catch (err) {
             if (axios.isAxiosError(err)) {
-                const status = err.response?.status;
-                const message = (err.response?.data as { message?: string })?.message;
+                if (!err.response) {
+                    setError('Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
+                    return;
+                }
+
+                const status = err.response.status;
+                const message = (err.response.data as { message?: string })?.message;
 
                 if (status === 409) {
                     setError(message ?? 'E-mail ou CPF já cadastrado. Verifique os dados.');
                 } else if (status === 400) {
                     setError(message ? `Dado inválido: ${message}` : 'Verifique os dados informados e tente novamente.');
                 } else {
-                    setError('Não foi possível completar o cadastro. Tente novamente.');
+                    setError(`Erro ${status} ao realizar o cadastro. Tente novamente.`);
                 }
             } else {
-                setError('Não foi possível conectar ao servidor. Tente novamente.');
+                setError('Erro inesperado. Tente novamente.');
             }
         } finally {
             setIsLoading(false);
         }
     }
-
-    const isOtherEmployer = form.employerEntityId === EMPLOYER_OPTION_OTHER;
 
     return (
         <main className="min-h-screen flex bg-background">
@@ -225,11 +157,9 @@ export default function CadastroClientePage() {
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="hidden lg:flex lg:w-[38%] bg-secondary flex-col justify-between p-10 sticky top-0 h-screen relative overflow-hidden border-r border-border"
             >
-                {/* Blur orbs */}
                 <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-8 -right-16 w-64 h-64 rounded-full bg-amber-400/8 blur-3xl" />
 
-                {/* Logo */}
                 <div className="relative z-10 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-gradient-gold shadow-gold flex items-center justify-center shrink-0">
                         <Car size={20} className="text-primary-foreground" />
@@ -239,7 +169,6 @@ export default function CadastroClientePage() {
                     </span>
                 </div>
 
-                {/* Headline */}
                 <div className="relative z-10">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-gold shadow-gold flex items-center justify-center mb-6">
                         <UserPlus size={22} className="text-primary-foreground" />
@@ -253,7 +182,6 @@ export default function CadastroClientePage() {
                     </p>
                 </div>
 
-                {/* Footer */}
                 <p className="relative z-10 text-xs text-muted-foreground">
                     © {new Date().getFullYear()} Rent Cars · PUC Minas
                 </p>
@@ -471,102 +399,6 @@ export default function CadastroClientePage() {
                                 />
                             </div>
                         </motion.div>
-
-                        {/* Empresa empregadora */}
-                        <motion.div variants={item} className="pt-1 border-t border-border">
-                            <label htmlFor="employerEntityId" className={`${labelBase} mt-3`}>
-                                Empresa empregadora
-                            </label>
-                            <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                                    <Building2 size={15} />
-                                </div>
-                                <select
-                                    id="employerEntityId"
-                                    name="employerEntityId"
-                                    value={form.employerEntityId}
-                                    onChange={handleChange}
-                                    className={`${inputBase} pl-10 pr-8 appearance-none`}
-                                >
-                                    <option value={EMPLOYER_OPTION_NONE}>Nenhuma / Não informar</option>
-                                    {employerEntities.map((entity) => (
-                                        <option key={entity.id} value={entity.id}>
-                                            {entity.name}
-                                        </option>
-                                    ))}
-                                    <option value={EMPLOYER_OPTION_OTHER}>Outra (cadastrar nova)</option>
-                                </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground">
-                                    <ChevronDown size={14} />
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* Campos extras — nova empresa (animado) */}
-                        <AnimatePresence>
-                            {isOtherEmployer && (
-                                <motion.div
-                                    key="new-employer"
-                                    initial={{ opacity: 0, height: 0, y: -8 }}
-                                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                    exit={{ opacity: 0, height: 0, y: -8 }}
-                                    transition={{ duration: 0.25, ease: 'easeOut' }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="space-y-4 bg-card rounded-xl p-4 border border-border">
-                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">
-                                            Nova empresa empregadora
-                                        </p>
-
-                                        <div>
-                                            <label htmlFor="newEmployerName" className={labelBase}>
-                                                Nome da empresa {requiredMark}
-                                            </label>
-                                            <div className="relative">
-                                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                                                    <Building size={15} />
-                                                </div>
-                                                <input
-                                                    id="newEmployerName"
-                                                    name="newEmployerName"
-                                                    type="text"
-                                                    required={isOtherEmployer}
-                                                    minLength={2}
-                                                    maxLength={150}
-                                                    value={form.newEmployerName}
-                                                    onChange={handleChange}
-                                                    placeholder="Empresa Ltda."
-                                                    className={inputWithIcon}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label htmlFor="newEmployerCnpj" className={labelBase}>
-                                                CNPJ {requiredMark}
-                                            </label>
-                                            <div className="relative">
-                                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
-                                                    <Hash size={15} />
-                                                </div>
-                                                <input
-                                                    id="newEmployerCnpj"
-                                                    name="newEmployerCnpj"
-                                                    type="text"
-                                                    required={isOtherEmployer}
-                                                    inputMode="numeric"
-                                                    maxLength={18}
-                                                    value={form.newEmployerCnpj}
-                                                    onChange={handleChange}
-                                                    placeholder="00.000.000/0001-00"
-                                                    className={inputWithIcon}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
 
                         {/* Erro */}
                         {error && (

@@ -34,7 +34,6 @@ public class EmployerEntityController {
     }
 
     @Get
-    @Secured(SecurityRule.IS_ANONYMOUS)
     @Produces(MediaType.APPLICATION_JSON)
     public List<EmployerEntityResponse> listAll() {
         return service.listAll();
