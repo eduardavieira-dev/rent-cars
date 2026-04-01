@@ -66,6 +66,41 @@ const INITIAL_FORM: FormState = {
 const EMPLOYER_OPTION_NONE = '';
 const EMPLOYER_OPTION_OTHER = 'outra';
 
+// ── Input masks ──────────────────────────────────────────────
+function maskCpf(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length <= 3) return d;
+    if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+    if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+    return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+}
+
+function maskPhone(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 11);
+    if (d.length === 0) return '';
+    if (d.length <= 2) return `(${d}`;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+function maskRg(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 9);
+    if (d.length <= 2) return d;
+    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
+    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
+}
+
+function maskCnpj(v: string): string {
+    const d = v.replace(/\D/g, '').slice(0, 14);
+    if (d.length <= 2) return d;
+    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
+    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
+    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
+}
+
 // ── Animation variants ───────────────────────────────────────
 const container = {
     hidden: {},
@@ -107,7 +142,12 @@ export default function CadastroClientePage() {
 
     function handleChange(e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        let masked = value;
+        if (name === 'cpf') masked = maskCpf(value);
+        else if (name === 'phone') masked = maskPhone(value);
+        else if (name === 'rg') masked = maskRg(value);
+        else if (name === 'newEmployerCnpj') masked = maskCnpj(value);
+        setForm((prev) => ({ ...prev, [name]: masked }));
     }
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -159,7 +199,7 @@ export default function CadastroClientePage() {
                 const message = (err.response?.data as { message?: string })?.message;
 
                 if (status === 409) {
-                    setError(message ?? 'E-mail ou CPF já cadastrado.');
+                    setError(message ?? 'E-mail ou CPF já cadastrado. Verifique os dados.');
                 } else if (status === 400) {
                     setError(message ? `Dado inválido: ${message}` : 'Verifique os dados informados e tente novamente.');
                 } else {
@@ -334,6 +374,8 @@ export default function CadastroClientePage() {
                                         name="cpf"
                                         type="text"
                                         required
+                                        inputMode="numeric"
+                                        maxLength={14}
                                         value={form.cpf}
                                         onChange={handleChange}
                                         placeholder="000.000.000-00"
@@ -356,6 +398,8 @@ export default function CadastroClientePage() {
                                         type="tel"
                                         required
                                         autoComplete="tel"
+                                        inputMode="numeric"
+                                        maxLength={15}
                                         value={form.phone}
                                         onChange={handleChange}
                                         placeholder="(11) 99999-9999"
@@ -377,8 +421,8 @@ export default function CadastroClientePage() {
                                         id="rg"
                                         name="rg"
                                         type="text"
-                                        minLength={5}
-                                        maxLength={20}
+                                        inputMode="numeric"
+                                        maxLength={12}
                                         value={form.rg}
                                         onChange={handleChange}
                                         placeholder="12.345.678-9"
@@ -510,6 +554,8 @@ export default function CadastroClientePage() {
                                                     name="newEmployerCnpj"
                                                     type="text"
                                                     required={isOtherEmployer}
+                                                    inputMode="numeric"
+                                                    maxLength={18}
                                                     value={form.newEmployerCnpj}
                                                     onChange={handleChange}
                                                     placeholder="00.000.000/0001-00"

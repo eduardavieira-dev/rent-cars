@@ -28,6 +28,8 @@ public abstract class User {
     @Column(nullable = false)
     private String password;
 
+    protected User() {}
+
     protected User(String name, String email, String phone, String password) {
         this.name = name;
         this.email = email;
