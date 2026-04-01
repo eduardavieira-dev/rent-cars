@@ -44,7 +44,7 @@ public class AuthenticationProviderService implements AuthenticationProvider<Htt
                     AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH));
         }
 
-        String role = "ROLE_" + user.getClass().getSimpleName().toUpperCase();
+        String role = user.getClass().getSimpleName().toUpperCase();
         return Publishers.just(AuthenticationResponse.success(email, List.of(role)));
     }
 }
