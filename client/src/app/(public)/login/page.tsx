@@ -38,10 +38,11 @@ function LoginForm() {
         setIsLoading(true);
 
         try {
-            const { data } = await axios.post<LoginResponse>(`${BASE_URL}/login`, {
-                username: email,
-                password,
-            });
+            const params = new URLSearchParams();
+            params.append('username', email);
+            params.append('password', password);
+
+            const { data } = await axios.post<LoginResponse>(`${BASE_URL}/login`, params);
 
             login(data.access_token);
             router.push(searchParams.get('redirect') ?? '/dashboard');
@@ -187,7 +188,7 @@ function LoginForm() {
                     <motion.p variants={item} className="mt-6 text-center text-sm text-muted-foreground">
                         Não tem conta?{' '}
                         <Link
-                            href="/cadastro/cliente"
+                            href="/cadastro"
                             className="text-primary hover:opacity-80 font-medium transition-opacity"
                         >
                             Cadastre-se
