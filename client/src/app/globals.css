@@ -65,6 +65,16 @@ body {
     font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
 /* Select options inherit dark background in supported browsers */
 select option {
     background-color: var(--input);

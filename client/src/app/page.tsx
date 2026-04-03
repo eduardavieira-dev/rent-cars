@@ -135,7 +135,7 @@ export default function Home() {
                     </Link>
                 </aside>
 
-                <div id="home" className="relative z-10 mx-auto flex min-h-[76vh] w-full max-w-6xl items-center justify-center px-6 pt-28 pb-16 text-center sm:pt-24">
+                <div id="home" className="scroll-mt-28 relative z-10 mx-auto flex min-h-[76vh] w-full max-w-6xl items-center justify-center px-6 pt-28 pb-16 text-center sm:pt-24">
                     <div className="mx-auto max-w-3xl">
                         <h1 className="font-heading text-4xl font-bold leading-tight text-foreground sm:text-5xl">
                             Gerencie e alugue veículos de forma simples e segura
@@ -162,7 +162,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="sobre" className="mx-auto w-full max-w-6xl px-6 py-5 md:py-10">
+            <section id="sobre" className="scroll-mt-28 mx-auto w-full max-w-6xl px-6 py-5 md:py-10">
                 <h2 className="text-center font-heading text-4xl font-bold">O que é o Rent Cars?</h2>
                 <p className="mx-auto mt-5 max-w-3xl text-center text-muted-foreground">
                     O Rent Cars é um sistema web desenvolvido para facilitar a gestão de aluguel de veículos. Ele
@@ -209,7 +209,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="frota" className="mx-auto w-full max-w-6xl px-6 py-8">
+            <section id="frota" className="scroll-mt-28 mx-auto w-full max-w-6xl px-6 py-8">
                 <h2 className="text-center font-heading text-4xl font-bold">Conheça a nossa Frota</h2>
                 <p className="mt-3 text-center text-muted-foreground">
                     As melhores condições para você reservar e aproveitar.
@@ -259,7 +259,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="faq" className="mx-auto grid w-full max-w-6xl gap-10 px-8 py-20 lg:grid-cols-2">
+            <section id="faq" className="scroll-mt-28 mx-auto grid w-full max-w-6xl gap-10 px-8 py-20 lg:grid-cols-2">
                 <div>
                     <h2 className="font-heading text-4xl font-bold">Perguntas Frequentes</h2>
                     <p className="mt-4 text-muted-foreground">
