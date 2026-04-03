@@ -6,6 +6,8 @@ import {
     ArrowRight,
     Briefcase,
     CreditCard,
+    Eye,
+    EyeOff,
     FileText,
     Lock,
     Mail,
@@ -106,6 +108,7 @@ export default function CadastroClientePage() {
     const router = useRouter();
 
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -277,7 +280,7 @@ export default function CadastroClientePage() {
                                     <input
                                         id="password"
                                         name="password"
-                                        type="password"
+                                        type={showPassword ? 'text' : 'password'}
                                         required
                                         autoComplete="new-password"
                                         minLength={6}
@@ -285,8 +288,16 @@ export default function CadastroClientePage() {
                                         value={form.password}
                                         onChange={handleChange}
                                         placeholder="Mín. 6 caracteres"
-                                        className={inputWithIcon}
+                                        className={`${inputBase} pl-10 pr-10`}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                    >
+                                        {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>

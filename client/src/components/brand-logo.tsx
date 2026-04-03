@@ -39,7 +39,7 @@ export function BrandLogo({
     const config = sizeMap[size];
 
     return (
-        <div className={mergeClassNames('flex items-center', className)}>
+        <a href="/" className={mergeClassNames('flex items-center', className)}>
             <div className={mergeClassNames(' flex items-center justify-center shrink-0', config.box)}>
                 <Car size="22" className="text-primary" />
             </div>
@@ -52,6 +52,6 @@ export function BrandLogo({
             >
                 {label}
             </span>
-        </div>
+        </a>
     );
 }
