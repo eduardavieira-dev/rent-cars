@@ -82,8 +82,9 @@ function LoginForm() {
                 initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="hidden md:flex md:w-5/12 lg:w-[42%] bg-secondary flex-col justify-between p-10 relative overflow-hidden border-r border-border"
+                className="hidden md:flex md:w-5/12 lg:w-[42%] bg-secondary bg-[url('/background.png')] bg-cover bg-center bg-no-repeat flex-col justify-between p-10 relative overflow-hidden border-r border-border"
             >
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-black/65 via-black/45 to-black/25" />
                 <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-8 -right-16 w-72 h-72 rounded-full bg-amber-400/8 blur-3xl" />
 
@@ -95,7 +96,7 @@ function LoginForm() {
                         <span className="text-gradient-gold">Locação de Veículos</span>
                     </h2>
                     <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-                        Gerencie sua frota, contratos e clientes em um único lugar — com segurança e eficiência.
+                        Gerencie sua frota, contratos e clientes em um único lugar com segurança e eficiência.
                     </p>
                 </div>
 
@@ -111,7 +112,7 @@ function LoginForm() {
                     animate="visible"
                     className="w-full max-w-sm"
                 >
-                    <motion.div variants={item} className="flex md:hidden items-center justify-center gap-2.5 mb-10">
+                    <motion.div variants={item} className="flex md:hidden items-center gap-2.5 mb-10">
                         <BrandLogo size="sm" />
                     </motion.div>
 

@@ -150,8 +150,9 @@ export default function CadastroEmpresaPage() {
                 initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="hidden lg:flex lg:w-[38%] bg-secondary flex-col justify-between p-10 sticky top-0 h-screen overflow-hidden border-r border-border"
+                className="hidden lg:flex lg:w-[38%] bg-secondary bg-[url('/background.png')] bg-cover bg-center bg-no-repeat flex-col justify-between p-10 sticky top-0 h-screen overflow-hidden border-r border-border"
             >
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-black/65 via-black/45 to-black/25" />
                 <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-8 -right-16 w-64 h-64 rounded-full bg-amber-400/8 blur-3xl" />
 
@@ -175,7 +176,7 @@ export default function CadastroEmpresaPage() {
                 </p>
             </motion.aside>
 
-            <div className="w-full lg:w-[62%] flex justify-center px-6 py-12">
+            <div className="w-full lg:w-[62%] flex items-center justify-center px-6 py-12">
                 <motion.div
                     variants={container}
                     initial="hidden"
