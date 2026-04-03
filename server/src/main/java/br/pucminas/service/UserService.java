@@ -4,8 +4,10 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import br.pucminas.model.*;
 import br.pucminas.dto.request.*;
 import br.pucminas.dto.response.UserResponse;
+import br.pucminas.exception.CpfAlreadyExistsException;
 import br.pucminas.exception.EmailAlreadyExistsException;
 import br.pucminas.exception.UserNotFoundException;
+import br.pucminas.repository.ClientRepository;
 import br.pucminas.repository.UserRepository;
 import jakarta.inject.Singleton;
 import jakarta.transaction.Transactional;
@@ -19,14 +21,17 @@ import java.util.stream.StreamSupport;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, ClientRepository clientRepository) {
         this.userRepository = userRepository;
+        this.clientRepository = clientRepository;
     }
 
     @Transactional
     public UserResponse registerClient(RegisterClientRequest request) {
         validateEmailUniqueness(request.email());
+        validateCpfUniqueness(request.cpf());
         Client client = new Client(
                 request.name(), request.email(), request.phone(), hashPassword(request.password()),
                 request.cpf(), request.rg(), request.address(), request.profession());
@@ -117,6 +122,12 @@ public class UserService {
     public void deleteUser(UUID id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
+        }
+    }
+
+    private void validateCpfUniqueness(String cpf) {
+        if (clientRepository.existsByCpf(cpf)) {
+            throw new CpfAlreadyExistsException(cpf);
         }
     }
 

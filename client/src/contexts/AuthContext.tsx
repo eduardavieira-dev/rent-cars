@@ -18,7 +18,9 @@ function decodeToken(token: string): AuthUser | null {
 
 function persistToken(token: string): void {
     localStorage.setItem(TOKEN_KEY, token);
-    document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=${60 * 60 * 24 * 30}; samesite=lax`;
+    const decoded = decodeToken(token);
+    const maxAge = decoded ? Math.max(0, decoded.exp - Math.floor(Date.now() / 1000)) : 3600;
+    document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=${maxAge}; samesite=lax`;
 }
 
 function clearToken(): void {

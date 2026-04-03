@@ -1,3 +1,22 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+
+import { useAuth } from '@/hooks/useAuth';
+
 export default function DashboardPage() {
-    return <h1>Painel</h1>;
+    const { logout } = useAuth();
+    const router = useRouter();
+
+    function handleLogout() {
+        logout();
+        router.push('/login');
+    }
+
+    return (
+        <div>
+            <h1>Painel</h1>
+            <button onClick={handleLogout}>Sair</button>
+        </div>
+    );
 }

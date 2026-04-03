@@ -1,26 +1,72 @@
 @import 'tailwindcss';
 
+/* ─── Design Tokens ──────────────────────────────────────── */
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --background:           #0c0a09;
+    --foreground:           #fafaf9;
+    --secondary:            #141210;
+    --secondary-foreground: #e7e5e4;
+    --muted-foreground:     #a8a29e;
+    --border:               #2c2624;
+    --primary:              #d97706;
+    --primary-foreground:   #0c0400;
+    --input:                #1c1917;
+    --destructive:          #ef4444;
+    --card:                 #111010;
 }
 
+/* ─── Tailwind 4 Theme Extension ─────────────────────────── */
 @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
+    --color-background:           var(--background);
+    --color-foreground:           var(--foreground);
+    --color-secondary:            var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted-foreground:     var(--muted-foreground);
+    --color-border:               var(--border);
+    --color-primary:              var(--primary);
+    --color-primary-foreground:   var(--primary-foreground);
+    --color-input:                var(--input);
+    --color-destructive:          var(--destructive);
+    --color-card:                 var(--card);
+
+    --font-sans:    var(--font-geist-sans);
+    --font-mono:    var(--font-geist-mono);
+    --font-heading: var(--font-raleway);
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
+/* ─── Custom Utilities ───────────────────────────────────── */
+@layer utilities {
+    .bg-gradient-gold {
+        background: linear-gradient(135deg, #b45309 0%, #d97706 40%, #f59e0b 75%, #fbbf24 100%);
+    }
+
+    .bg-gradient-card {
+        background: linear-gradient(160deg, #1a1614 0%, #0e0c0b 100%);
+    }
+
+    .text-gradient-gold {
+        background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 55%, #fde68a 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .shadow-gold {
+        box-shadow:
+            0 8px 32px -8px rgba(217, 119, 6, 0.45),
+            0 2px 8px -2px rgba(217, 119, 6, 0.2);
     }
 }
 
+/* ─── Base ───────────────────────────────────────────────── */
 body {
-    background: var(--background);
+    background-color: var(--background);
     color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Select options inherit dark background in supported browsers */
+select option {
+    background-color: var(--input);
+    color: var(--foreground);
 }

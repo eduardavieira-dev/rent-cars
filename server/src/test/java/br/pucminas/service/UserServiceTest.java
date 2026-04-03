@@ -8,6 +8,7 @@ import br.pucminas.dto.request.*;
 import br.pucminas.dto.response.UserResponse;
 import br.pucminas.exception.EmailAlreadyExistsException;
 import br.pucminas.exception.UserNotFoundException;
+import br.pucminas.repository.ClientRepository;
 import br.pucminas.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,18 +24,21 @@ import static org.mockito.Mockito.*;
 class UserServiceTest {
 
     private UserRepository userRepository;
+    private ClientRepository clientRepository;
     private UserService userService;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
-        userService = new UserService(userRepository);
+        clientRepository = mock(ClientRepository.class);
+        userService = new UserService(userRepository, clientRepository);
     }
 
     @Test
     void shouldRegisterClientSuccessfully() {
         UUID savedId = UUID.randomUUID();
         when(userRepository.existsByEmail("test@email.com")).thenReturn(false);
+        when(clientRepository.existsByCpf("12345678901")).thenReturn(false);
         Client savedClient = new Client("Test", "test@email.com", "31999990001", "hashed",
                 "12345678901", null, null, null);
         setId(savedClient, savedId);
@@ -56,6 +60,7 @@ class UserServiceTest {
     @Test
     void shouldRejectDuplicateEmailOnRegisterClient() {
         when(userRepository.existsByEmail("taken@email.com")).thenReturn(true);
+        when(clientRepository.existsByCpf("12345678901")).thenReturn(false);
 
         var request = new RegisterClientRequest(
                 "Test", "taken@email.com", "31999990001", "secret123",
@@ -228,6 +233,7 @@ class UserServiceTest {
     @Test
     void shouldHashPasswordOnRegistration() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(clientRepository.existsByCpf(anyString())).thenReturn(false);
         when(userRepository.save(any(Client.class))).thenAnswer(inv -> {
             Client c = inv.getArgument(0);
             setId(c, UUID.randomUUID());

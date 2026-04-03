@@ -24,6 +24,21 @@ public class AuthController {
         this.userService = userService;
     }
 
+    @Options("/register/client")
+    public HttpResponse<?> handlePreflightClient() {
+        return HttpResponse.ok();
+    }
+
+    @Options("/register/bank")
+    public HttpResponse<?> handlePreflightBank() {
+        return HttpResponse.ok();
+    }
+
+    @Options("/register/company")
+    public HttpResponse<?> handlePreflightCompany() {
+        return HttpResponse.ok();
+    }
+
     @Post("/register/client")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
