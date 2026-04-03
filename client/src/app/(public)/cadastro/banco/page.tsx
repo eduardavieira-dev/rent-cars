@@ -31,6 +31,25 @@ function maskCode(v: string): string {
     return v.replace(/\D/g, '').slice(0, 3);
 }
 
+function onlyDigits(value: string): string {
+    return value.replace(/\D/g, '');
+}
+
+function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function validateForm(form: FormState): string | null {
+    if (!form.name.trim()) return 'Informe o nome do responsável.';
+    if (!isValidEmail(form.email)) return 'Informe um e-mail válido.';
+    if (form.password.length < 6) return 'A senha deve ter no mínimo 6 caracteres.';
+    if (onlyDigits(form.phone).length < 10) return 'Informe um telefone válido.';
+    if (onlyDigits(form.cnpj).length !== 14) return 'Informe um CNPJ válido.';
+    if (onlyDigits(form.code).length !== 3) return 'Informe um código FEBRABAN válido.';
+
+    return null;
+}
+
 const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
@@ -83,6 +102,13 @@ export default function CadastroBancoPage() {
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        const validationError = validateForm(form);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
         setError('');
         setIsLoading(true);
 

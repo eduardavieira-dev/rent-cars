@@ -27,6 +27,25 @@ function maskCnpj(v: string): string {
     return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
 }
 
+function onlyDigits(value: string): string {
+    return value.replace(/\D/g, '');
+}
+
+function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function validateForm(form: FormState): string | null {
+    if (!form.name.trim()) return 'Informe o nome do responsável.';
+    if (!form.corporateName.trim()) return 'Informe a razão social.';
+    if (!isValidEmail(form.email)) return 'Informe um e-mail válido.';
+    if (form.password.length < 6) return 'A senha deve ter no mínimo 6 caracteres.';
+    if (onlyDigits(form.phone).length < 10) return 'Informe um telefone válido.';
+    if (onlyDigits(form.cnpj).length !== 14) return 'Informe um CNPJ válido.';
+
+    return null;
+}
+
 const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
@@ -78,6 +97,13 @@ export default function CadastroEmpresaPage() {
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        const validationError = validateForm(form);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
         setError('');
         setIsLoading(true);
 

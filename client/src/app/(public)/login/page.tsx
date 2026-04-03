@@ -22,6 +22,17 @@ const item = {
     visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
 };
 
+function isValidEmail(value: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+
+function validateForm(email: string, password: string): string | null {
+    if (!isValidEmail(email)) return 'Informe um e-mail válido.';
+    if (!password) return 'Informe sua senha.';
+
+    return null;
+}
+
 function LoginForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -34,6 +45,13 @@ function LoginForm() {
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        const validationError = validateForm(email, password);
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
         setError('');
         setIsLoading(true);
 
