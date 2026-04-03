@@ -70,3 +70,44 @@ select option {
     background-color: var(--input);
     color: var(--foreground);
 }
+
+@keyframes accordion-down {
+    from {
+        height: 0;
+        opacity: 0;
+    }
+    to {
+        height: var(--radix-accordion-content-height);
+        opacity: 1;
+    }
+}
+
+@keyframes accordion-up {
+    from {
+        height: var(--radix-accordion-content-height);
+        opacity: 1;
+    }
+    to {
+        height: 0;
+        opacity: 0;
+    }
+}
+
+.accordion-content[data-state='open'] {
+    animation: accordion-down 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.accordion-content[data-state='closed'] {
+    animation: accordion-up 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.accordion-content > div {
+    transform: translateY(-4px);
+    opacity: 0;
+    transition: opacity 360ms ease, transform 360ms ease;
+}
+
+.accordion-content[data-state='open'] > div {
+    transform: translateY(0);
+    opacity: 1;
+}
