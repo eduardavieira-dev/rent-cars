@@ -85,7 +85,7 @@ function LoginForm() {
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="hidden md:flex md:w-5/12 lg:w-[42%] bg-secondary bg-[url('/background.png')] bg-cover bg-center bg-no-repeat flex-col justify-between p-10 relative overflow-hidden border-r border-border"
             >
-                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-black/75 via-black/65 to-black/35" />
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-black/75 via-black/45 to-black/35" />
                 <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-8 -right-16 w-72 h-72 rounded-full bg-amber-400/8 blur-3xl" />
 
@@ -94,7 +94,7 @@ function LoginForm() {
                 <div className="relative z-10">
                     <h2 className="font-heading text-3xl lg:text-4xl font-bold text-foreground leading-snug mb-4">
                         Gestão Inteligente de{' '}
-                        <span className="text-gradient-gold">Locação de Veículos</span>
+                        <span className="text-orange-400">Locação de Veículos</span>
                     </h2>
                     <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
                         Gerencie sua frota, contratos e clientes em um único lugar com segurança e eficiência.

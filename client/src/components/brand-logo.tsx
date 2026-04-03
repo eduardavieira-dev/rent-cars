@@ -45,7 +45,7 @@ export function BrandLogo({
             </div>
             <span
                 className={mergeClassNames(
-                    'font-heading font-bold text-primary tracking-tight',
+                    'font-heading font-bold tracking-tight',
                     config.text,
                     textClassName,
                 )}
