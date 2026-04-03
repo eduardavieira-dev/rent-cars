@@ -1,18 +1,20 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Building2, Car, Landmark, User, UserPlus } from 'lucide-react';
+import { ArrowRight, Building2, Landmark, User, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+
+import { BrandLogo } from '@/components/brand-logo';
 
 const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
-};
+} as const;
 
 const item = {
     hidden: { opacity: 0, y: 12 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
-};
+} as const;
 
 const options = [
     {
@@ -42,19 +44,12 @@ export default function CadastroPage() {
                 initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="hidden lg:flex lg:w-[38%] bg-secondary flex-col justify-between p-10 sticky top-0 h-screen relative overflow-hidden border-r border-border"
+                className="hidden lg:flex lg:w-[38%] bg-secondary flex-col justify-between p-10 sticky top-0 h-screen overflow-hidden border-r border-border"
             >
                 <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-8 -right-16 w-64 h-64 rounded-full bg-amber-400/8 blur-3xl" />
 
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-gold shadow-gold flex items-center justify-center shrink-0">
-                        <Car size={20} className="text-primary-foreground" />
-                    </div>
-                    <span className="font-heading text-xl font-bold text-foreground tracking-tight">
-                        Rent Cars
-                    </span>
-                </div>
+                <BrandLogo size="md" className="relative z-10" />
 
                 <div className="relative z-10">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-gold shadow-gold flex items-center justify-center mb-6">
@@ -82,10 +77,7 @@ export default function CadastroPage() {
                     className="w-full max-w-md"
                 >
                     <motion.div variants={item} className="flex lg:hidden items-center gap-2.5 mb-10">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-gold shadow-gold flex items-center justify-center">
-                            <Car size={17} className="text-primary-foreground" />
-                        </div>
-                        <span className="font-heading text-lg font-bold text-foreground">Rent Cars</span>
+                        <BrandLogo size="sm" />
                     </motion.div>
 
                     <motion.div variants={item} className="mb-8">

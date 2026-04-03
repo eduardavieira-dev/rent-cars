@@ -10,6 +10,7 @@
         "format": "prettier --write ."
     },
     "dependencies": {
+        "@phosphor-icons/react": "^2.1.10",
         "axios": "^1.14.0",
         "framer-motion": "^12.38.0",
         "lucide-react": "^1.7.0",

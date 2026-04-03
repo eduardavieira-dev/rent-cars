@@ -2,11 +2,12 @@
 
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { ArrowRight, Car, Lock, Mail } from 'lucide-react';
+import { ArrowRight, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, Suspense, useState } from 'react';
 
+import { BrandLogo } from '@/components/brand-logo';
 import { useAuth } from '@/hooks/useAuth';
 import type { LoginResponse } from '@/types/auth';
 
@@ -15,12 +16,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const container = {
     hidden: {},
     visible: { transition: { staggerChildren: 0.09, delayChildren: 0.1 } },
-};
+} as const;
 
 const item = {
     hidden: { opacity: 0, y: 14 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
-};
+} as const;
 
 function isValidEmail(value: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -86,14 +87,7 @@ function LoginForm() {
                 <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
                 <div className="pointer-events-none absolute bottom-8 -right-16 w-72 h-72 rounded-full bg-amber-400/8 blur-3xl" />
 
-                <div className="relative z-10 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-gold shadow-gold flex items-center justify-center shrink-0">
-                        <Car size={20} className="text-primary-foreground" />
-                    </div>
-                    <span className="font-heading text-xl font-bold text-foreground tracking-tight">
-                        Rent Cars
-                    </span>
-                </div>
+                <BrandLogo size="md" className="relative z-10" />
 
                 <div className="relative z-10">
                     <h2 className="font-heading text-3xl lg:text-4xl font-bold text-foreground leading-snug mb-4">
@@ -118,10 +112,7 @@ function LoginForm() {
                     className="w-full max-w-sm"
                 >
                     <motion.div variants={item} className="flex md:hidden items-center justify-center gap-2.5 mb-10">
-                        <div className="w-9 h-9 rounded-xl bg-gradient-gold shadow-gold flex items-center justify-center">
-                            <Car size={17} className="text-primary-foreground" />
-                        </div>
-                        <span className="font-heading text-lg font-bold text-foreground">Rent Cars</span>
+                        <BrandLogo size="sm" />
                     </motion.div>
 
                     <motion.div variants={item} className="mb-8">
