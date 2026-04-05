@@ -148,11 +148,39 @@ public class UserService {
     }
 
     private UserResponse toResponse(User user) {
+        String cpf = null;
+        String rg = null;
+        String address = null;
+        String profession = null;
+        String cnpj = null;
+        String code = null;
+        String corporateName = null;
+
+        if (user instanceof Client client) {
+            cpf = client.getCpf();
+            rg = client.getRg();
+            address = client.getAddress();
+            profession = client.getProfession();
+        } else if (user instanceof Bank bank) {
+            cnpj = bank.getCnpj();
+            code = bank.getCode();
+        } else if (user instanceof Company company) {
+            cnpj = company.getCnpj();
+            corporateName = company.getCorporateName();
+        }
+
         return new UserResponse(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getClass().getSimpleName());
+                user.getClass().getSimpleName(),
+                cpf,
+                rg,
+                address,
+                profession,
+                cnpj,
+                code,
+                corporateName);
     }
 }
