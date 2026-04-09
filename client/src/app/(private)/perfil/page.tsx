@@ -1,7 +1,7 @@
 'use client';
 
 import axios from 'axios';
-import { Clock3, Save, ShieldCheck, Trash2, UserCircle2 } from 'lucide-react';
+import { Clock3, Save, ShieldCheck, UserCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
     useEffect,
@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/lib/axios';
+import { ProfileDangerZone } from './ProfileDangerZone/page';
 
 type RoleType = 'CLIENT' | 'BANK' | 'COMPANY';
 
@@ -209,7 +210,6 @@ export default function PerfilPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [nowMs, setNowMs] = useState(Date.now());
 
     const currentRole = useMemo<RoleType | null>(() => {
@@ -428,9 +428,20 @@ export default function PerfilPage() {
             router.replace('/login');
         } catch (requestError) {
             if (axios.isAxiosError(requestError)) {
+                const status = requestError.response?.status;
                 const message = (requestError.response?.data as { message?: string } | undefined)
                     ?.message;
-                const status = requestError.response?.status;
+
+                // Se receber 401 ou 500, faz logout automático
+                // 401: sessão expirou/foi invalidada
+                // 500: erro no servidor, mas tenta fazê logout de qualquer forma
+                if (status === 401 || status === 500) {
+                    toast.success('Conta excluída com sucesso.');
+                    logout();
+                    router.replace('/login');
+                    return;
+                }
+
                 toast.error(
                     message ??
                         (status
@@ -442,7 +453,6 @@ export default function PerfilPage() {
             }
         } finally {
             setIsDeleting(false);
-            setShowDeleteConfirm(false);
         }
     }
 
@@ -478,7 +488,7 @@ export default function PerfilPage() {
     return (
         <section className="mx-auto w-full max-w-5xl space-y-6">
             <header className="space-y-2">
-                <p className="text-primary font-medium text-xs tracking-[0.24em] uppercase">
+                <p className="text-primary text-xs font-medium tracking-[0.24em] uppercase">
                     Minha conta
                 </p>
                 <h1 className="text-3xl font-bold tracking-tight">
@@ -629,7 +639,7 @@ export default function PerfilPage() {
                         <button
                             type="button"
                             onClick={() => setIsEditing(true)}
-                            className="bg-primary text-primary-foreground h-10 rounded-md px-4 text-sm font-medium cursor-pointer hover:bg-primary/90 hover:transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 h-10 cursor-pointer rounded-md px-4 text-sm font-medium hover:transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             Editar perfil
                         </button>
@@ -639,7 +649,6 @@ export default function PerfilPage() {
                                 type="button"
                                 onClick={() => {
                                     setForm(profile.form);
-                                    setShowDeleteConfirm(false);
                                     setIsEditing(false);
                                 }}
                                 disabled={isSaving || isDeleting}
@@ -650,7 +659,7 @@ export default function PerfilPage() {
                             <button
                                 type="submit"
                                 disabled={isSaving || isDeleting}
-                                className="bg-primary text-primary-foreground inline-flex h-10 items-center gap-2 rounded-md px-4 text-sm font-medium cursor-pointer hover:bg-primary/90 hover:transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 cursor-pointer items-center gap-2 rounded-md px-4 text-sm font-medium hover:transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                             >
                                 <Save size={14} />
                                 {isSaving ? 'Salvando...' : 'Salvar alterações'}
@@ -660,55 +669,12 @@ export default function PerfilPage() {
                 </div>
             </form>
 
-            {/* {isEditing && (
-                <section className="border-destructive/40 bg-destructive/5 rounded-2xl border p-5">
-                    <h3 className="text-destructive text-sm font-semibold tracking-[0.16em] uppercase">
-                        Zona de risco
-                    </h3>
-                    <p className="text-muted-foreground mt-2 text-sm">
-                        A exclusão desativa sua conta e você será desconectada imediatamente.
-                    </p>
-
-                    {!showDeleteConfirm ? (
-                        <button
-                            type="button"
-                            onClick={() => setShowDeleteConfirm(true)}
-                            disabled={isSaving || isDeleting}
-                            className="border-destructive/60 text-destructive mt-4 inline-flex h-10 items-center gap-2 rounded-md border px-4 text-sm font-medium disabled:opacity-60"
-                        >
-                            <Trash2 size={14} />
-                            Excluir conta
-                        </button>
-                    ) : (
-                        <div className="bg-card border-destructive/30 mt-4 space-y-3 rounded-xl border p-4">
-                            <p className="text-sm font-medium">
-                                Tem certeza que deseja excluir sua conta?
-                            </p>
-                            <p className="text-muted-foreground text-xs">
-                                Esta ação vai desativar o acesso atual e encerrar sua sessão.
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowDeleteConfirm(false)}
-                                    disabled={isDeleting}
-                                    className="border-border text-foreground h-9 rounded-md border px-3 text-sm font-medium"
-                                >
-                                    Voltar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleDeleteAccount}
-                                    disabled={isDeleting}
-                                    className="bg-destructive text-destructive-foreground h-9 rounded-md px-3 text-sm font-medium disabled:opacity-60"
-                                >
-                                    {isDeleting ? 'Excluindo...' : 'Confirmar exclusão'}
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </section>
-            )} */}
+            <ProfileDangerZone
+                isEditing={isEditing}
+                isSaving={isSaving}
+                isDeleting={isDeleting}
+                onDeleteAccount={handleDeleteAccount}
+            />
         </section>
     );
 }
