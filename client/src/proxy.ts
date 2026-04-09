@@ -11,7 +11,7 @@ function isTokenValid(token: string): boolean {
     }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
     const rawToken = request.cookies.get('access_token')?.value;
     const token = rawToken && isTokenValid(rawToken) ? rawToken : null;
     const { pathname } = request.nextUrl;
@@ -20,7 +20,6 @@ export function middleware(request: NextRequest) {
         pathname === '/' ||
         PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
-    // Expired cookie on a protected route: clear it and send to login
     if (rawToken && !token && !isPublicPath) {
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirect', pathname);

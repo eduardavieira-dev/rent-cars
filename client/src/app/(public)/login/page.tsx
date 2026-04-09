@@ -1,6 +1,5 @@
 'use client';
 
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
@@ -8,10 +7,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, Suspense, useState } from 'react';
 
 import { BrandLogo } from '@/components/brand-logo';
+import api, { axios } from '@/lib/axios';
 import { useAuth } from '@/hooks/useAuth';
 import type { LoginResponse } from '@/types/auth';
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const container = {
     hidden: {},
@@ -62,11 +60,15 @@ function LoginForm() {
             params.append('username', email);
             params.append('password', password);
 
-            const { data } = await axios.post<LoginResponse>(`${BASE_URL}/login`, params);
+            const { data } = await api.post<LoginResponse>('/login', params, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
 
             login(data.access_token);
             router.push(searchParams.get('redirect') ?? '/dashboard');
-        } catch (err) {
+        } catch (err: unknown) {
             if (axios.isAxiosError(err) && err.response?.status === 401) {
                 setError('E-mail ou senha inválidos.');
             } else {
