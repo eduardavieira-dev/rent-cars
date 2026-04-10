@@ -284,7 +284,7 @@ export default function ClientRegistrationPage() {
                     </motion.div>
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="name" className={labelBase}>
                                     Nome completo {requiredMark}
@@ -342,7 +342,7 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="cpf" className={labelBase}>
                                     CPF {requiredMark}
@@ -406,7 +406,7 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="phone" className={labelBase}>
                                     Telefone {requiredMark}
@@ -471,7 +471,7 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="street" className={labelBase}>
                                     Rua {requiredMark}
@@ -531,7 +531,7 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="neighborhood" className={labelBase}>
                                     Bairro {requiredMark}
@@ -618,7 +618,7 @@ export default function ClientRegistrationPage() {
                             )}
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="password" className={labelBase}>
                                     Senha {requiredMark}

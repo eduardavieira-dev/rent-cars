@@ -220,7 +220,7 @@ export default function BankRegistrationPage() {
                     </motion.div>
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="name" className={labelBase}>
                                     Nome do banco {requiredMark}
@@ -311,7 +311,7 @@ export default function BankRegistrationPage() {
                             )}
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="email" className={labelBase}>
                                     E-mail {requiredMark}
@@ -371,7 +371,7 @@ export default function BankRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-2 gap-4">
+                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                                 <label htmlFor="password" className={labelBase}>
                                     Senha {requiredMark}
