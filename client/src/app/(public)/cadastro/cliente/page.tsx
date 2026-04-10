@@ -666,7 +666,7 @@ export default function ClientRegistrationPage() {
                                         onChange={(e) =>
                                             handleTextChange('password', e.target.value)
                                         }
-                                        placeholder="Mín. 6 caracteres"
+                                        placeholder="Mín. 8 caracteres, com letra, número e símbolo"
                                         className={`${inputBase} pr-10 pl-10`}
                                     />
                                     <button
