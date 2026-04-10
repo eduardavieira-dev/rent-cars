@@ -1,6 +1,6 @@
 'use client';
 
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 import {
     ArrowRight,
@@ -19,6 +19,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type ChangeEvent, type FormEvent, useState } from 'react';
+import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
 import api from '@/lib/axios';
@@ -48,23 +49,16 @@ function maskRg(v: string): string {
     return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
 }
 
-function onlyDigits(value: string): string {
-    return value.replace(/\D/g, '');
-}
-
-function isValidEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}
-
-function validateForm(form: FormState): string | null {
-    if (!form.name.trim()) return 'Informe o nome completo.';
-    if (!isValidEmail(form.email)) return 'Informe um e-mail válido.';
-    if (form.password.length < 6) return 'A senha deve ter no mínimo 6 caracteres.';
-    if (onlyDigits(form.phone).length < 10) return 'Informe um telefone válido.';
-    if (onlyDigits(form.cpf).length !== 11) return 'Informe um CPF válido.';
-
-    return null;
-}
+const clienteSchema = z.object({
+    name: z.string().min(1, 'Informe o nome completo.'),
+    email: z.string().email('Informe um e-mail válido.'),
+    password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+    phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+    cpf: z.string().refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
+    rg: z.string().optional(),
+    address: z.string().optional(),
+    profession: z.string().optional(),
+});
 
 const container = {
     hidden: {},
@@ -124,9 +118,9 @@ export default function CadastroClientePage() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const validationError = validateForm(form);
-        if (validationError) {
-            setError(validationError);
+        const result = clienteSchema.safeParse(form);
+        if (!result.success) {
+            setError(result.error.issues[0].message);
             return;
         }
 
@@ -147,7 +141,7 @@ export default function CadastroClientePage() {
 
             router.push('/login');
         } catch (err) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 if (!err.response) {
                     setError('Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
                     return;

@@ -1,11 +1,12 @@
 'use client';
 
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 import { ArrowRight, Building, Eye, EyeOff, Hash, Landmark, Lock, Mail, Phone, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type ChangeEvent, type FormEvent, useState } from 'react';
+import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
 import api from '@/lib/axios';
@@ -32,24 +33,14 @@ function maskCode(v: string): string {
     return v.replace(/\D/g, '').slice(0, 3);
 }
 
-function onlyDigits(value: string): string {
-    return value.replace(/\D/g, '');
-}
-
-function isValidEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}
-
-function validateForm(form: FormState): string | null {
-    if (!form.name.trim()) return 'Informe o nome do responsável.';
-    if (!isValidEmail(form.email)) return 'Informe um e-mail válido.';
-    if (form.password.length < 6) return 'A senha deve ter no mínimo 6 caracteres.';
-    if (onlyDigits(form.phone).length < 10) return 'Informe um telefone válido.';
-    if (onlyDigits(form.cnpj).length !== 14) return 'Informe um CNPJ válido.';
-    if (onlyDigits(form.code).length !== 3) return 'Informe um código FEBRABAN válido.';
-
-    return null;
-}
+const bancoSchema = z.object({
+    name: z.string().min(1, 'Informe o nome do responsável.'),
+    email: z.string().email('Informe um e-mail válido.'),
+    password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+    phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+    cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
+    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código FEBRABAN válido.'),
+});
 
 const container = {
     hidden: {},
@@ -105,9 +96,9 @@ export default function CadastroBancoPage() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const validationError = validateForm(form);
-        if (validationError) {
-            setError(validationError);
+        const result = bancoSchema.safeParse(form);
+        if (!result.success) {
+            setError(result.error.issues[0].message);
             return;
         }
 
@@ -126,7 +117,7 @@ export default function CadastroBancoPage() {
 
             router.push('/login');
         } catch (err) {
-            if (axios.isAxiosError(err)) {
+            if (isAxiosError(err)) {
                 if (!err.response) {
                     setError('Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
                     return;

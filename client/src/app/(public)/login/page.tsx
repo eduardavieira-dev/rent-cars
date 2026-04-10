@@ -1,15 +1,22 @@
 'use client';
 
+import { isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
 import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, Suspense, useState } from 'react';
+import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
-import api, { axios } from '@/lib/axios';
+import api from '@/lib/axios';
 import { useAuth } from '@/hooks/useAuth';
 import type { LoginResponse } from '@/types/auth';
+
+const loginSchema = z.object({
+    email: z.string().email('Informe um e-mail válido.'),
+    password: z.string().min(1, 'Informe sua senha.'),
+});
 
 const container = {
     hidden: {},
@@ -20,17 +27,6 @@ const item = {
     hidden: { opacity: 0, y: 14 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
 } as const;
-
-function isValidEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}
-
-function validateForm(email: string, password: string): string | null {
-    if (!isValidEmail(email)) return 'Informe um e-mail válido.';
-    if (!password) return 'Informe sua senha.';
-
-    return null;
-}
 
 function LoginForm() {
     const router = useRouter();
@@ -46,9 +42,9 @@ function LoginForm() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const validationError = validateForm(email, password);
-        if (validationError) {
-            setError(validationError);
+        const result = loginSchema.safeParse({ email, password });
+        if (!result.success) {
+            setError(result.error.issues[0].message);
             return;
         }
 
@@ -69,7 +65,7 @@ function LoginForm() {
             login(data.access_token);
             router.push(searchParams.get('redirect') ?? '/dashboard');
         } catch (err: unknown) {
-            if (axios.isAxiosError(err) && err.response?.status === 401) {
+            if (isAxiosError(err) && err.response?.status === 401) {
                 setError('E-mail ou senha inválidos.');
             } else {
                 setError('Não foi possível conectar ao servidor. Tente novamente.');
