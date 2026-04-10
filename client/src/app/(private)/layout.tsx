@@ -1,8 +1,8 @@
 'use client';
 
-import { List } from '@phosphor-icons/react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { useAuth } from '@/hooks/useAuth';
+import { Menu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 
@@ -51,7 +51,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
                         className="text-secondary-foreground hover:bg-secondary inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors"
                         aria-label="Abrir menu"
                     >
-                        <List size={20} />
+                        <Menu size={20} />
                     </button>
                     <span className="text-sm font-medium">Menu</span>
                 </header>

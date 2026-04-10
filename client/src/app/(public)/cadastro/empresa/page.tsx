@@ -29,7 +29,7 @@ function maskCnpj(v: string): string {
     return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
 }
 
-const empresaSchema = z.object({
+const companySchema = z.object({
     name: z.string().min(1, 'Informe o nome do responsável.'),
     corporateName: z.string().min(1, 'Informe a razão social.'),
     email: z.string().email('Informe um e-mail válido.'),
@@ -72,7 +72,7 @@ const INITIAL_FORM: FormState = {
     corporateName: '',
 };
 
-export default function CadastroEmpresaPage() {
+export default function CompanyRegistrationPage() {
     const router = useRouter();
 
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
@@ -91,7 +91,7 @@ export default function CadastroEmpresaPage() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const result = empresaSchema.safeParse(form);
+        const result = companySchema.safeParse(form);
         if (!result.success) {
             setError(result.error.issues[0].message);
             return;

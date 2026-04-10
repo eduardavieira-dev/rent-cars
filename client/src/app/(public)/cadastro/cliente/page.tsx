@@ -49,7 +49,7 @@ function maskRg(v: string): string {
     return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
 }
 
-const clienteSchema = z.object({
+const clientSchema = z.object({
     name: z.string().min(1, 'Informe o nome completo.'),
     email: z.string().email('Informe um e-mail válido.'),
     password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
@@ -98,7 +98,7 @@ const INITIAL_FORM: FormState = {
     profession: '',
 };
 
-export default function CadastroClientePage() {
+export default function ClientRegistrationPage() {
     const router = useRouter();
 
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
@@ -118,7 +118,7 @@ export default function CadastroClientePage() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const result = clienteSchema.safeParse(form);
+        const result = clientSchema.safeParse(form);
         if (!result.success) {
             setError(result.error.issues[0].message);
             return;

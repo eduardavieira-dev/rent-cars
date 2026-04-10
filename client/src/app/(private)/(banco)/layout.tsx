@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 
-export default function BancoRoleLayout({ children }: { children: ReactNode }) {
+export default function BankRoleLayout({ children }: { children: ReactNode }) {
     const { hasRole, isLoading } = useAuth();
     const router = useRouter();
 

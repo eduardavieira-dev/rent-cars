@@ -1,4 +1,4 @@
-export default function AnalisarPedidosPage() {
+export default function ReviewOrdersPage() {
     return (
         <section className="space-y-2">
             <h1 className="text-2xl font-bold">Analisar pedidos</h1>

@@ -1,3 +1,3 @@
-export default function EntidadesEmpregadorasPage() {
+export default function EmployerEntitiesPage() {
     return <h1>Entidades Empregadoras</h1>;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Car, ClipboardText, FileText, SignOut, SquaresFour, User, X } from '@phosphor-icons/react';
+import { Car, ClipboardList, FileText, LayoutGrid, LogOut, User, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -34,7 +34,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
     const roleItems: MenuItem[] = [];
 
     if (isClient) {
-        roleItems.push({ href: '/meus-pedidos', label: 'Meus pedidos', icon: ClipboardText });
+        roleItems.push({ href: '/meus-pedidos', label: 'Meus pedidos', icon: ClipboardList });
     }
 
     if (isClient || isAgent) {
@@ -45,13 +45,13 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
         roleItems.push({
             href: '/analisar-pedidos',
             label: 'Analisar pedidos',
-            icon: ClipboardText,
+            icon: ClipboardList,
         });
         roleItems.push({ href: '/contratos', label: 'Contratos', icon: FileText });
     }
 
     const menuItems: MenuItem[] = [
-        { href: '/dashboard', label: 'Dashboard', icon: SquaresFour },
+        { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
         ...roleItems,
         { href: '/perfil', label: 'Perfil', icon: User },
     ];
@@ -110,7 +110,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                     onClick={handleLogout}
                     className="text-secondary-foreground hover:bg-destructive/15 hover:text-destructive mt-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
-                    <SignOut size={18} />
+                    <LogOut size={18} />
                     <span>Sair</span>
                 </button>
             </div>

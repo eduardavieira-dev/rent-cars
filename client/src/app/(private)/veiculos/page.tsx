@@ -1,4 +1,4 @@
-export default function VeiculosPage() {
+export default function VehiclesPage() {
     return (
         <section className="space-y-2">
             <h1 className="text-2xl font-bold">Veiculos</h1>

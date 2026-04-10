@@ -56,13 +56,13 @@ function LoginForm() {
             params.append('username', email);
             params.append('password', password);
 
-            const { data } = await api.post<LoginResponse>('/login', params, {
+            const { data: loginResponse } = await api.post<LoginResponse>('/login', params, {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
 
-            login(data.access_token);
+            login(loginResponse.access_token);
             router.push(searchParams.get('redirect') ?? '/dashboard');
         } catch (err: unknown) {
             if (isAxiosError(err) && err.response?.status === 401) {

@@ -1,4 +1,4 @@
-export default function ContratosPage() {
+export default function ContractsPage() {
     return (
         <section className="space-y-2">
             <h1 className="text-2xl font-bold">Contratos</h1>

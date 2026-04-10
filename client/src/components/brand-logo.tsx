@@ -1,6 +1,6 @@
 'use client';
 
-import { Car } from '@phosphor-icons/react';
+import { Car } from 'lucide-react';
 
 type BrandLogoSize = 'sm' | 'md' | 'lg';
 

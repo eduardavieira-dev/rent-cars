@@ -1,6 +1,6 @@
 'use client';
 
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 import { Clock3, Save, ShieldCheck, UserCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
@@ -15,7 +15,8 @@ import { toast } from 'sonner';
 
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/lib/axios';
-import { ProfileDangerZone } from './ProfileDangerZone/page';
+import { z } from 'zod';
+import { ProfileDangerZone } from './ProfileDangerZone/index';
 
 type RoleType = 'CLIENT' | 'BANK' | 'COMPANY';
 
@@ -119,14 +120,6 @@ function roleToLabel(role: RoleType): string {
     return 'Empresa';
 }
 
-function onlyDigits(value: string): string {
-    return value.replace(/\D/g, '');
-}
-
-function isValidEmail(value: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}
-
 function maskCpf(v: string): string {
     const d = v.replace(/\D/g, '').slice(0, 11);
     if (d.length <= 3) return d;
@@ -165,14 +158,40 @@ function maskCode(v: string): string {
     return v.replace(/\D/g, '').slice(0, 3);
 }
 
-function extractApiMessage(data: unknown): string | null {
-    if (typeof data === 'string') return data;
-    if (!isRecord(data)) return null;
+const baseProfileSchema = z.object({
+    name: z.string().min(1, 'Informe o nome.'),
+    email: z.string().email('Informe um e-mail válido.'),
+    phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+});
 
-    const message = data.message;
+const clientProfileSchema = baseProfileSchema.extend({
+    cpf: z.string().refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
+});
+
+const bankProfileSchema = baseProfileSchema.extend({
+    cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
+    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código FEBRABAN válido.'),
+});
+
+const companyProfileSchema = baseProfileSchema.extend({
+    cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
+    corporateName: z.string().min(1, 'Informe a razão social.'),
+});
+
+const profileSchemaByRole = {
+    CLIENT: clientProfileSchema,
+    BANK: bankProfileSchema,
+    COMPANY: companyProfileSchema,
+};
+
+function extractApiErrorMessage(responseData: unknown): string | null {
+    if (typeof responseData === 'string') return responseData;
+    if (!isRecord(responseData)) return null;
+
+    const message = responseData.message;
     if (typeof message === 'string') return message;
 
-    const error = data.error;
+    const error = responseData.error;
     if (typeof error === 'string') return error;
 
     return null;
@@ -200,7 +219,7 @@ function formatTimeLeft(remainingSeconds: number): string {
     return restMinutes === 0 ? `Expira em ${hours}h` : `Expira em ${hours}h ${restMinutes}min`;
 }
 
-export default function PerfilPage() {
+export default function ProfilePage() {
     const { user, logout } = useAuth();
     const router = useRouter();
 
@@ -268,7 +287,7 @@ export default function PerfilPage() {
                 setForm(userProfile.form);
                 setIsEditing(false);
             } catch (requestError) {
-                if (axios.isAxiosError(requestError)) {
+                if (isAxiosError(requestError)) {
                     const status = requestError.response?.status;
                     toast.error(
                         status
@@ -307,53 +326,9 @@ export default function PerfilPage() {
             return;
         }
 
-        if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
-            toast.error('Preencha nome, e-mail e telefone.');
-            return;
-        }
-
-        if (!isValidEmail(form.email)) {
-            toast.error('Informe um e-mail válido.');
-            return;
-        }
-
-        if (onlyDigits(form.phone).length < 10) {
-            toast.error('Informe um telefone válido.');
-            return;
-        }
-
-        if (currentRole === 'CLIENT' && !form.cpf.trim()) {
-            toast.error('CPF é obrigatório para cliente.');
-            return;
-        }
-
-        if (currentRole === 'CLIENT' && onlyDigits(form.cpf).length !== 11) {
-            toast.error('Informe um CPF válido.');
-            return;
-        }
-
-        if (currentRole === 'BANK' && (!form.cnpj.trim() || !form.code.trim())) {
-            toast.error('CNPJ e código são obrigatórios para banco.');
-            return;
-        }
-
-        if (currentRole === 'BANK' && onlyDigits(form.cnpj).length !== 14) {
-            toast.error('Informe um CNPJ válido.');
-            return;
-        }
-
-        if (currentRole === 'BANK' && onlyDigits(form.code).length !== 3) {
-            toast.error('Informe um código FEBRABAN válido.');
-            return;
-        }
-
-        if (currentRole === 'COMPANY' && (!form.cnpj.trim() || !form.corporateName.trim())) {
-            toast.error('CNPJ e razão social são obrigatórios para empresa.');
-            return;
-        }
-
-        if (currentRole === 'COMPANY' && onlyDigits(form.cnpj).length !== 14) {
-            toast.error('Informe um CNPJ válido.');
+        const validationResult = profileSchemaByRole[currentRole].safeParse(form);
+        if (!validationResult.success) {
+            toast.error(validationResult.error.issues[0].message);
             return;
         }
 
@@ -396,8 +371,8 @@ export default function PerfilPage() {
             setIsEditing(false);
             toast.success('Perfil atualizado com sucesso.');
         } catch (requestError) {
-            if (axios.isAxiosError(requestError)) {
-                const message = extractApiMessage(requestError.response?.data);
+            if (isAxiosError(requestError)) {
+                const message = extractApiErrorMessage(requestError.response?.data);
                 const status = requestError.response?.status;
                 toast.error(
                     (message ? translateApiErrorMessage(message) : null) ??
@@ -427,14 +402,11 @@ export default function PerfilPage() {
             logout();
             router.replace('/login');
         } catch (requestError) {
-            if (axios.isAxiosError(requestError)) {
+            if (isAxiosError(requestError)) {
                 const status = requestError.response?.status;
                 const message = (requestError.response?.data as { message?: string } | undefined)
                     ?.message;
 
-                // Se receber 401 ou 500, faz logout automático
-                // 401: sessão expirou/foi invalidada
-                // 500: erro no servidor, mas tenta fazê logout de qualquer forma
                 if (status === 401 || status === 500) {
                     toast.success('Conta excluída com sucesso.');
                     logout();

@@ -1,4 +1,4 @@
-export default function MeusPedidosPage() {
+export default function MyOrdersPage() {
     return (
         <section className="space-y-2">
             <h1 className="text-2xl font-bold">Meus pedidos</h1>

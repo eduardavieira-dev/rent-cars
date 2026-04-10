@@ -33,7 +33,7 @@ function maskCode(v: string): string {
     return v.replace(/\D/g, '').slice(0, 3);
 }
 
-const bancoSchema = z.object({
+const bankSchema = z.object({
     name: z.string().min(1, 'Informe o nome do responsável.'),
     email: z.string().email('Informe um e-mail válido.'),
     password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
@@ -76,7 +76,7 @@ const INITIAL_FORM: FormState = {
     code: '',
 };
 
-export default function CadastroBancoPage() {
+export default function BankRegistrationPage() {
     const router = useRouter();
 
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
@@ -96,7 +96,7 @@ export default function CadastroBancoPage() {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
-        const result = bancoSchema.safeParse(form);
+        const result = bankSchema.safeParse(form);
         if (!result.success) {
             setError(result.error.issues[0].message);
             return;
