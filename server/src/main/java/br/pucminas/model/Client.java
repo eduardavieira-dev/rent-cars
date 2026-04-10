@@ -13,17 +13,21 @@ public class Client extends User {
 
     private String rg;
 
+    private String cep;
+
     private String address;
 
     private String profession;
 
-    protected Client() {}
+    protected Client() {
+    }
 
     public Client(String name, String email, String phone, String password,
-            String cpf, String rg, String address, String profession) {
+            String cpf, String rg, String cep, String address, String profession) {
         super(name, email, phone, password);
         this.cpf = cpf;
         this.rg = rg;
+        this.cep = cep;
         this.address = address;
         this.profession = profession;
     }
@@ -42,6 +46,14 @@ public class Client extends User {
 
     public void setRg(String rg) {
         this.rg = rg;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
     }
 
     public String getAddress() {

@@ -121,7 +121,7 @@ function parseUserProfile(payload: unknown): UserProfile | null {
             phone: toStringValue(payload.phone),
             cpf: toStringValue(payload.cpf),
             rg: toStringValue(payload.rg),
-            cep: addressParsed.cep,
+            cep: toStringValue(payload.cep),
             street: addressParsed.street,
             complement: addressParsed.complement,
             neighborhood: addressParsed.neighborhood,
@@ -407,6 +407,7 @@ export default function ProfilePage() {
                 phone: form.phone.replace(/\D/g, ''),
                 cpf: form.cpf.replace(/\D/g, ''),
                 rg: form.rg.replace(/[.\-\s]/g, ''),
+                cep: form.cep.replace(/\D/g, ''),
                 address: `${form.street.trim()} - ${form.complement.trim()}. Bairro ${form.neighborhood.trim()} - ${form.city.trim()}`,
                 profession: form.profession.trim(),
             },
@@ -663,7 +664,7 @@ export default function ProfilePage() {
                                 error={fieldErrors.street}
                             />
                             <InputField
-                                label="Complemento/Número"
+                                label="Complemento"
                                 name="complement"
                                 placeholder="Apt 101"
                                 value={form.complement}

@@ -11,11 +11,12 @@ import jakarta.validation.constraints.Size;
 @Serdeable
 @Introspected
 public record UpdateClientRequest(
-                @NotBlank @Size(min = 3, max = 100) @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "must contain only letters and spaces") String name,
-                @NotBlank @Email String email,
-                @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid Brazilian phone number") String phone,
-                @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid CPF") String cpf,
-                @NotBlank @Size(min = 7, max = 20) String rg,
-                @Nullable @Size(max = 300) String address,
-                @NotBlank @Size(min = 3, max = 100) String profession) {
+        @NotBlank @Size(min = 3, max = 100) @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "must contain only letters and spaces") String name,
+        @NotBlank @Email String email,
+        @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid Brazilian phone number") String phone,
+        @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid CPF") String cpf,
+        @NotBlank @Size(min = 7, max = 20) String rg,
+        @NotBlank @Pattern(regexp = "\\d{8}", message = "must be a valid CEP with 8 digits") String cep,
+        @Nullable @Size(max = 300) String address,
+        @NotBlank @Size(min = 3, max = 100) String profession) {
 }

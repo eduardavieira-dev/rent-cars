@@ -235,6 +235,7 @@ export default function ClientRegistrationPage() {
                 phone: form.phone.replace(/\D/g, ''),
                 cpf: form.cpf.replace(/\D/g, ''),
                 rg: form.rg.replace(/[.\-\s]/g, ''),
+                cep: form.cep.replace(/\D/g, ''),
                 profession: form.profession.trim(),
                 address: composedAddress,
             });

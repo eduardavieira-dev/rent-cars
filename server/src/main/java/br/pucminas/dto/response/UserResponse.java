@@ -9,16 +9,17 @@ import java.util.UUID;
 @Serdeable
 @Introspected
 public record UserResponse(
-        UUID id,
-        String name,
-        String email,
-        String phone,
-        String type,
-        @Nullable String cpf,
-        @Nullable String rg,
-        @Nullable String address,
-        @Nullable String profession,
-        @Nullable String cnpj,
-        @Nullable String code,
-        @Nullable String corporateName) {
+                UUID id,
+                String name,
+                String email,
+                String phone,
+                String type,
+                @Nullable String cpf,
+                @Nullable String rg,
+                @Nullable String cep,
+                @Nullable String address,
+                @Nullable String profession,
+                @Nullable String cnpj,
+                @Nullable String code,
+                @Nullable String corporateName) {
 }

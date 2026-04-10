@@ -34,7 +34,7 @@ public class UserService {
         validateCpfUniqueness(request.cpf());
         Client client = new Client(
                 request.name(), request.email(), request.phone(), hashPassword(request.password()),
-                request.cpf(), request.rg(), request.address(), request.profession());
+                request.cpf(), request.rg(), request.cep(), request.address(), request.profession());
         return toResponse(userRepository.save(client));
     }
 
@@ -81,6 +81,7 @@ public class UserService {
         client.setPhone(request.phone());
         client.setCpf(request.cpf());
         client.setRg(request.rg());
+        client.setCep(request.cep());
         client.setAddress(request.address());
         client.setProfession(request.profession());
         return toResponse(userRepository.update(client));
@@ -150,6 +151,7 @@ public class UserService {
     private UserResponse toResponse(User user) {
         String cpf = null;
         String rg = null;
+        String cep = null;
         String address = null;
         String profession = null;
         String cnpj = null;
@@ -159,6 +161,7 @@ public class UserService {
         if (user instanceof Client client) {
             cpf = client.getCpf();
             rg = client.getRg();
+            cep = client.getCep();
             address = client.getAddress();
             profession = client.getProfession();
         } else if (user instanceof Bank bank) {
@@ -177,6 +180,7 @@ public class UserService {
                 user.getClass().getSimpleName(),
                 cpf,
                 rg,
+                cep,
                 address,
                 profession,
                 cnpj,
