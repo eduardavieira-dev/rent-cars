@@ -33,9 +33,9 @@ const clientSchema = z.object({
     password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
     phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
     cpf: z.string().refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
-    rg: z.string().optional(),
+    rg: z.string().min(1, 'Informe o RG.'),
     address: z.string().optional(),
-    profession: z.string().optional(),
+    profession: z.string().min(1, 'Informe a profissão.'),
 });
 
 type ClientFormErrors = Partial<Record<keyof z.infer<typeof clientSchema>, string>>;
@@ -117,9 +117,9 @@ export default function ClientRegistrationPage() {
                 password: form.password,
                 phone: form.phone,
                 cpf: form.cpf,
-                rg: form.rg || null,
+                rg: form.rg,
                 address: form.address || null,
-                profession: form.profession || null,
+                profession: form.profession,
             });
 
             router.push('/login');
@@ -345,7 +345,7 @@ export default function ClientRegistrationPage() {
 
                         <motion.div variants={item} className="grid grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="rg" className={labelBase}>RG</label>
+                                <label htmlFor="rg" className={labelBase}>RG {requiredMark}</label>
                                 <div className="relative">
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                                         <FileText size={15} />
@@ -355,20 +355,24 @@ export default function ClientRegistrationPage() {
                                         name="rg"
                                         mask={[
                                             { mask: '00.000.000-0' },
-                                            { mask: 'aa.000.000-0', definitions: { a: /[A-Za-z]/ } },
+                                            { mask: 'aa-00.000.000', definitions: { a: /[A-Za-z]/ } },
                                         ]}
                                         prepare={(value: string) => value.toUpperCase()}
                                         type="text"
+                                        required
                                         value={form.rg}
                                         onAccept={(value: string) => handleTextChange('rg', value)}
-                                        placeholder="MG.123.456-7"
+                                        placeholder="MG-12.345.678"
                                         className={inputWithIcon}
                                     />
                                 </div>
+                                {fieldErrors.rg && (
+                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.rg}</p>
+                                )}
                             </div>
 
                             <div>
-                                <label htmlFor="profession" className={labelBase}>Profissão</label>
+                                <label htmlFor="profession" className={labelBase}>Profissão {requiredMark}</label>
                                 <div className="relative">
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                                         <Briefcase size={15} />
@@ -377,6 +381,7 @@ export default function ClientRegistrationPage() {
                                         id="profession"
                                         name="profession"
                                         type="text"
+                                        required
                                         maxLength={100}
                                         value={form.profession}
                                         onChange={(e) => handleTextChange('profession', e.target.value)}
@@ -384,6 +389,9 @@ export default function ClientRegistrationPage() {
                                         className={inputWithIcon}
                                     />
                                 </div>
+                                {fieldErrors.profession && (
+                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.profession}</p>
+                                )}
                             </div>
                         </motion.div>
 

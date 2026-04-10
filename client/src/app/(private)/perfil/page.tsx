@@ -520,7 +520,7 @@ export default function ProfilePage() {
                                 label="RG"
                                 mask={[
                                     { mask: '00.000.000-0' },
-                                    { mask: 'aa.000.000-0', definitions: { a: /[A-Za-z]/ } },
+                                    { mask: 'aa-00.000.000', definitions: { a: /[A-Za-z]/ } },
                                 ]}
                                 prepare={(value: string) => value.toUpperCase()}
                                 value={form.rg}

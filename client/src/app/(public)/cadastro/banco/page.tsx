@@ -20,7 +20,7 @@ const bankSchema = z.object({
     password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
     phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
     cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
-    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código FEBRABAN válido.'),
+    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
 });
 
 type BankFormErrors = Partial<Record<keyof z.infer<typeof bankSchema>, string>>;
@@ -323,7 +323,7 @@ export default function BankRegistrationPage() {
 
                             <div>
                                 <label htmlFor="code" className={labelBase}>
-                                    Código FEBRABAN {requiredMark}
+                                    Código COMPE {requiredMark}
                                 </label>
                                 <div className="relative">
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
