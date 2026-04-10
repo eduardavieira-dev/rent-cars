@@ -84,59 +84,68 @@ function LoginForm() {
     }
 
     return (
-        <main className="min-h-screen flex bg-background">
+        <main className="bg-background flex min-h-screen">
             <motion.aside
                 initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="hidden md:flex md:w-5/12 lg:w-[42%] bg-secondary bg-[url('/background.png')] bg-cover bg-center bg-no-repeat flex-col justify-between p-10 relative overflow-hidden border-r border-border"
+                className="bg-secondary border-border relative hidden flex-col justify-between overflow-hidden border-r bg-[url('/background.png')] bg-cover bg-center bg-no-repeat p-10 md:flex md:w-5/12 lg:w-[42%]"
             >
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-black/75 via-black/45 to-black/35" />
-                <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
-                <div className="pointer-events-none absolute bottom-8 -right-16 w-72 h-72 rounded-full bg-amber-400/8 blur-3xl" />
+                <div className="bg-primary/10 pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full blur-3xl" />
+                <div className="pointer-events-none absolute -right-16 bottom-8 h-72 w-72 rounded-full bg-amber-400/8 blur-3xl" />
 
                 <BrandLogo size="md" className="relative z-10" />
 
                 <div className="relative z-10">
-                    <h2 className="font-heading text-3xl lg:text-4xl font-bold text-foreground leading-snug mb-4">
+                    <h2 className="font-heading text-foreground mb-4 text-3xl leading-snug font-bold lg:text-4xl">
                         Gestão Inteligente de{' '}
                         <span className="text-orange-400">Locação de Veículos</span>
                     </h2>
-                    <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-                        Gerencie sua frota, contratos e clientes em um único lugar com segurança e eficiência.
+                    <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
+                        Gerencie sua frota, contratos e clientes em um único lugar com segurança e
+                        eficiência.
                     </p>
                 </div>
 
-                <p className="relative z-10 text-xs text-muted-foreground">
+                <p className="text-muted-foreground relative z-10 text-xs">
                     © {new Date().getFullYear()} Rent Cars · PUC Minas
                 </p>
             </motion.aside>
 
-            <div className="w-full md:w-7/12 lg:w-[58%] flex items-center justify-center px-6 py-12">
+            <div className="flex w-full items-center justify-center px-6 py-12 md:w-7/12 lg:w-[58%]">
                 <motion.div
                     variants={container}
                     initial="hidden"
                     animate="visible"
                     className="w-full max-w-sm"
                 >
-                    <motion.div variants={item} className="flex md:hidden items-center gap-2.5 mb-10">
+                    <motion.div
+                        variants={item}
+                        className="mb-10 flex items-center gap-2.5 md:hidden"
+                    >
                         <BrandLogo size="sm" />
                     </motion.div>
 
                     <motion.div variants={item} className="mb-8">
-                        <h1 className="font-heading text-2xl font-bold text-foreground mb-1">
+                        <h1 className="font-heading text-foreground mb-1 text-2xl font-bold">
                             Bem-vindo de volta
                         </h1>
-                        <p className="text-sm text-muted-foreground">Faça login para acessar o sistema.</p>
+                        <p className="text-muted-foreground text-sm">
+                            Faça login para acessar o sistema.
+                        </p>
                     </motion.div>
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
                         <motion.div variants={item}>
-                            <label htmlFor="email" className="block text-sm font-medium text-secondary-foreground mb-1.5">
+                            <label
+                                htmlFor="email"
+                                className="text-secondary-foreground mb-1.5 block text-sm font-medium"
+                            >
                                 E-mail
                             </label>
                             <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <Mail size={15} />
                                 </div>
                                 <input
@@ -147,23 +156,32 @@ function LoginForm() {
                                     value={email}
                                     onChange={(e) => {
                                         setEmail(e.target.value);
-                                        if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                                        if (fieldErrors.email)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                email: undefined,
+                                            }));
                                     }}
                                     placeholder="seu@email.com"
-                                    className="w-full rounded-lg border border-border bg-input pl-10 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                                    className="border-border bg-input text-foreground placeholder:text-muted-foreground focus:border-primary w-full rounded-lg border py-2.5 pr-3 pl-10 text-sm transition-colors outline-none"
                                 />
                             </div>
                             {fieldErrors.email && (
-                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.email}</p>
+                                <p className="text-destructive mt-1 text-xs font-bold">
+                                    {fieldErrors.email}
+                                </p>
                             )}
                         </motion.div>
 
                         <motion.div variants={item}>
-                            <label htmlFor="password" className="block text-sm font-medium text-secondary-foreground mb-1.5">
+                            <label
+                                htmlFor="password"
+                                className="text-secondary-foreground mb-1.5 block text-sm font-medium"
+                            >
                                 Senha
                             </label>
                             <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <Lock size={15} />
                                 </div>
                                 <input
@@ -174,22 +192,28 @@ function LoginForm() {
                                     value={password}
                                     onChange={(e) => {
                                         setPassword(e.target.value);
-                                        if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                                        if (fieldErrors.password)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                password: undefined,
+                                            }));
                                     }}
                                     placeholder="••••••••"
-                                    className="w-full rounded-lg border border-border bg-input pl-10 pr-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
+                                    className="border-border bg-input text-foreground placeholder:text-muted-foreground focus:border-primary w-full rounded-lg border py-2.5 pr-10 pl-10 text-sm transition-colors outline-none"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword((prev) => !prev)}
                                     aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                    className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
                                 >
                                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                                 </button>
                             </div>
                             {fieldErrors.password && (
-                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.password}</p>
+                                <p className="text-destructive mt-1 text-xs font-bold">
+                                    {fieldErrors.password}
+                                </p>
                             )}
                         </motion.div>
 
@@ -197,7 +221,7 @@ function LoginForm() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-gold shadow-gold text-primary-foreground font-semibold py-2.5 px-4 rounded-lg text-sm transition-all hover:opacity-90 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-gradient-gold shadow-gold text-primary-foreground flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {isLoading ? (
                                     'Entrando…'
@@ -210,11 +234,14 @@ function LoginForm() {
                         </motion.div>
                     </form>
 
-                    <motion.p variants={item} className="mt-6 text-center text-sm text-muted-foreground">
+                    <motion.p
+                        variants={item}
+                        className="text-muted-foreground mt-6 text-center text-sm"
+                    >
                         Não tem conta?{' '}
                         <Link
                             href="/cadastro"
-                            className="text-primary hover:opacity-80 font-medium transition-opacity"
+                            className="text-primary font-medium transition-opacity hover:opacity-80"
                         >
                             Cadastre-se
                         </Link>

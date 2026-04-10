@@ -2,35 +2,35 @@
 
 /* ─── Design Tokens ──────────────────────────────────────── */
 :root {
-    --background:           #0c0a09;
-    --foreground:           #fafaf9;
-    --secondary:            #141210;
+    --background: #0c0a09;
+    --foreground: #fafaf9;
+    --secondary: #141210;
     --secondary-foreground: #e7e5e4;
-    --muted-foreground:     #a8a29e;
-    --border:               #2c2624;
-    --primary:              #d97706;
-    --primary-foreground:   #0c0400;
-    --input:                #1c1917;
-    --destructive:          #ef4444;
-    --card:                 #111010;
+    --muted-foreground: #a8a29e;
+    --border: #2c2624;
+    --primary: #d97706;
+    --primary-foreground: #0c0400;
+    --input: #1c1917;
+    --destructive: #ef4444;
+    --card: #111010;
 }
 
 /* ─── Tailwind 4 Theme Extension ─────────────────────────── */
 @theme inline {
-    --color-background:           var(--background);
-    --color-foreground:           var(--foreground);
-    --color-secondary:            var(--secondary);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted-foreground:     var(--muted-foreground);
-    --color-border:               var(--border);
-    --color-primary:              var(--primary);
-    --color-primary-foreground:   var(--primary-foreground);
-    --color-input:                var(--input);
-    --color-destructive:          var(--destructive);
-    --color-card:                 var(--card);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-border: var(--border);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-input: var(--input);
+    --color-destructive: var(--destructive);
+    --color-card: var(--card);
 
-    --font-sans:    var(--font-geist-sans);
-    --font-mono:    var(--font-geist-mono);
+    --font-sans: var(--font-geist-sans);
+    --font-mono: var(--font-geist-mono);
     --font-heading: var(--font-raleway);
 }
 
@@ -114,7 +114,9 @@ select option {
 .accordion-content > div {
     transform: translateY(-4px);
     opacity: 0;
-    transition: opacity 360ms ease, transform 360ms ease;
+    transition:
+        opacity 360ms ease,
+        transform 360ms ease;
 }
 
 .accordion-content[data-state='open'] > div {

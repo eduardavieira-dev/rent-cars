@@ -2,7 +2,18 @@
 
 import { isAxiosError } from 'axios';
 import { motion } from 'framer-motion';
-import { ArrowRight, Building, Eye, EyeOff, Hash, Landmark, Lock, Mail, Phone, User } from 'lucide-react';
+import {
+    ArrowRight,
+    Building,
+    Eye,
+    EyeOff,
+    Hash,
+    Landmark,
+    Lock,
+    Mail,
+    Phone,
+    User,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { SyntheticEvent } from 'react';
@@ -18,9 +29,13 @@ const bankSchema = z.object({
     name: z.string().min(1, 'Informe o nome do responsável.'),
     email: z.string().email('Informe um e-mail válido.'),
     password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
-    phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+    phone: z
+        .string()
+        .refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
     cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
-    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
+    code: z
+        .string()
+        .refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
 });
 
 type BankFormErrors = Partial<Record<keyof z.infer<typeof bankSchema>, string>>;
@@ -105,7 +120,9 @@ export default function BankRegistrationPage() {
         } catch (err) {
             if (isAxiosError(err)) {
                 if (!err.response) {
-                    toast.error('Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
+                    toast.error(
+                        'Não foi possível conectar ao servidor. Verifique se o backend está em execução.'
+                    );
                     return;
                 }
 
@@ -115,7 +132,11 @@ export default function BankRegistrationPage() {
                 if (status === 409) {
                     toast.error(message ?? 'CNPJ ou e-mail já cadastrado. Verifique os dados.');
                 } else if (status === 400) {
-                    toast.error(message ? `Dado inválido: ${message}` : 'Verifique os dados informados e tente novamente.');
+                    toast.error(
+                        message
+                            ? `Dado inválido: ${message}`
+                            : 'Verifique os dados informados e tente novamente.'
+                    );
                 } else {
                     toast.error(`Erro ${status} ao realizar o cadastro. Tente novamente.`);
                 }
@@ -128,51 +149,57 @@ export default function BankRegistrationPage() {
     }
 
     return (
-        <main className="min-h-screen flex bg-background">
+        <main className="bg-background flex min-h-screen">
             <motion.aside
                 initial={{ opacity: 0, x: -24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="hidden lg:flex lg:w-[38%] bg-secondary flex-col justify-between p-10 sticky top-0 h-screen overflow-hidden border-r border-border"
+                className="bg-secondary border-border sticky top-0 hidden h-screen flex-col justify-between overflow-hidden border-r p-10 lg:flex lg:w-[38%]"
             >
                 <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-black/65 via-black/45 to-black/25" />
-                <div className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
-                <div className="pointer-events-none absolute bottom-8 -right-16 w-64 h-64 rounded-full bg-amber-400/8 blur-3xl" />
+                <div className="bg-primary/10 pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full blur-3xl" />
+                <div className="pointer-events-none absolute -right-16 bottom-8 h-64 w-64 rounded-full bg-amber-400/8 blur-3xl" />
 
                 <BrandLogo size="md" className="relative z-10" />
 
                 <div className="relative z-10">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-gold shadow-gold flex items-center justify-center mb-6">
+                    <div className="bg-gradient-gold shadow-gold mb-6 flex h-12 w-12 items-center justify-center rounded-2xl">
                         <Landmark size={22} className="text-primary-foreground" />
                     </div>
-                    <h2 className="font-heading text-3xl font-bold text-foreground leading-snug mb-4">
+                    <h2 className="font-heading text-foreground mb-4 text-3xl leading-snug font-bold">
                         Cadastre sua{' '}
                         <span className="text-gradient-gold">instituição financeira</span>
                     </h2>
-                    <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-                        Registre seu banco na plataforma e participe do financiamento de contratos de locação.
+                    <p className="text-muted-foreground max-w-xs text-sm leading-relaxed">
+                        Registre seu banco na plataforma e participe do financiamento de contratos
+                        de locação.
                     </p>
                 </div>
 
-                <p className="relative z-10 text-xs text-muted-foreground">
+                <p className="text-muted-foreground relative z-10 text-xs">
                     © {new Date().getFullYear()} Rent Cars · PUC Minas
                 </p>
             </motion.aside>
 
-            <div className="w-full lg:w-[62%] flex items-center justify-center px-6 py-12">
+            <div className="flex w-full items-center justify-center px-6 py-12 lg:w-[62%]">
                 <motion.div
                     variants={container}
                     initial="hidden"
                     animate="visible"
                     className="w-full max-w-lg"
                 >
-                    <motion.div variants={item} className="flex lg:hidden items-center gap-2.5 mb-10">
+                    <motion.div
+                        variants={item}
+                        className="mb-10 flex items-center gap-2.5 lg:hidden"
+                    >
                         <BrandLogo size="sm" />
                     </motion.div>
 
                     <motion.div variants={item} className="mb-8">
-                        <h1 className="font-heading text-2xl font-bold text-foreground mb-1">Cadastro de Banco</h1>
-                        <p className="text-sm text-muted-foreground">
+                        <h1 className="font-heading text-foreground mb-1 text-2xl font-bold">
+                            Cadastro de Banco
+                        </h1>
+                        <p className="text-muted-foreground text-sm">
                             Preencha os dados abaixo para cadastrar sua instituição financeira.
                         </p>
                     </motion.div>
@@ -183,7 +210,7 @@ export default function BankRegistrationPage() {
                                 Nome do responsável {requiredMark}
                             </label>
                             <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <User size={15} />
                                 </div>
                                 <input
@@ -201,7 +228,9 @@ export default function BankRegistrationPage() {
                                 />
                             </div>
                             {fieldErrors.name && (
-                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.name}</p>
+                                <p className="text-destructive mt-1 text-xs font-bold">
+                                    {fieldErrors.name}
+                                </p>
                             )}
                         </motion.div>
 
@@ -211,7 +240,7 @@ export default function BankRegistrationPage() {
                                     E-mail {requiredMark}
                                 </label>
                                 <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <Mail size={15} />
                                     </div>
                                     <input
@@ -227,7 +256,9 @@ export default function BankRegistrationPage() {
                                     />
                                 </div>
                                 {fieldErrors.email && (
-                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.email}</p>
+                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                        {fieldErrors.email}
+                                    </p>
                                 )}
                             </div>
 
@@ -236,7 +267,7 @@ export default function BankRegistrationPage() {
                                     Senha {requiredMark}
                                 </label>
                                 <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <Lock size={15} />
                                     </div>
                                     <input
@@ -248,21 +279,27 @@ export default function BankRegistrationPage() {
                                         minLength={6}
                                         maxLength={100}
                                         value={form.password}
-                                        onChange={(e) => handleTextChange('password', e.target.value)}
+                                        onChange={(e) =>
+                                            handleTextChange('password', e.target.value)
+                                        }
                                         placeholder="Mín. 6 caracteres"
-                                        className={`${inputBase} pl-10 pr-10`}
+                                        className={`${inputBase} pr-10 pl-10`}
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword((prev) => !prev)}
-                                        aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                                        aria-label={
+                                            showPassword ? 'Ocultar senha' : 'Mostrar senha'
+                                        }
+                                        className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
                                     >
                                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                                     </button>
                                 </div>
                                 {fieldErrors.password && (
-                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.password}</p>
+                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                        {fieldErrors.password}
+                                    </p>
                                 )}
                             </div>
                         </motion.div>
@@ -272,7 +309,7 @@ export default function BankRegistrationPage() {
                                 Telefone {requiredMark}
                             </label>
                             <div className="relative">
-                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <Phone size={15} />
                                 </div>
                                 <IMaskInput
@@ -290,7 +327,9 @@ export default function BankRegistrationPage() {
                                 />
                             </div>
                             {fieldErrors.phone && (
-                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.phone}</p>
+                                <p className="text-destructive mt-1 text-xs font-bold">
+                                    {fieldErrors.phone}
+                                </p>
                             )}
                         </motion.div>
 
@@ -300,7 +339,7 @@ export default function BankRegistrationPage() {
                                     CNPJ {requiredMark}
                                 </label>
                                 <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <Building size={15} />
                                     </div>
                                     <IMaskInput
@@ -311,13 +350,17 @@ export default function BankRegistrationPage() {
                                         required
                                         inputMode="numeric"
                                         value={form.cnpj}
-                                        onAccept={(value: string) => handleTextChange('cnpj', value)}
+                                        onAccept={(value: string) =>
+                                            handleTextChange('cnpj', value)
+                                        }
                                         placeholder="00.000.000/0000-00"
                                         className={inputWithIcon}
                                     />
                                 </div>
                                 {fieldErrors.cnpj && (
-                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.cnpj}</p>
+                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                        {fieldErrors.cnpj}
+                                    </p>
                                 )}
                             </div>
 
@@ -326,7 +369,7 @@ export default function BankRegistrationPage() {
                                     Código COMPE {requiredMark}
                                 </label>
                                 <div className="relative">
-                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
+                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                         <Hash size={15} />
                                     </div>
                                     <IMaskInput
@@ -337,13 +380,17 @@ export default function BankRegistrationPage() {
                                         required
                                         inputMode="numeric"
                                         value={form.code}
-                                        onAccept={(value: string) => handleTextChange('code', value)}
+                                        onAccept={(value: string) =>
+                                            handleTextChange('code', value)
+                                        }
                                         placeholder="001"
                                         className={inputWithIcon}
                                     />
                                 </div>
                                 {fieldErrors.code && (
-                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.code}</p>
+                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                        {fieldErrors.code}
+                                    </p>
                                 )}
                             </div>
                         </motion.div>
@@ -352,7 +399,7 @@ export default function BankRegistrationPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-gradient-gold shadow-gold text-primary-foreground font-semibold py-2.5 px-4 rounded-lg text-sm transition-all hover:opacity-90 active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-gradient-gold shadow-gold text-primary-foreground flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {isLoading ? (
                                     'Cadastrando…'
@@ -365,9 +412,15 @@ export default function BankRegistrationPage() {
                         </motion.div>
                     </form>
 
-                    <motion.p variants={item} className="mt-6 text-center text-sm text-muted-foreground">
+                    <motion.p
+                        variants={item}
+                        className="text-muted-foreground mt-6 text-center text-sm"
+                    >
                         Já tem conta?{' '}
-                        <Link href="/login" className="text-primary hover:opacity-80 font-medium transition-opacity">
+                        <Link
+                            href="/login"
+                            className="text-primary font-medium transition-opacity hover:opacity-80"
+                        >
                             Faça login
                         </Link>
                     </motion.p>

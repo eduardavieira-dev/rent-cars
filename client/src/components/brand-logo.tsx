@@ -40,14 +40,16 @@ export function BrandLogo({
 
     return (
         <a href="/" className={mergeClassNames('flex items-center', className)}>
-            <div className={mergeClassNames(' flex items-center justify-center shrink-0', config.box)}>
+            <div
+                className={mergeClassNames('flex shrink-0 items-center justify-center', config.box)}
+            >
                 <Car size="22" className="text-primary" />
             </div>
             <span
                 className={mergeClassNames(
                     'font-heading font-bold tracking-tight',
                     config.text,
-                    textClassName,
+                    textClassName
                 )}
             >
                 {label}

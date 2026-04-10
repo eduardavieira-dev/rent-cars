@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,10 +16,34 @@ import {
 } from '@/components/ui/accordion';
 
 const fleet = [
-    { imageSrc: '/cars/car-1.png', category: 'Executivo', model: 'Sedan Executivo', price: 'R$ 189/dia', score: 4.8 },
-    { imageSrc: '/cars/car-2.png', category: 'SUV', model: 'SUV Familiar', price: 'R$ 249/dia', score: 4.9 },
-    { imageSrc: '/cars/car-3.png', category: 'Econômico', model: 'Hatch Econômico', price: 'R$ 99/dia', score: 4.7 },
-    { imageSrc: '/cars/car-4.png', category: 'Utilitário', model: 'Pickup Adventure', price: 'R$ 299/dia', score: 4.8 },
+    {
+        imageSrc: '/cars/car-1.png',
+        category: 'Executivo',
+        model: 'Sedan Executivo',
+        price: 'R$ 189/dia',
+        score: 4.8,
+    },
+    {
+        imageSrc: '/cars/car-2.png',
+        category: 'SUV',
+        model: 'SUV Familiar',
+        price: 'R$ 249/dia',
+        score: 4.9,
+    },
+    {
+        imageSrc: '/cars/car-3.png',
+        category: 'Econômico',
+        model: 'Hatch Econômico',
+        price: 'R$ 99/dia',
+        score: 4.7,
+    },
+    {
+        imageSrc: '/cars/car-4.png',
+        category: 'Utilitário',
+        model: 'Pickup Adventure',
+        price: 'R$ 299/dia',
+        score: 4.8,
+    },
 ];
 
 const faq = [
@@ -50,10 +74,10 @@ export default function Home() {
     }, []);
 
     return (
-        <main className="min-h-screen bg-background text-foreground">
+        <main className="bg-background text-foreground min-h-screen">
             <section className="relative min-h-[80vh] overflow-hidden sm:min-h-[78vh]">
-                <div className="absolute inset-0 bg-[url('/hero.png')] bg-cover bg-no-repeat bg-position-[62%_center] sm:bg-center" />
-                <div className="absolute inset-0 bg-linear-to-b from-black/75 via-black/65 to-background" />
+                <div className="absolute inset-0 bg-[url('/hero.png')] bg-cover bg-position-[62%_center] bg-no-repeat sm:bg-center" />
+                <div className="to-background absolute inset-0 bg-linear-to-b from-black/75 via-black/65" />
 
                 <header
                     className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
@@ -63,19 +87,31 @@ export default function Home() {
                     }`}
                 >
                     <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-                        <BrandLogo size="sm" className="gap-2.5" textClassName="text-secondary-foreground" />
+                        <BrandLogo
+                            size="sm"
+                            className="gap-2.5"
+                            textClassName="text-secondary-foreground"
+                        />
 
-                        <nav className="hidden items-center gap-7 text-sm text-secondary-foreground md:flex">
-                            <a href="#home" className="transition-colors hover:text-foreground">Home</a>
-                            <a href="#sobre" className="transition-colors hover:text-foreground">Sobre</a>
-                            <a href="#frota" className="transition-colors hover:text-foreground">Frota</a>
-                            <a href="#faq" className="transition-colors hover:text-foreground">Perguntas</a>
+                        <nav className="text-secondary-foreground hidden items-center gap-7 text-sm md:flex">
+                            <a href="#home" className="hover:text-foreground transition-colors">
+                                Home
+                            </a>
+                            <a href="#sobre" className="hover:text-foreground transition-colors">
+                                Sobre
+                            </a>
+                            <a href="#frota" className="hover:text-foreground transition-colors">
+                                Frota
+                            </a>
+                            <a href="#faq" className="hover:text-foreground transition-colors">
+                                Perguntas
+                            </a>
                         </nav>
 
                         <div className="hidden md:block">
                             <Link
                                 href="/login"
-                                className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                                className="bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
                             >
                                 Entrar
                             </Link>
@@ -84,7 +120,7 @@ export default function Home() {
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen((prev) => !prev)}
-                            className="inline-flex items-center justify-center rounded-lg p-2 text-secondary-foreground transition-colors hover:text-foreground md:hidden"
+                            className="text-secondary-foreground hover:text-foreground inline-flex items-center justify-center rounded-lg p-2 transition-colors md:hidden"
                             aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
                             aria-expanded={isMenuOpen}
                         >
@@ -95,14 +131,16 @@ export default function Home() {
 
                 <div
                     className={`fixed inset-0 z-40 bg-black/55 transition-opacity duration-300 md:hidden ${
-                        isMenuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+                        isMenuOpen
+                            ? 'pointer-events-auto opacity-100'
+                            : 'pointer-events-none opacity-0'
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                     aria-hidden="true"
                 />
 
                 <aside
-                    className={`fixed top-0 right-0 z-50 h-screen w-72 border-l border-border bg-background/95 p-6 backdrop-blur-md transition-transform duration-300 md:hidden ${
+                    className={`border-border bg-background/95 fixed top-0 right-0 z-50 h-screen w-72 border-l p-6 backdrop-blur-md transition-transform duration-300 md:hidden ${
                         isMenuOpen ? 'translate-x-0' : 'translate-x-full'
                     }`}
                     aria-hidden={!isMenuOpen}
@@ -112,48 +150,75 @@ export default function Home() {
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen(false)}
-                            className="rounded-lg border border-border/70 p-2 text-secondary-foreground"
+                            className="border-border/70 text-secondary-foreground rounded-lg border p-2"
                             aria-label="Fechar menu"
                         >
                             <X size={18} />
                         </button>
                     </div>
 
-                    <nav className="space-y-4 text-sm text-secondary-foreground">
-                        <a href="#home" onClick={() => setIsMenuOpen(false)} className="block transition-colors hover:text-foreground">Home</a>
-                        <a href="#sobre" onClick={() => setIsMenuOpen(false)} className="block transition-colors hover:text-foreground">Sobre</a>
-                        <a href="#frota" onClick={() => setIsMenuOpen(false)} className="block transition-colors hover:text-foreground">Frota</a>
-                        <a href="#faq" onClick={() => setIsMenuOpen(false)} className="block transition-colors hover:text-foreground">Perguntas</a>
+                    <nav className="text-secondary-foreground space-y-4 text-sm">
+                        <a
+                            href="#home"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="hover:text-foreground block transition-colors"
+                        >
+                            Home
+                        </a>
+                        <a
+                            href="#sobre"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="hover:text-foreground block transition-colors"
+                        >
+                            Sobre
+                        </a>
+                        <a
+                            href="#frota"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="hover:text-foreground block transition-colors"
+                        >
+                            Frota
+                        </a>
+                        <a
+                            href="#faq"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="hover:text-foreground block transition-colors"
+                        >
+                            Perguntas
+                        </a>
                     </nav>
 
                     <Link
                         href="/login"
                         onClick={() => setIsMenuOpen(false)}
-                        className="mt-8 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground"
+                        className="bg-primary text-primary-foreground mt-8 inline-flex rounded-full px-5 py-2 text-sm font-semibold"
                     >
                         Entrar
                     </Link>
                 </aside>
 
-                <div id="home" className="scroll-mt-28 relative z-10 mx-auto flex min-h-[76vh] w-full max-w-6xl items-center justify-center px-6 pt-28 pb-16 text-center sm:pt-24">
+                <div
+                    id="home"
+                    className="relative z-10 mx-auto flex min-h-[76vh] w-full max-w-6xl scroll-mt-28 items-center justify-center px-6 pt-28 pb-16 text-center sm:pt-24"
+                >
                     <div className="mx-auto max-w-3xl">
-                        <h1 className="font-heading text-4xl font-bold leading-tight text-foreground sm:text-5xl">
+                        <h1 className="font-heading text-foreground text-4xl leading-tight font-bold sm:text-5xl">
                             Gerencie e alugue veículos de forma simples e segura
                         </h1>
-                        <p className="mt-4 max-w-2xl text-sm text-secondary-foreground sm:text-base">
-                            O Rent Cars conecta clientes, empresas e banco em um único sistema para tornar o processo
-                            de aluguel mais rápido, organizado e confiável.
+                        <p className="text-secondary-foreground mt-4 max-w-2xl text-sm sm:text-base">
+                            O Rent Cars conecta clientes, empresas e banco em um único sistema para
+                            tornar o processo de aluguel mais rápido, organizado e confiável.
                         </p>
                         <div className="mt-7 flex flex-wrap justify-center gap-3">
                             <Link
                                 href="/cadastro"
-                                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                                className="bg-primary text-primary-foreground rounded-full px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90"
                             >
                                 Alugar um carro
                             </Link>
                             <a
                                 href="#sobre"
-                                className="rounded-full border border-border bg-secondary/70 px-6 py-3 text-sm font-medium text-foreground backdrop-blur-sm transition-colors hover:bg-secondary"
+                                className="border-border bg-secondary/70 text-foreground hover:bg-secondary rounded-full border px-6 py-3 text-sm font-medium backdrop-blur-sm transition-colors"
                             >
                                 Ver mais
                             </a>
@@ -162,16 +227,21 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="sobre" className="scroll-mt-28 mx-auto w-full max-w-6xl px-6 py-5 md:py-10">
-                <h2 className="text-center font-heading text-4xl font-bold">O que é o Rent Cars?</h2>
-                <p className="mx-auto mt-5 max-w-3xl text-center text-muted-foreground">
-                    O Rent Cars é um sistema web desenvolvido para facilitar a gestão de aluguel de veículos. Ele
-                    permite que clientes solicitem aluguéis, enquanto funcionários acompanham e gerenciam todos os
-                    pedidos de forma centralizada.
+            <section
+                id="sobre"
+                className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 py-5 md:py-10"
+            >
+                <h2 className="font-heading text-center text-4xl font-bold">
+                    O que é o Rent Cars?
+                </h2>
+                <p className="text-muted-foreground mx-auto mt-5 max-w-3xl text-center">
+                    O Rent Cars é um sistema web desenvolvido para facilitar a gestão de aluguel de
+                    veículos. Ele permite que clientes solicitem aluguéis, enquanto funcionários
+                    acompanham e gerenciam todos os pedidos de forma centralizada.
                 </p>
 
                 <div className="mt-12 grid gap-3 p-0 sm:p-4">
-                    <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+                    <div className="border-border bg-card relative overflow-hidden rounded-2xl border">
                         <Image
                             src="/about/about-1.png"
                             alt="Painel principal do Rent Cars"
@@ -180,11 +250,11 @@ export default function Home() {
                             className="h-auto w-full object-cover"
                             priority
                         />
-                            <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/75 via-black/25 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/75 via-black/25 to-transparent" />
                     </div>
 
-                    <div className="grid gap-3 md:grid-cols-2 ">
-                        <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+                    <div className="grid gap-3 md:grid-cols-2">
+                        <div className="border-border bg-card relative overflow-hidden rounded-2xl border">
                             <Image
                                 src="/about/about-2.png"
                                 alt="Visão operacional do sistema"
@@ -195,7 +265,7 @@ export default function Home() {
                             <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/75 via-black/25 to-transparent" />
                         </div>
 
-                        <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+                        <div className="border-border bg-card relative overflow-hidden rounded-2xl border">
                             <Image
                                 src="/about/about-3.png"
                                 alt="Visão da frota disponível"
@@ -209,13 +279,15 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="frota" className="scroll-mt-28 mx-auto w-full max-w-6xl px-6 py-8">
-                <h2 className="text-center font-heading text-4xl font-bold">Conheça a nossa Frota</h2>
-                <p className="mt-3 text-center text-muted-foreground">
+            <section id="frota" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 py-8">
+                <h2 className="font-heading text-center text-4xl font-bold">
+                    Conheça a nossa Frota
+                </h2>
+                <p className="text-muted-foreground mt-3 text-center">
                     As melhores condições para você reservar e aproveitar.
                 </p>
 
-                <div className="mt-10 grid gap-4 px-4 sm:p-1 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="mt-10 grid gap-4 px-4 sm:grid-cols-2 sm:p-1 lg:grid-cols-4">
                     {fleet.map((car) => (
                         <CardCar
                             key={car.model}
@@ -231,44 +303,47 @@ export default function Home() {
                 <div className="mt-8 text-center">
                     <Link
                         href="/cadastro"
-                        className="inline-flex rounded-full border border-primary/60 px-5 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
+                        className="border-primary/60 text-primary hover:bg-primary/10 inline-flex rounded-full border px-5 py-2 text-sm font-medium transition-colors"
                     >
                         Ver toda frota
                     </Link>
                 </div>
             </section>
 
-            <section className="mt-10 border-y border-border bg-secondary/40">
+            <section className="border-border bg-secondary/40 mt-10 border-y">
                 <div className="mx-auto grid w-full max-w-6xl grid-cols-2 gap-6 px-6 py-12 text-center sm:grid-cols-4">
                     <div>
-                        <p className="text-4xl font-bold text-primary">500+</p>
-                        <p className="mt-1 text-sm text-muted-foreground">Veículos</p>
+                        <p className="text-primary text-4xl font-bold">500+</p>
+                        <p className="text-muted-foreground mt-1 text-sm">Veículos</p>
                     </div>
                     <div>
-                        <p className="text-4xl font-bold text-primary">15k+</p>
-                        <p className="mt-1 text-sm text-muted-foreground">Clientes</p>
+                        <p className="text-primary text-4xl font-bold">15k+</p>
+                        <p className="text-muted-foreground mt-1 text-sm">Clientes</p>
                     </div>
                     <div>
-                        <p className="text-4xl font-bold text-primary">98%</p>
-                        <p className="mt-1 text-sm text-muted-foreground">Satisfação</p>
+                        <p className="text-primary text-4xl font-bold">98%</p>
+                        <p className="text-muted-foreground mt-1 text-sm">Satisfação</p>
                     </div>
                     <div>
-                        <p className="text-4xl font-bold text-primary">50+</p>
-                        <p className="mt-1 text-sm text-muted-foreground">Cidades</p>
+                        <p className="text-primary text-4xl font-bold">50+</p>
+                        <p className="text-muted-foreground mt-1 text-sm">Cidades</p>
                     </div>
                 </div>
             </section>
 
-            <section id="faq" className="scroll-mt-28 mx-auto grid w-full max-w-6xl gap-10 px-8 py-20 lg:grid-cols-2">
+            <section
+                id="faq"
+                className="mx-auto grid w-full max-w-6xl scroll-mt-28 gap-10 px-8 py-20 lg:grid-cols-2"
+            >
                 <div>
                     <h2 className="font-heading text-4xl font-bold">Perguntas Frequentes</h2>
-                    <p className="mt-4 text-muted-foreground">
-                        Tire suas dúvidas sobre o funcionamento do Rent Cars e entenda como realizar aluguéis de forma
-                        simples, rápida e segura.
+                    <p className="text-muted-foreground mt-4">
+                        Tire suas dúvidas sobre o funcionamento do Rent Cars e entenda como realizar
+                        aluguéis de forma simples, rápida e segura.
                     </p>
                     <Link
                         href="/cadastro"
-                        className="mt-6 inline-flex rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                        className="bg-primary text-primary-foreground mt-6 inline-flex rounded-full px-5 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
                     >
                         Entrar em contato
                     </Link>

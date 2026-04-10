@@ -4,13 +4,7 @@ import { isAxiosError } from 'axios';
 import { Clock3, Save, ShieldCheck, UserCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { SyntheticEvent } from 'react';
-import {
-    useEffect,
-    useMemo,
-    useState,
-    type ChangeEvent,
-    type InputHTMLAttributes,
-} from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { IMaskInput } from 'react-imask';
 import { toast } from 'sonner';
 
@@ -124,7 +118,9 @@ function roleToLabel(role: RoleType): string {
 const baseProfileSchema = z.object({
     name: z.string().min(1, 'Informe o nome.'),
     email: z.string().email('Informe um e-mail válido.'),
-    phone: z.string().refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+    phone: z
+        .string()
+        .refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
 });
 
 const clientProfileSchema = baseProfileSchema.extend({
@@ -135,7 +131,9 @@ const clientProfileSchema = baseProfileSchema.extend({
 
 const bankProfileSchema = baseProfileSchema.extend({
     cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
-    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
+    code: z
+        .string()
+        .refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
 });
 
 const companyProfileSchema = baseProfileSchema.extend({
@@ -691,7 +689,14 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     error?: string;
 }
 
-function InputField({ label, wrapperClassName = '', className = '', error, required, ...props }: InputFieldProps) {
+function InputField({
+    label,
+    wrapperClassName = '',
+    className = '',
+    error,
+    required,
+    ...props
+}: InputFieldProps) {
     return (
         <div className={`space-y-1.5 ${wrapperClassName}`}>
             <label className="text-foreground text-sm font-medium">
@@ -703,7 +708,7 @@ function InputField({ label, wrapperClassName = '', className = '', error, requi
                 className={`border-border bg-input text-foreground focus:border-primary disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md border px-3 text-sm transition-colors outline-none disabled:cursor-not-allowed ${className}`}
                 {...props}
             />
-            {error && <p className="mt-1 text-xs font-bold text-destructive">{error}</p>}
+            {error && <p className="text-destructive mt-1 text-xs font-bold">{error}</p>}
         </div>
     );
 }
@@ -744,10 +749,20 @@ function MaskedInputField({
                 {required && <span className="text-primary ml-0.5">*</span>}
             </label>
             <IMaskInput
-                {...({ mask, prepare, value, onAccept, disabled, required, placeholder, inputMode, type } as object)}
+                {...({
+                    mask,
+                    prepare,
+                    value,
+                    onAccept,
+                    disabled,
+                    required,
+                    placeholder,
+                    inputMode,
+                    type,
+                } as object)}
                 className="border-border bg-input text-foreground focus:border-primary disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md border px-3 text-sm transition-colors outline-none disabled:cursor-not-allowed"
             />
-            {error && <p className="mt-1 text-xs font-bold text-destructive">{error}</p>}
+            {error && <p className="text-destructive mt-1 text-xs font-bold">{error}</p>}
         </div>
     );
 }
