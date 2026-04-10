@@ -6,17 +6,20 @@ import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { type FormEvent, Suspense, useState } from 'react';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
-import api from '@/lib/axios';
 import { useAuth } from '@/hooks/useAuth';
+import api from '@/lib/axios';
 import type { LoginResponse } from '@/types/auth';
 
 const loginSchema = z.object({
     email: z.string().email('Informe um e-mail válido.'),
     password: z.string().min(1, 'Informe sua senha.'),
 });
+
+type LoginFormErrors = Partial<Record<'email' | 'password', string>>;
 
 const container = {
     hidden: {},
@@ -36,7 +39,7 @@ function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
+    const [fieldErrors, setFieldErrors] = useState<LoginFormErrors>({});
     const [isLoading, setIsLoading] = useState(false);
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -44,11 +47,16 @@ function LoginForm() {
 
         const result = loginSchema.safeParse({ email, password });
         if (!result.success) {
-            setError(result.error.issues[0].message);
+            const errors: LoginFormErrors = {};
+            for (const issue of result.error.issues) {
+                const field = issue.path[0] as keyof LoginFormErrors;
+                if (!errors[field]) errors[field] = issue.message;
+            }
+            setFieldErrors(errors);
             return;
         }
 
-        setError('');
+        setFieldErrors({});
         setIsLoading(true);
 
         try {
@@ -66,9 +74,9 @@ function LoginForm() {
             router.push(searchParams.get('redirect') ?? '/dashboard');
         } catch (err: unknown) {
             if (isAxiosError(err) && err.response?.status === 401) {
-                setError('E-mail ou senha inválidos.');
+                toast.error('E-mail ou senha inválidos.');
             } else {
-                setError('Não foi possível conectar ao servidor. Tente novamente.');
+                toast.error('Não foi possível conectar ao servidor. Tente novamente.');
             }
         } finally {
             setIsLoading(false);
@@ -137,11 +145,17 @@ function LoginForm() {
                                     required
                                     autoComplete="email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                                    }}
                                     placeholder="seu@email.com"
                                     className="w-full rounded-lg border border-border bg-input pl-10 pr-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
                                 />
                             </div>
+                            {fieldErrors.email && (
+                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.email}</p>
+                            )}
                         </motion.div>
 
                         <motion.div variants={item}>
@@ -158,7 +172,10 @@ function LoginForm() {
                                     required
                                     autoComplete="current-password"
                                     value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    onChange={(e) => {
+                                        setPassword(e.target.value);
+                                        if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                                    }}
                                     placeholder="••••••••"
                                     className="w-full rounded-lg border border-border bg-input pl-10 pr-10 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary transition-colors"
                                 />
@@ -171,19 +188,10 @@ function LoginForm() {
                                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                                 </button>
                             </div>
+                            {fieldErrors.password && (
+                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.password}</p>
+                            )}
                         </motion.div>
-
-                        {error && (
-                            <motion.p
-                                role="alert"
-                                initial={{ opacity: 0, y: -8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2"
-                            >
-                                {error}
-                            </motion.p>
-                        )}
 
                         <motion.div variants={item} className="pt-1">
                             <button

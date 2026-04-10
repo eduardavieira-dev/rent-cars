@@ -11,6 +11,7 @@ import {
     type FormEvent,
     type InputHTMLAttributes,
 } from 'react';
+import { IMaskInput } from 'react-imask';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -120,44 +121,6 @@ function roleToLabel(role: RoleType): string {
     return 'Empresa';
 }
 
-function maskCpf(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 11);
-    if (d.length <= 3) return d;
-    if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
-    if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
-    return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
-}
-
-function maskPhone(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 11);
-    if (d.length === 0) return '';
-    if (d.length <= 2) return `(${d}`;
-    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-}
-
-function maskRg(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 9);
-    if (d.length <= 2) return d;
-    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
-    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
-    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
-}
-
-function maskCnpj(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 14);
-    if (d.length <= 2) return d;
-    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
-    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
-    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
-    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
-}
-
-function maskCode(v: string): string {
-    return v.replace(/\D/g, '').slice(0, 3);
-}
-
 const baseProfileSchema = z.object({
     name: z.string().min(1, 'Informe o nome.'),
     email: z.string().email('Informe um e-mail válido.'),
@@ -177,6 +140,8 @@ const companyProfileSchema = baseProfileSchema.extend({
     cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
     corporateName: z.string().min(1, 'Informe a razão social.'),
 });
+
+type ProfileFormErrors = Partial<Record<keyof ProfileFormState, string>>;
 
 const profileSchemaByRole = {
     CLIENT: clientProfileSchema,
@@ -225,6 +190,7 @@ export default function ProfilePage() {
 
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [form, setForm] = useState<ProfileFormState>(EMPTY_FORM);
+    const [fieldErrors, setFieldErrors] = useState<ProfileFormErrors>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -307,15 +273,17 @@ export default function ProfilePage() {
 
     function handleChange(event: ChangeEvent<HTMLInputElement>) {
         const { name, value } = event.target;
-        let masked = value;
+        setForm((previous) => ({ ...previous, [name]: value }));
+        if (fieldErrors[name as keyof ProfileFormErrors]) {
+            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+        }
+    }
 
-        if (name === 'cpf') masked = maskCpf(value);
-        else if (name === 'phone') masked = maskPhone(value);
-        else if (name === 'rg') masked = maskRg(value);
-        else if (name === 'cnpj') masked = maskCnpj(value);
-        else if (name === 'code') masked = maskCode(value);
-
-        setForm((previous) => ({ ...previous, [name]: masked }));
+    function handleMaskedChange(name: keyof ProfileFormState, value: string) {
+        setForm((previous) => ({ ...previous, [name]: value }));
+        if (fieldErrors[name]) {
+            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+        }
     }
 
     async function handleSave(event: FormEvent<HTMLFormElement>) {
@@ -328,10 +296,16 @@ export default function ProfilePage() {
 
         const validationResult = profileSchemaByRole[currentRole].safeParse(form);
         if (!validationResult.success) {
-            toast.error(validationResult.error.issues[0].message);
+            const errors: ProfileFormErrors = {};
+            for (const issue of validationResult.error.issues) {
+                const field = issue.path[0] as keyof ProfileFormErrors;
+                if (!errors[field]) errors[field] = issue.message;
+            }
+            setFieldErrors(errors);
             return;
         }
 
+        setFieldErrors({});
         setIsSaving(true);
 
         const endpoint = `/users/${roleToPath(currentRole)}/${profile.id}`;
@@ -509,6 +483,7 @@ export default function ProfilePage() {
                         onChange={handleChange}
                         disabled={!isEditing}
                         required
+                        error={fieldErrors.name}
                     />
                     <InputField
                         label="E-mail"
@@ -518,31 +493,38 @@ export default function ProfilePage() {
                         onChange={handleChange}
                         disabled={!isEditing}
                         required
+                        error={fieldErrors.email}
                     />
-                    <InputField
+                    <MaskedInputField
                         label="Telefone"
-                        name="phone"
+                        mask={[{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }]}
                         value={form.phone}
-                        onChange={handleChange}
+                        onAccept={(value) => handleMaskedChange('phone', value)}
                         disabled={!isEditing}
                         required
+                        error={fieldErrors.phone}
                     />
 
                     {currentRole === 'CLIENT' && (
                         <>
-                            <InputField
+                            <MaskedInputField
                                 label="CPF"
-                                name="cpf"
+                                mask="000.000.000-00"
                                 value={form.cpf}
-                                onChange={handleChange}
+                                onAccept={(value) => handleMaskedChange('cpf', value)}
                                 disabled={!isEditing}
                                 required
+                                error={fieldErrors.cpf}
                             />
-                            <InputField
+                            <MaskedInputField
                                 label="RG"
-                                name="rg"
+                                mask={[
+                                    { mask: '00.000.000-0' },
+                                    { mask: 'aa.000.000-0', definitions: { a: /[A-Za-z]/ } },
+                                ]}
+                                prepare={(value: string) => value.toUpperCase()}
                                 value={form.rg}
-                                onChange={handleChange}
+                                onAccept={(value) => handleMaskedChange('rg', value)}
                                 disabled={!isEditing}
                             />
                             <InputField
@@ -565,34 +547,37 @@ export default function ProfilePage() {
 
                     {currentRole === 'BANK' && (
                         <>
-                            <InputField
+                            <MaskedInputField
                                 label="CNPJ"
-                                name="cnpj"
+                                mask="00.000.000/0000-00"
                                 value={form.cnpj}
-                                onChange={handleChange}
+                                onAccept={(value) => handleMaskedChange('cnpj', value)}
                                 disabled={!isEditing}
                                 required
+                                error={fieldErrors.cnpj}
                             />
-                            <InputField
+                            <MaskedInputField
                                 label="Código do banco"
-                                name="code"
+                                mask="000"
                                 value={form.code}
-                                onChange={handleChange}
+                                onAccept={(value) => handleMaskedChange('code', value)}
                                 disabled={!isEditing}
                                 required
+                                error={fieldErrors.code}
                             />
                         </>
                     )}
 
                     {currentRole === 'COMPANY' && (
                         <>
-                            <InputField
+                            <MaskedInputField
                                 label="CNPJ"
-                                name="cnpj"
+                                mask="00.000.000/0000-00"
                                 value={form.cnpj}
-                                onChange={handleChange}
+                                onAccept={(value) => handleMaskedChange('cnpj', value)}
                                 disabled={!isEditing}
                                 required
+                                error={fieldErrors.cnpj}
                             />
                             <InputField
                                 label="Razão social"
@@ -601,6 +586,7 @@ export default function ProfilePage() {
                                 onChange={handleChange}
                                 disabled={!isEditing}
                                 required
+                                error={fieldErrors.corporateName}
                             />
                         </>
                     )}
@@ -621,6 +607,7 @@ export default function ProfilePage() {
                                 type="button"
                                 onClick={() => {
                                     setForm(profile.form);
+                                    setFieldErrors({});
                                     setIsEditing(false);
                                 }}
                                 disabled={isSaving || isDeleting}
@@ -677,9 +664,10 @@ function InfoCard({
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
     wrapperClassName?: string;
+    error?: string;
 }
 
-function InputField({ label, wrapperClassName = '', className = '', ...props }: InputFieldProps) {
+function InputField({ label, wrapperClassName = '', className = '', error, ...props }: InputFieldProps) {
     return (
         <div className={`space-y-1.5 ${wrapperClassName}`}>
             <label className="text-foreground text-sm font-medium">{label}</label>
@@ -687,6 +675,42 @@ function InputField({ label, wrapperClassName = '', className = '', ...props }: 
                 className={`border-border bg-input text-foreground focus:border-primary disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md border px-3 text-sm transition-colors outline-none disabled:cursor-not-allowed ${className}`}
                 {...props}
             />
+            {error && <p className="text-xs font-bold text-destructive">{error}</p>}
+        </div>
+    );
+}
+
+interface MaskedInputFieldProps {
+    label: string;
+    mask: string | { mask: string; definitions?: Record<string, RegExp> }[];
+    prepare?: (value: string) => string;
+    value: string;
+    onAccept: (value: string) => void;
+    disabled?: boolean;
+    required?: boolean;
+    wrapperClassName?: string;
+    error?: string;
+}
+
+function MaskedInputField({
+    label,
+    mask,
+    prepare,
+    value,
+    onAccept,
+    disabled,
+    required,
+    wrapperClassName = '',
+    error,
+}: MaskedInputFieldProps) {
+    return (
+        <div className={`space-y-1.5 ${wrapperClassName}`}>
+            <label className="text-foreground text-sm font-medium">{label}</label>
+            <IMaskInput
+                {...({ mask, prepare, value, onAccept, disabled, required } as object)}
+                className="border-border bg-input text-foreground focus:border-primary disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md border px-3 text-sm transition-colors outline-none disabled:cursor-not-allowed"
+            />
+            {error && <p className="text-xs font-bold text-destructive">{error}</p>}
         </div>
     );
 }

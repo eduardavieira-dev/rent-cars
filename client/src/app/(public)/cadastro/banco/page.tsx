@@ -5,33 +5,14 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Building, Eye, EyeOff, Hash, Landmark, Lock, Mail, Phone, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type ChangeEvent, type FormEvent, useState } from 'react';
+import type { SyntheticEvent } from 'react';
+import { useState } from 'react';
+import { IMaskInput } from 'react-imask';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
 import api from '@/lib/axios';
-
-function maskPhone(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 11);
-    if (d.length === 0) return '';
-    if (d.length <= 2) return `(${d}`;
-    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
-    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
-}
-
-function maskCnpj(v: string): string {
-    const d = v.replace(/\D/g, '').slice(0, 14);
-    if (d.length <= 2) return d;
-    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
-    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
-    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
-    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
-}
-
-function maskCode(v: string): string {
-    return v.replace(/\D/g, '').slice(0, 3);
-}
 
 const bankSchema = z.object({
     name: z.string().min(1, 'Informe o nome do responsável.'),
@@ -41,6 +22,8 @@ const bankSchema = z.object({
     cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
     code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código FEBRABAN válido.'),
 });
+
+type BankFormErrors = Partial<Record<keyof z.infer<typeof bankSchema>, string>>;
 
 const container = {
     hidden: {},
@@ -80,29 +63,32 @@ export default function BankRegistrationPage() {
     const router = useRouter();
 
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
+    const [fieldErrors, setFieldErrors] = useState<BankFormErrors>({});
     const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    function handleChange(e: ChangeEvent<HTMLInputElement>) {
-        const { name, value } = e.target;
-        let masked = value;
-        if (name === 'phone') masked = maskPhone(value);
-        else if (name === 'cnpj') masked = maskCnpj(value);
-        else if (name === 'code') masked = maskCode(value);
-        setForm((prev) => ({ ...prev, [name]: masked }));
+    function handleTextChange(name: keyof FormState, value: string) {
+        setForm((prev) => ({ ...prev, [name]: value }));
+        if (fieldErrors[name]) {
+            setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
+        }
     }
 
-    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
         e.preventDefault();
 
         const result = bankSchema.safeParse(form);
         if (!result.success) {
-            setError(result.error.issues[0].message);
+            const errors: BankFormErrors = {};
+            for (const issue of result.error.issues) {
+                const field = issue.path[0] as keyof BankFormErrors;
+                if (!errors[field]) errors[field] = issue.message;
+            }
+            setFieldErrors(errors);
             return;
         }
 
-        setError('');
+        setFieldErrors({});
         setIsLoading(true);
 
         try {
@@ -119,7 +105,7 @@ export default function BankRegistrationPage() {
         } catch (err) {
             if (isAxiosError(err)) {
                 if (!err.response) {
-                    setError('Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
+                    toast.error('Não foi possível conectar ao servidor. Verifique se o backend está em execução.');
                     return;
                 }
 
@@ -127,14 +113,14 @@ export default function BankRegistrationPage() {
                 const message = (err.response.data as { message?: string })?.message;
 
                 if (status === 409) {
-                    setError(message ?? 'CNPJ ou e-mail já cadastrado. Verifique os dados.');
+                    toast.error(message ?? 'CNPJ ou e-mail já cadastrado. Verifique os dados.');
                 } else if (status === 400) {
-                    setError(message ? `Dado inválido: ${message}` : 'Verifique os dados informados e tente novamente.');
+                    toast.error(message ? `Dado inválido: ${message}` : 'Verifique os dados informados e tente novamente.');
                 } else {
-                    setError(`Erro ${status} ao realizar o cadastro. Tente novamente.`);
+                    toast.error(`Erro ${status} ao realizar o cadastro. Tente novamente.`);
                 }
             } else {
-                setError('Erro inesperado. Tente novamente.');
+                toast.error('Erro inesperado. Tente novamente.');
             }
         } finally {
             setIsLoading(false);
@@ -209,11 +195,14 @@ export default function BankRegistrationPage() {
                                     minLength={3}
                                     maxLength={100}
                                     value={form.name}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleTextChange('name', e.target.value)}
                                     placeholder="João da Silva"
                                     className={inputWithIcon}
                                 />
                             </div>
+                            {fieldErrors.name && (
+                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.name}</p>
+                            )}
                         </motion.div>
 
                         <motion.div variants={item} className="grid grid-cols-2 gap-4">
@@ -232,11 +221,14 @@ export default function BankRegistrationPage() {
                                         required
                                         autoComplete="email"
                                         value={form.email}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleTextChange('email', e.target.value)}
                                         placeholder="banco@email.com"
                                         className={inputWithIcon}
                                     />
                                 </div>
+                                {fieldErrors.email && (
+                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.email}</p>
+                                )}
                             </div>
 
                             <div>
@@ -256,7 +248,7 @@ export default function BankRegistrationPage() {
                                         minLength={6}
                                         maxLength={100}
                                         value={form.password}
-                                        onChange={handleChange}
+                                        onChange={(e) => handleTextChange('password', e.target.value)}
                                         placeholder="Mín. 6 caracteres"
                                         className={`${inputBase} pl-10 pr-10`}
                                     />
@@ -269,6 +261,9 @@ export default function BankRegistrationPage() {
                                         {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                                     </button>
                                 </div>
+                                {fieldErrors.password && (
+                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.password}</p>
+                                )}
                             </div>
                         </motion.div>
 
@@ -280,20 +275,23 @@ export default function BankRegistrationPage() {
                                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                                     <Phone size={15} />
                                 </div>
-                                <input
+                                <IMaskInput
                                     id="phone"
                                     name="phone"
+                                    mask={[{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }]}
                                     type="tel"
                                     required
                                     autoComplete="tel"
                                     inputMode="numeric"
-                                    maxLength={15}
                                     value={form.phone}
-                                    onChange={handleChange}
+                                    onAccept={(value: string) => handleTextChange('phone', value)}
                                     placeholder="(11) 99999-9999"
                                     className={inputWithIcon}
                                 />
                             </div>
+                            {fieldErrors.phone && (
+                                <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.phone}</p>
+                            )}
                         </motion.div>
 
                         <motion.div variants={item} className="grid grid-cols-2 gap-4">
@@ -305,19 +303,22 @@ export default function BankRegistrationPage() {
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                                         <Building size={15} />
                                     </div>
-                                    <input
+                                    <IMaskInput
                                         id="cnpj"
                                         name="cnpj"
+                                        mask="00.000.000/0000-00"
                                         type="text"
                                         required
                                         inputMode="numeric"
-                                        maxLength={18}
                                         value={form.cnpj}
-                                        onChange={handleChange}
+                                        onAccept={(value: string) => handleTextChange('cnpj', value)}
                                         placeholder="00.000.000/0000-00"
                                         className={inputWithIcon}
                                     />
                                 </div>
+                                {fieldErrors.cnpj && (
+                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.cnpj}</p>
+                                )}
                             </div>
 
                             <div>
@@ -328,33 +329,24 @@ export default function BankRegistrationPage() {
                                     <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-muted-foreground">
                                         <Hash size={15} />
                                     </div>
-                                    <input
+                                    <IMaskInput
                                         id="code"
                                         name="code"
+                                        mask="000"
                                         type="text"
                                         required
                                         inputMode="numeric"
-                                        maxLength={3}
                                         value={form.code}
-                                        onChange={handleChange}
+                                        onAccept={(value: string) => handleTextChange('code', value)}
                                         placeholder="001"
                                         className={inputWithIcon}
                                     />
                                 </div>
+                                {fieldErrors.code && (
+                                    <p className="mt-1 text-xs font-bold text-destructive">{fieldErrors.code}</p>
+                                )}
                             </div>
                         </motion.div>
-
-                        {error && (
-                            <motion.p
-                                role="alert"
-                                initial={{ opacity: 0, y: -8 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2"
-                            >
-                                {error}
-                            </motion.p>
-                        )}
 
                         <motion.div variants={item} className="pt-1">
                             <button
