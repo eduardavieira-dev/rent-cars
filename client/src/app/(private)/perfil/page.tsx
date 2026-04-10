@@ -1,6 +1,6 @@
 'use client';
 
-import { isAxiosError } from 'axios';
+import axios, { isAxiosError } from 'axios';
 import { Clock3, Save, ShieldCheck, UserCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { SyntheticEvent } from 'react';
@@ -15,13 +15,24 @@ import { ProfileDangerZone } from './ProfileDangerZone/index';
 
 type RoleType = 'CLIENT' | 'BANK' | 'COMPANY';
 
+interface ViaCepResponse {
+    erro?: boolean;
+    logradouro?: string;
+    bairro?: string;
+    localidade?: string;
+}
+
 interface ProfileFormState {
     name: string;
     email: string;
     phone: string;
     cpf: string;
     rg: string;
-    address: string;
+    cep: string;
+    street: string;
+    complement: string;
+    neighborhood: string;
+    city: string;
     profession: string;
     cnpj: string;
     code: string;
@@ -40,7 +51,11 @@ const EMPTY_FORM: ProfileFormState = {
     phone: '',
     cpf: '',
     rg: '',
-    address: '',
+    cep: '',
+    street: '',
+    complement: '',
+    neighborhood: '',
+    city: '',
     profession: '',
     cnpj: '',
     code: '',
@@ -63,6 +78,12 @@ function normalizeRole(value: unknown): RoleType | null {
     return null;
 }
 
+function parseAddressString(address: string): { cep: string; street: string; complement: string; neighborhood: string; city: string } {
+    const match = /^(.*?) - (.*?)\. Bairro (.*?) - (.*)$/.exec(address);
+    if (match) return { cep: '', street: match[1], complement: match[2], neighborhood: match[3], city: match[4] };
+    return { cep: '', street: address, complement: '', neighborhood: '', city: '' };
+}
+
 function parseUserProfile(payload: unknown): UserProfile | null {
     if (!isRecord(payload)) return null;
 
@@ -76,6 +97,8 @@ function parseUserProfile(payload: unknown): UserProfile | null {
     const id = String(payload.id ?? '');
     if (!id) return null;
 
+    const addressParsed = parseAddressString(toStringValue(payload.address));
+
     return {
         id,
         roles,
@@ -85,7 +108,11 @@ function parseUserProfile(payload: unknown): UserProfile | null {
             phone: toStringValue(payload.phone),
             cpf: toStringValue(payload.cpf),
             rg: toStringValue(payload.rg),
-            address: toStringValue(payload.address),
+            cep: addressParsed.cep,
+            street: addressParsed.street,
+            complement: addressParsed.complement,
+            neighborhood: addressParsed.neighborhood,
+            city: addressParsed.city,
             profession: toStringValue(payload.profession),
             cnpj: toStringValue(payload.cnpj),
             code: toStringValue(payload.code),
@@ -127,6 +154,11 @@ const clientProfileSchema = baseProfileSchema.extend({
     cpf: z.string().refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
     rg: z.string().min(1, 'Informe o RG.'),
     profession: z.string().min(1, 'Informe a profissão.'),
+    cep: z.string().refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
+    street: z.string().min(1, 'Informe a rua.'),
+    complement: z.string().min(1, 'Informe o complemento/número.'),
+    neighborhood: z.string().min(1, 'Informe o bairro.'),
+    city: z.string().min(1, 'Informe a cidade.'),
 });
 
 const bankProfileSchema = baseProfileSchema.extend({
@@ -192,6 +224,7 @@ export default function ProfilePage() {
     const [form, setForm] = useState<ProfileFormState>(EMPTY_FORM);
     const [fieldErrors, setFieldErrors] = useState<ProfileFormErrors>({});
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingCep, setIsLoadingCep] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -286,6 +319,34 @@ export default function ProfilePage() {
         }
     }
 
+    async function handleCepBlur() {
+        const digits = form.cep.replace(/\D/g, '');
+        if (digits.length !== 8) return;
+        setIsLoadingCep(true);
+        try {
+            const response = await axios.get<ViaCepResponse>(`https://viacep.com.br/ws/${digits}/json/`);
+            const data = response.data;
+            if (!data.erro) {
+                setForm((prev) => ({
+                    ...prev,
+                    street: data.logradouro ?? prev.street,
+                    neighborhood: data.bairro ?? prev.neighborhood,
+                    city: data.localidade ?? prev.city,
+                }));
+                setFieldErrors((prev) => ({
+                    ...prev,
+                    street: undefined,
+                    neighborhood: undefined,
+                    city: undefined,
+                }));
+            }
+        } catch {
+            // keep existing values on fetch error
+        } finally {
+            setIsLoadingCep(false);
+        }
+    }
+
     async function handleSave(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
         event.preventDefault();
 
@@ -316,7 +377,7 @@ export default function ProfilePage() {
                 phone: form.phone.trim(),
                 cpf: form.cpf.trim(),
                 rg: form.rg.trim(),
-                address: form.address.trim() || null,
+                address: `${form.street.trim()} - ${form.complement.trim()}. Bairro ${form.neighborhood.trim()} - ${form.city.trim()}`,
                 profession: form.profession.trim(),
             },
             BANK: {
@@ -478,7 +539,7 @@ export default function ProfilePage() {
 
                 <div className="grid gap-4 md:grid-cols-2">
                     <InputField
-                        label="Nome"
+                        label={currentRole === 'BANK' ? 'Nome do banco' : 'Nome'}
                         name="name"
                         placeholder="Maria da Silva"
                         value={form.name}
@@ -548,14 +609,58 @@ export default function ProfilePage() {
                                 required
                                 error={fieldErrors.profession}
                             />
+                            <MaskedInputField
+                                label="CEP"
+                                mask="00000-000"
+                                inputMode="numeric"
+                                placeholder="00000-000"
+                                value={form.cep}
+                                onAccept={(value) => handleMaskedChange('cep', value)}
+                                onBlur={handleCepBlur}
+                                disabled={!isEditing}
+                                required
+                                error={fieldErrors.cep}
+                                wrapperClassName={isLoadingCep ? 'opacity-60' : ''}
+                            />
                             <InputField
-                                label="Endereço"
-                                name="address"
-                                placeholder="Rua das Flores, 123 — Belo Horizonte, MG"
-                                value={form.address}
+                                label="Rua"
+                                name="street"
+                                placeholder="Rua das Flores"
+                                value={form.street}
+                                onChange={handleChange}
+                                disabled={!isEditing || isLoadingCep}
+                                required
+                                error={fieldErrors.street}
+                            />
+                            <InputField
+                                label="Complemento/Número"
+                                name="complement"
+                                placeholder="Apt 101"
+                                value={form.complement}
                                 onChange={handleChange}
                                 disabled={!isEditing}
-                                wrapperClassName="md:col-span-2"
+                                required
+                                error={fieldErrors.complement}
+                            />
+                            <InputField
+                                label="Bairro"
+                                name="neighborhood"
+                                placeholder="Centro"
+                                value={form.neighborhood}
+                                onChange={handleChange}
+                                disabled={!isEditing || isLoadingCep}
+                                required
+                                error={fieldErrors.neighborhood}
+                            />
+                            <InputField
+                                label="Cidade"
+                                name="city"
+                                placeholder="Belo Horizonte"
+                                value={form.city}
+                                onChange={handleChange}
+                                disabled={!isEditing || isLoadingCep}
+                                required
+                                error={fieldErrors.city}
                             />
                         </>
                     )}
@@ -719,6 +824,7 @@ interface MaskedInputFieldProps {
     prepare?: (value: string) => string;
     value: string;
     onAccept: (value: string) => void;
+    onBlur?: () => void;
     disabled?: boolean;
     required?: boolean;
     placeholder?: string;
@@ -734,6 +840,7 @@ function MaskedInputField({
     prepare,
     value,
     onAccept,
+    onBlur,
     disabled,
     required,
     placeholder,
@@ -754,6 +861,7 @@ function MaskedInputField({
                     prepare,
                     value,
                     onAccept,
+                    onBlur,
                     disabled,
                     required,
                     placeholder,
