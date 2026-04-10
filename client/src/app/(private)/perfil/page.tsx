@@ -3,12 +3,12 @@
 import { isAxiosError } from 'axios';
 import { Clock3, Save, ShieldCheck, UserCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import type { SyntheticEvent } from 'react';
 import {
     useEffect,
     useMemo,
     useState,
     type ChangeEvent,
-    type FormEvent,
     type InputHTMLAttributes,
 } from 'react';
 import { IMaskInput } from 'react-imask';
@@ -129,11 +129,13 @@ const baseProfileSchema = z.object({
 
 const clientProfileSchema = baseProfileSchema.extend({
     cpf: z.string().refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
+    rg: z.string().min(1, 'Informe o RG.'),
+    profession: z.string().min(1, 'Informe a profissão.'),
 });
 
 const bankProfileSchema = baseProfileSchema.extend({
     cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
-    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código FEBRABAN válido.'),
+    code: z.string().refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
 });
 
 const companyProfileSchema = baseProfileSchema.extend({
@@ -286,7 +288,7 @@ export default function ProfilePage() {
         }
     }
 
-    async function handleSave(event: FormEvent<HTMLFormElement>) {
+    async function handleSave(event: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
         event.preventDefault();
 
         if (!profile || !currentRole) {
@@ -315,9 +317,9 @@ export default function ProfilePage() {
                 email: form.email.trim(),
                 phone: form.phone.trim(),
                 cpf: form.cpf.trim(),
-                rg: form.rg.trim() || null,
+                rg: form.rg.trim(),
                 address: form.address.trim() || null,
-                profession: form.profession.trim() || null,
+                profession: form.profession.trim(),
             },
             BANK: {
                 name: form.name.trim(),
@@ -466,6 +468,7 @@ export default function ProfilePage() {
 
             <form
                 onSubmit={handleSave}
+                noValidate
                 className="border-border bg-card space-y-5 rounded-2xl border p-6 shadow-sm"
             >
                 <div className="flex items-center justify-between gap-3">
@@ -479,6 +482,7 @@ export default function ProfilePage() {
                     <InputField
                         label="Nome"
                         name="name"
+                        placeholder="Maria da Silva"
                         value={form.name}
                         onChange={handleChange}
                         disabled={!isEditing}
@@ -489,6 +493,7 @@ export default function ProfilePage() {
                         label="E-mail"
                         name="email"
                         type="email"
+                        placeholder="seu@email.com"
                         value={form.email}
                         onChange={handleChange}
                         disabled={!isEditing}
@@ -498,6 +503,9 @@ export default function ProfilePage() {
                     <MaskedInputField
                         label="Telefone"
                         mask={[{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }]}
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder="(11) 99999-9999"
                         value={form.phone}
                         onAccept={(value) => handleMaskedChange('phone', value)}
                         disabled={!isEditing}
@@ -510,6 +518,8 @@ export default function ProfilePage() {
                             <MaskedInputField
                                 label="CPF"
                                 mask="000.000.000-00"
+                                inputMode="numeric"
+                                placeholder="000.000.000-00"
                                 value={form.cpf}
                                 onAccept={(value) => handleMaskedChange('cpf', value)}
                                 disabled={!isEditing}
@@ -523,20 +533,27 @@ export default function ProfilePage() {
                                     { mask: 'aa-00.000.000', definitions: { a: /[A-Za-z]/ } },
                                 ]}
                                 prepare={(value: string) => value.toUpperCase()}
+                                placeholder="MG-12.345.678"
                                 value={form.rg}
                                 onAccept={(value) => handleMaskedChange('rg', value)}
                                 disabled={!isEditing}
+                                required
+                                error={fieldErrors.rg}
                             />
                             <InputField
                                 label="Profissão"
                                 name="profession"
+                                placeholder="Engenheira de Software"
                                 value={form.profession}
                                 onChange={handleChange}
                                 disabled={!isEditing}
+                                required
+                                error={fieldErrors.profession}
                             />
                             <InputField
                                 label="Endereço"
                                 name="address"
+                                placeholder="Rua das Flores, 123 — Belo Horizonte, MG"
                                 value={form.address}
                                 onChange={handleChange}
                                 disabled={!isEditing}
@@ -550,6 +567,8 @@ export default function ProfilePage() {
                             <MaskedInputField
                                 label="CNPJ"
                                 mask="00.000.000/0000-00"
+                                inputMode="numeric"
+                                placeholder="00.000.000/0000-00"
                                 value={form.cnpj}
                                 onAccept={(value) => handleMaskedChange('cnpj', value)}
                                 disabled={!isEditing}
@@ -557,8 +576,10 @@ export default function ProfilePage() {
                                 error={fieldErrors.cnpj}
                             />
                             <MaskedInputField
-                                label="Código do banco"
+                                label="Código COMPE"
                                 mask="000"
+                                inputMode="numeric"
+                                placeholder="001"
                                 value={form.code}
                                 onAccept={(value) => handleMaskedChange('code', value)}
                                 disabled={!isEditing}
@@ -573,6 +594,8 @@ export default function ProfilePage() {
                             <MaskedInputField
                                 label="CNPJ"
                                 mask="00.000.000/0000-00"
+                                inputMode="numeric"
+                                placeholder="00.000.000/0000-00"
                                 value={form.cnpj}
                                 onAccept={(value) => handleMaskedChange('cnpj', value)}
                                 disabled={!isEditing}
@@ -582,6 +605,7 @@ export default function ProfilePage() {
                             <InputField
                                 label="Razão social"
                                 name="corporateName"
+                                placeholder="Locadora XYZ Ltda."
                                 value={form.corporateName}
                                 onChange={handleChange}
                                 disabled={!isEditing}
@@ -667,15 +691,19 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
     error?: string;
 }
 
-function InputField({ label, wrapperClassName = '', className = '', error, ...props }: InputFieldProps) {
+function InputField({ label, wrapperClassName = '', className = '', error, required, ...props }: InputFieldProps) {
     return (
         <div className={`space-y-1.5 ${wrapperClassName}`}>
-            <label className="text-foreground text-sm font-medium">{label}</label>
+            <label className="text-foreground text-sm font-medium">
+                {label}
+                {required && <span className="text-primary ml-0.5">*</span>}
+            </label>
             <input
+                required={required}
                 className={`border-border bg-input text-foreground focus:border-primary disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md border px-3 text-sm transition-colors outline-none disabled:cursor-not-allowed ${className}`}
                 {...props}
             />
-            {error && <p className="text-xs font-bold text-destructive">{error}</p>}
+            {error && <p className="mt-1 text-xs font-bold text-destructive">{error}</p>}
         </div>
     );
 }
@@ -688,6 +716,9 @@ interface MaskedInputFieldProps {
     onAccept: (value: string) => void;
     disabled?: boolean;
     required?: boolean;
+    placeholder?: string;
+    inputMode?: 'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search';
+    type?: string;
     wrapperClassName?: string;
     error?: string;
 }
@@ -700,17 +731,23 @@ function MaskedInputField({
     onAccept,
     disabled,
     required,
+    placeholder,
+    inputMode,
+    type,
     wrapperClassName = '',
     error,
 }: MaskedInputFieldProps) {
     return (
         <div className={`space-y-1.5 ${wrapperClassName}`}>
-            <label className="text-foreground text-sm font-medium">{label}</label>
+            <label className="text-foreground text-sm font-medium">
+                {label}
+                {required && <span className="text-primary ml-0.5">*</span>}
+            </label>
             <IMaskInput
-                {...({ mask, prepare, value, onAccept, disabled, required } as object)}
+                {...({ mask, prepare, value, onAccept, disabled, required, placeholder, inputMode, type } as object)}
                 className="border-border bg-input text-foreground focus:border-primary disabled:bg-muted disabled:text-muted-foreground h-11 w-full rounded-md border px-3 text-sm transition-colors outline-none disabled:cursor-not-allowed"
             />
-            {error && <p className="text-xs font-bold text-destructive">{error}</p>}
+            {error && <p className="mt-1 text-xs font-bold text-destructive">{error}</p>}
         </div>
     );
 }
