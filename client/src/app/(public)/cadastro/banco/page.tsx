@@ -1,11 +1,10 @@
 'use client';
 
 import { isAxiosError } from 'axios';
-import { motion } from 'framer-motion';
-import { ArrowRight, Building, Eye, EyeOff, Hash, Landmark, Lock, Mail, Phone } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Building, Eye, EyeOff, Hash, Landmark, Lock, Mail, Phone } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { SyntheticEvent } from 'react';
 import { useState } from 'react';
 import { IMaskInput } from 'react-imask';
 import { toast } from 'sonner';
@@ -13,6 +12,8 @@ import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
 import { PasswordStrengthChecker } from '@/components/PasswordStrengthChecker';
+import { StepNavigationButtons } from '@/components/StepNavigationButtons';
+import { StepProgressBar } from '@/components/StepProgressBar';
 import api from '@/lib/axios';
 
 const passwordSchema = z
@@ -25,33 +26,33 @@ const passwordSchema = z
         'A senha deve conter pelo menos um caractere especial.'
     );
 
-const bankSchema = z
+const step1Schema = z.object({
+    name: z.string().min(3, 'O nome do banco deve ter no mínimo 3 caracteres.'),
+    code: z
+        .string()
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 3,
+            'Informe um código COMPE válido (3 dígitos).'
+        ),
+    cnpj: z
+        .string()
+        .refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido (14 dígitos).'),
+    email: z.string().email('Informe um e-mail válido.'),
+    phone: z
+        .string()
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 11,
+            'Informe um telefone com DDD e 9 dígitos.'
+        ),
+});
+
+const step2Schema = z
     .object({
-        name: z.string().min(3, 'O nome do banco deve ter no mínimo 3 caracteres.'),
-        email: z.string().email('Informe um e-mail válido.'),
         password: passwordSchema,
         confirmPassword: z.string().min(1, 'Confirme a senha.'),
-        phone: z
-            .string()
-            .refine(
-                (v) => v.replace(/\D/g, '').length === 11,
-                'Informe um telefone com DDD e 9 dígitos.'
-            ),
-        cnpj: z
-            .string()
-            .refine(
-                (v) => v.replace(/\D/g, '').length === 14,
-                'Informe um CNPJ válido (14 dígitos).'
-            ),
-        code: z
-            .string()
-            .refine(
-                (v) => v.replace(/\D/g, '').length === 3,
-                'Informe um código COMPE válido (3 dígitos).'
-            ),
     })
-    .superRefine((data, ctx) => {
-        if (data.password !== data.confirmPassword) {
+    .superRefine((formData, ctx) => {
+        if (formData.password !== formData.confirmPassword) {
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 message: 'As senhas não coincidem.',
@@ -60,7 +61,31 @@ const bankSchema = z
         }
     });
 
-type BankFormErrors = Partial<Record<keyof z.infer<typeof bankSchema>, string>>;
+interface FormState {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    phone: string;
+    cnpj: string;
+    code: string;
+}
+
+type FormErrors = Partial<Record<keyof FormState, string>>;
+
+const INITIAL_FORM: FormState = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    cnpj: '',
+    code: '',
+};
+
+const STEPS = [{ label: 'Dados do banco' }, { label: 'Senha' }];
+
+const stepSchemas = [step1Schema, step2Schema];
 
 const container = {
     hidden: {},
@@ -78,34 +103,14 @@ const inputWithIcon = `${inputBase} pl-10 pr-3`;
 const labelBase = 'block text-sm font-medium text-secondary-foreground mb-1.5';
 const requiredMark = <span className="text-primary ml-0.5">*</span>;
 
-interface FormState {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    phone: string;
-    cnpj: string;
-    code: string;
-}
-
-const INITIAL_FORM: FormState = {
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    phone: '',
-    cnpj: '',
-    code: '',
-};
-
 export default function BankRegistrationPage() {
     const router = useRouter();
 
+    const [currentStep, setCurrentStep] = useState(0);
     const [form, setForm] = useState<FormState>(INITIAL_FORM);
-    const [fieldErrors, setFieldErrors] = useState<BankFormErrors>({});
+    const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [showPasswordChecker, setShowPasswordChecker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     function handleTextChange(name: keyof FormState, value: string) {
@@ -115,21 +120,37 @@ export default function BankRegistrationPage() {
         }
     }
 
-    async function handleSubmit(e: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
-        e.preventDefault();
-
-        const result = bankSchema.safeParse(form);
+    function validateCurrentStep(): boolean {
+        const schema = stepSchemas[currentStep];
+        const result = schema.safeParse(form);
         if (!result.success) {
-            const errors: BankFormErrors = {};
+            const errors: FormErrors = {};
             for (const issue of result.error.issues) {
-                const field = issue.path[0] as keyof BankFormErrors;
+                const field = issue.path[0] as keyof FormErrors;
                 if (!errors[field]) errors[field] = issue.message;
             }
             setFieldErrors(errors);
-            return;
+            return false;
         }
-
         setFieldErrors({});
+        return true;
+    }
+
+    function handleNext() {
+        if (!validateCurrentStep()) return;
+        if (currentStep < STEPS.length - 1) {
+            setCurrentStep((prev) => prev + 1);
+        } else {
+            handleSubmit();
+        }
+    }
+
+    function handleBack() {
+        setFieldErrors({});
+        setCurrentStep((prev) => prev - 1);
+    }
+
+    async function handleSubmit() {
         setIsLoading(true);
 
         try {
@@ -221,7 +242,7 @@ export default function BankRegistrationPage() {
                         <BrandLogo size="sm" />
                     </motion.div>
 
-                    <motion.div variants={item} className="mb-8">
+                    <motion.div variants={item} className="mb-6">
                         <h1 className="font-heading text-foreground mb-1 text-2xl font-bold">
                             Cadastro de Banco
                         </h1>
@@ -230,282 +251,320 @@ export default function BankRegistrationPage() {
                         </p>
                     </motion.div>
 
-                    <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                        <motion.div
-                            variants={item}
-                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                        >
-                            <div>
-                                <label htmlFor="name" className={labelBase}>
-                                    Nome do banco {requiredMark}
-                                </label>
-                                <div className="relative">
-                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <Landmark size={15} />
-                                    </div>
-                                    <input
-                                        id="name"
-                                        name="name"
-                                        type="text"
-                                        required
-                                        autoComplete="organization"
-                                        minLength={3}
-                                        maxLength={100}
-                                        value={form.name}
-                                        onChange={(e) => handleTextChange('name', e.target.value)}
-                                        placeholder="Banco do Brasil"
-                                        className={inputWithIcon}
-                                    />
-                                </div>
-                                {fieldErrors.name && (
-                                    <p className="text-destructive mt-1 text-xs font-bold">
-                                        {fieldErrors.name}
-                                    </p>
-                                )}
-                            </div>
+                    <motion.div variants={item} className="mb-8">
+                        <StepProgressBar steps={STEPS} currentStep={currentStep} />
+                    </motion.div>
 
-                            <div>
-                                <label htmlFor="code" className={labelBase}>
-                                    Código COMPE {requiredMark}
-                                </label>
-                                <div className="relative">
-                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <Hash size={15} />
-                                    </div>
-                                    <IMaskInput
-                                        id="code"
-                                        name="code"
-                                        mask="000"
-                                        type="text"
-                                        required
-                                        inputMode="numeric"
-                                        value={form.code}
-                                        onAccept={(value: string) =>
-                                            handleTextChange('code', value)
-                                        }
-                                        placeholder="001"
-                                        className={inputWithIcon}
-                                    />
-                                </div>
-                                {fieldErrors.code && (
-                                    <p className="text-destructive mt-1 text-xs font-bold">
-                                        {fieldErrors.code}
-                                    </p>
-                                )}
-                            </div>
-                        </motion.div>
-
-                        <motion.div variants={item}>
-                            <label htmlFor="cnpj" className={labelBase}>
-                                CNPJ {requiredMark}
-                            </label>
-                            <div className="relative">
-                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                    <Building size={15} />
-                                </div>
-                                <IMaskInput
-                                    id="cnpj"
-                                    name="cnpj"
-                                    mask="00.000.000/0000-00"
-                                    type="text"
-                                    required
-                                    inputMode="numeric"
-                                    value={form.cnpj}
-                                    onAccept={(value: string) => handleTextChange('cnpj', value)}
-                                    placeholder="00.000.000/0000-00"
-                                    className={inputWithIcon}
-                                />
-                            </div>
-                            {fieldErrors.cnpj && (
-                                <p className="text-destructive mt-1 text-xs font-bold">
-                                    {fieldErrors.cnpj}
-                                </p>
-                            )}
-                        </motion.div>
-
-                        <motion.div
-                            variants={item}
-                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                        >
-                            <div>
-                                <label htmlFor="email" className={labelBase}>
-                                    E-mail {requiredMark}
-                                </label>
-                                <div className="relative">
-                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <Mail size={15} />
-                                    </div>
-                                    <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        required
-                                        autoComplete="email"
-                                        value={form.email}
-                                        onChange={(e) => handleTextChange('email', e.target.value)}
-                                        placeholder="banco@email.com"
-                                        className={inputWithIcon}
-                                    />
-                                </div>
-                                {fieldErrors.email && (
-                                    <p className="text-destructive mt-1 text-xs font-bold">
-                                        {fieldErrors.email}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label htmlFor="phone" className={labelBase}>
-                                    Telefone {requiredMark}
-                                </label>
-                                <div className="relative">
-                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <Phone size={15} />
-                                    </div>
-                                    <IMaskInput
-                                        id="phone"
-                                        name="phone"
-                                        mask={[
-                                            { mask: '(00) 0000-0000' },
-                                            { mask: '(00) 00000-0000' },
-                                        ]}
-                                        type="tel"
-                                        required
-                                        autoComplete="tel"
-                                        inputMode="numeric"
-                                        value={form.phone}
-                                        onAccept={(value: string) =>
-                                            handleTextChange('phone', value)
-                                        }
-                                        placeholder="(11) 99999-9999"
-                                        className={inputWithIcon}
-                                    />
-                                </div>
-                                {fieldErrors.phone && (
-                                    <p className="text-destructive mt-1 text-xs font-bold">
-                                        {fieldErrors.phone}
-                                    </p>
-                                )}
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            variants={item}
-                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
-                        >
-                            <div>
-                                <label htmlFor="password" className={labelBase}>
-                                    Senha {requiredMark}
-                                </label>
-                                <div className="relative">
-                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <Lock size={15} />
-                                    </div>
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type={showPassword ? 'text' : 'password'}
-                                        required
-                                        autoComplete="new-password"
-                                        minLength={6}
-                                        maxLength={100}
-                                        value={form.password}
-                                        onChange={(e) =>
-                                            handleTextChange('password', e.target.value)
-                                        }
-                                        onFocus={() => setShowPasswordChecker(true)}
-                                        onBlur={() => setShowPasswordChecker(false)}
-                                        placeholder="Mín. 8 caracteres, com letra, número e símbolo"
-                                        className={`${inputBase} pr-10 pl-10`}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword((prev) => !prev)}
-                                        aria-label={
-                                            showPassword ? 'Ocultar senha' : 'Mostrar senha'
-                                        }
-                                        className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
-                                    >
-                                        {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                                    </button>
-                                </div>
-                                {fieldErrors.password && (
-                                    <p className="text-destructive mt-1 text-xs font-bold">
-                                        {fieldErrors.password}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div>
-                                <label htmlFor="confirmPassword" className={labelBase}>
-                                    Confirmar senha {requiredMark}
-                                </label>
-                                <div className="relative">
-                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <Lock size={15} />
-                                    </div>
-                                    <input
-                                        id="confirmPassword"
-                                        name="confirmPassword"
-                                        type={showConfirmPassword ? 'text' : 'password'}
-                                        required
-                                        autoComplete="new-password"
-                                        minLength={6}
-                                        maxLength={100}
-                                        value={form.confirmPassword}
-                                        onChange={(e) =>
-                                            handleTextChange('confirmPassword', e.target.value)
-                                        }
-                                        placeholder="Repita a senha"
-                                        className={`${inputBase} pr-10 pl-10`}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirmPassword((prev) => !prev)}
-                                        aria-label={
-                                            showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'
-                                        }
-                                        className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
-                                    >
-                                        {showConfirmPassword ? (
-                                            <EyeOff size={15} />
-                                        ) : (
-                                            <Eye size={15} />
-                                        )}
-                                    </button>
-                                </div>
-                                {fieldErrors.confirmPassword && (
-                                    <p className="text-destructive mt-1 text-xs font-bold">
-                                        {fieldErrors.confirmPassword}
-                                    </p>
-                                )}
-                            </div>
-                        </motion.div>
-
-                        <motion.div variants={item}>
-                            <PasswordStrengthChecker
-                                password={form.password}
-                                confirmPassword={form.confirmPassword}
-                                visible={showPasswordChecker}
-                            />
-                        </motion.div>
-
-                        <motion.div variants={item} className="pt-1">
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="bg-gradient-gold shadow-gold text-primary-foreground flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all hover:opacity-90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                    <motion.div variants={item}>
+                        <AnimatePresence initial={false} mode="wait">
+                            <motion.div
+                                key={currentStep}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2, ease: 'easeOut' }}
+                                className="space-y-4"
                             >
-                                {isLoading ? (
-                                    'Cadastrando…'
-                                ) : (
+                                {currentStep === 0 && (
                                     <>
-                                        Criar conta <ArrowRight size={15} />
+                                        <div>
+                                            <label htmlFor="name" className={labelBase}>
+                                                Nome do banco {requiredMark}
+                                            </label>
+                                            <div className="relative">
+                                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                    <Landmark size={15} />
+                                                </div>
+                                                <input
+                                                    id="name"
+                                                    name="name"
+                                                    type="text"
+                                                    required
+                                                    autoComplete="organization"
+                                                    minLength={3}
+                                                    maxLength={100}
+                                                    value={form.name}
+                                                    onChange={(e) =>
+                                                        handleTextChange('name', e.target.value)
+                                                    }
+                                                    placeholder="Banco do Brasil"
+                                                    className={inputWithIcon}
+                                                />
+                                            </div>
+                                            {fieldErrors.name && (
+                                                <p className="text-destructive mt-1 text-xs font-bold">
+                                                    {fieldErrors.name}
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label htmlFor="code" className={labelBase}>
+                                                    Código COMPE {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Hash size={15} />
+                                                    </div>
+                                                    <IMaskInput
+                                                        id="code"
+                                                        name="code"
+                                                        mask="000"
+                                                        type="text"
+                                                        required
+                                                        inputMode="numeric"
+                                                        value={form.code}
+                                                        onAccept={(value: string) =>
+                                                            handleTextChange('code', value)
+                                                        }
+                                                        placeholder="001"
+                                                        className={inputWithIcon}
+                                                    />
+                                                </div>
+                                                {fieldErrors.code && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.code}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="cnpj" className={labelBase}>
+                                                    CNPJ {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Building size={15} />
+                                                    </div>
+                                                    <IMaskInput
+                                                        id="cnpj"
+                                                        name="cnpj"
+                                                        mask="00.000.000/0000-00"
+                                                        type="text"
+                                                        required
+                                                        inputMode="numeric"
+                                                        value={form.cnpj}
+                                                        onAccept={(value: string) =>
+                                                            handleTextChange('cnpj', value)
+                                                        }
+                                                        placeholder="00.000.000/0000-00"
+                                                        className={inputWithIcon}
+                                                    />
+                                                </div>
+                                                {fieldErrors.cnpj && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.cnpj}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label htmlFor="email" className={labelBase}>
+                                                    E-mail {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Mail size={15} />
+                                                    </div>
+                                                    <input
+                                                        id="email"
+                                                        name="email"
+                                                        type="email"
+                                                        required
+                                                        autoComplete="email"
+                                                        value={form.email}
+                                                        onChange={(e) =>
+                                                            handleTextChange(
+                                                                'email',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="banco@email.com"
+                                                        className={inputWithIcon}
+                                                    />
+                                                </div>
+                                                {fieldErrors.email && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.email}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor="phone" className={labelBase}>
+                                                    Telefone {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Phone size={15} />
+                                                    </div>
+                                                    <IMaskInput
+                                                        id="phone"
+                                                        name="phone"
+                                                        mask={[
+                                                            { mask: '(00) 0000-0000' },
+                                                            { mask: '(00) 00000-0000' },
+                                                        ]}
+                                                        type="tel"
+                                                        required
+                                                        autoComplete="tel"
+                                                        inputMode="numeric"
+                                                        value={form.phone}
+                                                        onAccept={(value: string) =>
+                                                            handleTextChange('phone', value)
+                                                        }
+                                                        placeholder="(11) 99999-9999"
+                                                        className={inputWithIcon}
+                                                    />
+                                                </div>
+                                                {fieldErrors.phone && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.phone}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
                                     </>
                                 )}
-                            </button>
-                        </motion.div>
-                    </form>
+
+                                {currentStep === 1 && (
+                                    <>
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label htmlFor="password" className={labelBase}>
+                                                    Senha {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Lock size={15} />
+                                                    </div>
+                                                    <input
+                                                        id="password"
+                                                        name="password"
+                                                        type={showPassword ? 'text' : 'password'}
+                                                        required
+                                                        autoComplete="new-password"
+                                                        minLength={8}
+                                                        maxLength={100}
+                                                        value={form.password}
+                                                        onChange={(e) =>
+                                                            handleTextChange(
+                                                                'password',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Mín. 8 caracteres, com letra, número e símbolo"
+                                                        className={`${inputBase} pr-10 pl-10`}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowPassword((prev) => !prev)
+                                                        }
+                                                        aria-label={
+                                                            showPassword
+                                                                ? 'Ocultar senha'
+                                                                : 'Mostrar senha'
+                                                        }
+                                                        className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
+                                                    >
+                                                        {showPassword ? (
+                                                            <EyeOff size={15} />
+                                                        ) : (
+                                                            <Eye size={15} />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                {fieldErrors.password && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.password}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div>
+                                                <label
+                                                    htmlFor="confirmPassword"
+                                                    className={labelBase}
+                                                >
+                                                    Confirmar senha {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Lock size={15} />
+                                                    </div>
+                                                    <input
+                                                        id="confirmPassword"
+                                                        name="confirmPassword"
+                                                        type={
+                                                            showConfirmPassword
+                                                                ? 'text'
+                                                                : 'password'
+                                                        }
+                                                        required
+                                                        autoComplete="new-password"
+                                                        minLength={8}
+                                                        maxLength={100}
+                                                        value={form.confirmPassword}
+                                                        onChange={(e) =>
+                                                            handleTextChange(
+                                                                'confirmPassword',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="Repita a senha"
+                                                        className={`${inputBase} pr-10 pl-10`}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowConfirmPassword((prev) => !prev)
+                                                        }
+                                                        aria-label={
+                                                            showConfirmPassword
+                                                                ? 'Ocultar senha'
+                                                                : 'Mostrar senha'
+                                                        }
+                                                        className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
+                                                    >
+                                                        {showConfirmPassword ? (
+                                                            <EyeOff size={15} />
+                                                        ) : (
+                                                            <Eye size={15} />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                                {fieldErrors.confirmPassword && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.confirmPassword}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <PasswordStrengthChecker
+                                            password={form.password}
+                                            confirmPassword={form.confirmPassword}
+                                            visible={true}
+                                        />
+                                    </>
+                                )}
+                            </motion.div>
+                        </AnimatePresence>
+                    </motion.div>
+
+                    <motion.div variants={item} className="mt-6">
+                        <StepNavigationButtons
+                            currentStep={currentStep}
+                            totalSteps={STEPS.length}
+                            onBack={handleBack}
+                            onNext={handleNext}
+                            isLoading={isLoading}
+                        />
+                    </motion.div>
 
                     <motion.p
                         variants={item}
