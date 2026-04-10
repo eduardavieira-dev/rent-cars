@@ -30,27 +30,54 @@ import { z } from 'zod';
 import { BrandLogo } from '@/components/brand-logo';
 import api from '@/lib/axios';
 
+const passwordSchema = z
+    .string()
+    .min(8, 'A senha deve ter no mínimo 8 caracteres.')
+    .refine((v) => /[A-Za-z]/.test(v), 'A senha deve conter pelo menos uma letra.')
+    .refine((v) => /\d/.test(v), 'A senha deve conter pelo menos um número.')
+    .refine(
+        (v) => /[^A-Za-z0-9À-ÿ]/.test(v),
+        'A senha deve conter pelo menos um caractere especial.'
+    );
+
 const clientSchema = z
     .object({
-        name: z.string().min(1, 'Informe o nome completo.'),
+        name: z
+            .string()
+            .min(3, 'O nome deve ter no mínimo 3 caracteres.')
+            .refine(
+                (v) => /^[A-Za-zÀ-ÿ\s]+$/.test(v),
+                'O nome deve conter apenas letras e espaços.'
+            ),
         email: z.string().email('Informe um e-mail válido.'),
-        password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+        password: passwordSchema,
         confirmPassword: z.string().min(1, 'Confirme a senha.'),
         phone: z
             .string()
-            .refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+            .refine(
+                (v) => v.replace(/\D/g, '').length === 11,
+                'Informe um telefone com DDD e 9 dígitos.'
+            ),
         cpf: z
             .string()
-            .refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
-        rg: z.string().min(1, 'Informe o RG.'),
-        profession: z.string().min(1, 'Informe a profissão.'),
+            .refine(
+                (v) => v.replace(/\D/g, '').length === 11,
+                'Informe um CPF válido (11 dígitos).'
+            ),
+        rg: z
+            .string()
+            .refine(
+                (v) => v.replace(/[.\-\s]/g, '').length >= 7,
+                'Informe o RG completo.'
+            ),
+        profession: z.string().min(3, 'A profissão deve ter no mínimo 3 caracteres.'),
         cep: z
             .string()
             .refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
-        street: z.string().min(1, 'Informe a rua.'),
-        complement: z.string().min(1, 'Informe o complemento/número.'),
-        neighborhood: z.string().min(1, 'Informe o bairro.'),
-        city: z.string().min(1, 'Informe a cidade.'),
+        street: z.string().min(3, 'A rua deve ter no mínimo 3 caracteres.'),
+        complement: z.string(),
+        neighborhood: z.string().min(3, 'O bairro deve ter no mínimo 3 caracteres.'),
+        city: z.string().min(3, 'A cidade deve ter no mínimo 3 caracteres.'),
     })
     .superRefine((data, ctx) => {
         if (data.password !== data.confirmPassword) {
@@ -186,13 +213,13 @@ export default function ClientRegistrationPage() {
 
         try {
             await api.post('/auth/register/client', {
-                name: form.name,
-                email: form.email,
+                name: form.name.trim(),
+                email: form.email.trim(),
                 password: form.password,
-                phone: form.phone,
-                cpf: form.cpf,
-                rg: form.rg,
-                profession: form.profession,
+                phone: form.phone.replace(/\D/g, ''),
+                cpf: form.cpf.replace(/\D/g, ''),
+                rg: form.rg.replace(/[.\-\s]/g, ''),
+                profession: form.profession.trim(),
                 address: composedAddress,
             });
 

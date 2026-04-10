@@ -24,19 +24,41 @@ import { z } from 'zod';
 import { BrandLogo } from '@/components/brand-logo';
 import api from '@/lib/axios';
 
+const passwordSchema = z
+    .string()
+    .min(8, 'A senha deve ter no mínimo 8 caracteres.')
+    .refine((v) => /[A-Za-z]/.test(v), 'A senha deve conter pelo menos uma letra.')
+    .refine((v) => /\d/.test(v), 'A senha deve conter pelo menos um número.')
+    .refine(
+        (v) => /[^A-Za-z0-9À-ÿ]/.test(v),
+        'A senha deve conter pelo menos um caractere especial.'
+    );
+
 const companySchema = z
     .object({
-        name: z.string().min(1, 'Informe o nome do responsável.'),
-        corporateName: z.string().min(1, 'Informe a razão social.'),
+        name: z
+            .string()
+            .min(3, 'O nome deve ter no mínimo 3 caracteres.')
+            .refine(
+                (v) => /^[A-Za-zÀ-ÿ\s]+$/.test(v),
+                'O nome deve conter apenas letras e espaços.'
+            ),
+        corporateName: z.string().min(3, 'A razão social deve ter no mínimo 3 caracteres.'),
         email: z.string().email('Informe um e-mail válido.'),
-        password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres.'),
+        password: passwordSchema,
         confirmPassword: z.string().min(1, 'Confirme a senha.'),
         phone: z
             .string()
-            .refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+            .refine(
+                (v) => v.replace(/\D/g, '').length === 11,
+                'Informe um telefone com DDD e 9 dígitos.'
+            ),
         cnpj: z
             .string()
-            .refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
+            .refine(
+                (v) => v.replace(/\D/g, '').length === 14,
+                'Informe um CNPJ válido (14 dígitos).'
+            ),
     })
     .superRefine((data, ctx) => {
         if (data.password !== data.confirmPassword) {
@@ -121,12 +143,12 @@ export default function CompanyRegistrationPage() {
 
         try {
             await api.post('/auth/register/company', {
-                name: form.name,
-                email: form.email,
+                name: form.name.trim(),
+                email: form.email.trim(),
                 password: form.password,
-                phone: form.phone,
-                cnpj: form.cnpj,
-                corporateName: form.corporateName,
+                phone: form.phone.replace(/\D/g, ''),
+                cnpj: form.cnpj.replace(/\D/g, ''),
+                corporateName: form.corporateName.trim(),
             });
 
             router.push('/login');

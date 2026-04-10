@@ -143,34 +143,68 @@ function roleToLabel(role: RoleType): string {
 }
 
 const baseProfileSchema = z.object({
-    name: z.string().min(1, 'Informe o nome.'),
+    name: z
+        .string()
+        .min(3, 'O nome deve ter no mínimo 3 caracteres.')
+        .refine(
+            (v) => /^[A-Za-zÀ-ÿ\s]+$/.test(v),
+            'O nome deve conter apenas letras e espaços.'
+        ),
     email: z.string().email('Informe um e-mail válido.'),
     phone: z
         .string()
-        .refine((v) => v.replace(/\D/g, '').length >= 10, 'Informe um telefone válido.'),
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 11,
+            'Informe um telefone com DDD e 9 dígitos.'
+        ),
 });
 
 const clientProfileSchema = baseProfileSchema.extend({
-    cpf: z.string().refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido.'),
-    rg: z.string().min(1, 'Informe o RG.'),
-    profession: z.string().min(1, 'Informe a profissão.'),
-    cep: z.string().refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
-    street: z.string().min(1, 'Informe a rua.'),
-    complement: z.string().min(1, 'Informe o complemento/número.'),
-    neighborhood: z.string().min(1, 'Informe o bairro.'),
-    city: z.string().min(1, 'Informe a cidade.'),
+    cpf: z
+        .string()
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 11,
+            'Informe um CPF válido (11 dígitos).'
+        ),
+    rg: z
+        .string()
+        .refine(
+            (v) => v.replace(/[.\-\s]/g, '').length >= 7,
+            'Informe o RG completo.'
+        ),
+    profession: z.string().min(3, 'A profissão deve ter no mínimo 3 caracteres.'),
+    cep: z
+        .string()
+        .refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
+    street: z.string().min(3, 'A rua deve ter no mínimo 3 caracteres.'),
+    complement: z.string(),
+    neighborhood: z.string().min(3, 'O bairro deve ter no mínimo 3 caracteres.'),
+    city: z.string().min(3, 'A cidade deve ter no mínimo 3 caracteres.'),
 });
 
 const bankProfileSchema = baseProfileSchema.extend({
-    cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
+    cnpj: z
+        .string()
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 14,
+            'Informe um CNPJ válido (14 dígitos).'
+        ),
     code: z
         .string()
-        .refine((v) => v.replace(/\D/g, '').length === 3, 'Informe um código COMPE válido.'),
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 3,
+            'Informe um código COMPE válido (3 dígitos).'
+        ),
 });
 
 const companyProfileSchema = baseProfileSchema.extend({
-    cnpj: z.string().refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido.'),
-    corporateName: z.string().min(1, 'Informe a razão social.'),
+    cnpj: z
+        .string()
+        .refine(
+            (v) => v.replace(/\D/g, '').length === 14,
+            'Informe um CNPJ válido (14 dígitos).'
+        ),
+    corporateName: z.string().min(3, 'A razão social deve ter no mínimo 3 caracteres.'),
 });
 
 type ProfileFormErrors = Partial<Record<keyof ProfileFormState, string>>;
@@ -374,24 +408,24 @@ export default function ProfilePage() {
             CLIENT: {
                 name: form.name.trim(),
                 email: form.email.trim(),
-                phone: form.phone.trim(),
-                cpf: form.cpf.trim(),
-                rg: form.rg.trim(),
+                phone: form.phone.replace(/\D/g, ''),
+                cpf: form.cpf.replace(/\D/g, ''),
+                rg: form.rg.replace(/[.\-\s]/g, ''),
                 address: `${form.street.trim()} - ${form.complement.trim()}. Bairro ${form.neighborhood.trim()} - ${form.city.trim()}`,
                 profession: form.profession.trim(),
             },
             BANK: {
                 name: form.name.trim(),
                 email: form.email.trim(),
-                phone: form.phone.trim(),
-                cnpj: form.cnpj.trim(),
+                phone: form.phone.replace(/\D/g, ''),
+                cnpj: form.cnpj.replace(/\D/g, ''),
                 code: form.code.trim(),
             },
             COMPANY: {
                 name: form.name.trim(),
                 email: form.email.trim(),
-                phone: form.phone.trim(),
-                cnpj: form.cnpj.trim(),
+                phone: form.phone.replace(/\D/g, ''),
+                cnpj: form.cnpj.replace(/\D/g, ''),
                 corporateName: form.corporateName.trim(),
             },
         };

@@ -11,12 +11,12 @@ import jakarta.validation.constraints.Size;
 @Serdeable
 @Introspected
 public record RegisterClientRequest(
-        @NotBlank @Size(min = 3, max = 100) String name,
-        @NotBlank @Email String email,
-        @NotBlank @Pattern(regexp = "\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}", message = "must be a valid Brazilian phone number") String phone,
-        @NotBlank @Size(min = 6, max = 100) String password,
-        @NotBlank @Pattern(regexp = "\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}", message = "must be a valid CPF") String cpf,
-        @Nullable @Size(min = 5, max = 20) String rg,
-        @Nullable @Size(max = 200) String address,
-        @Nullable @Size(max = 100) String profession) {
+                @NotBlank @Size(min = 3, max = 100) @Pattern(regexp = "^[A-Za-zÀ-ÿ\\s]+$", message = "must contain only letters and spaces") String name,
+                @NotBlank @Email String email,
+                @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid Brazilian phone number") String phone,
+                @NotBlank @Size(min = 8, max = 100) @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$", message = "must contain at least one letter, number and special character") String password,
+                @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid CPF") String cpf,
+                @NotBlank @Size(min = 7, max = 20) String rg,
+                @Nullable @Size(max = 300) String address,
+                @NotBlank @Size(min = 3, max = 100) String profession) {
 }

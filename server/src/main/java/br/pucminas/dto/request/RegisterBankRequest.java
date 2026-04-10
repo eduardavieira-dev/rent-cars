@@ -10,10 +10,10 @@ import jakarta.validation.constraints.Size;
 @Serdeable
 @Introspected
 public record RegisterBankRequest(
-        @NotBlank @Size(min = 3, max = 100) String name,
-        @NotBlank @Email String email,
-        @NotBlank @Pattern(regexp = "\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}", message = "must be a valid Brazilian phone number") String phone,
-        @NotBlank @Size(min = 6, max = 100) String password,
-        @NotBlank @Pattern(regexp = "\\d{2}\\.?\\d{3}\\.?\\d{3}/?\\d{4}-?\\d{2}", message = "must be a valid CNPJ") String cnpj,
-        @NotBlank @Pattern(regexp = "\\d{3}", message = "must be a 3-digit FEBRABAN bank code") String code) {
+                @NotBlank @Size(min = 3, max = 100) String name,
+                @NotBlank @Email String email,
+                @NotBlank @Pattern(regexp = "\\d{11}", message = "must be a valid Brazilian phone number") String phone,
+                @NotBlank @Size(min = 8, max = 100) @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$", message = "must contain at least one letter, number and special character") String password,
+                @NotBlank @Pattern(regexp = "\\d{14}", message = "must be a valid CNPJ") String cnpj,
+                @NotBlank @Pattern(regexp = "\\d{3}", message = "must be a valid 3-digit COMPE code") String code) {
 }
