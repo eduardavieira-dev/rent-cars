@@ -22,6 +22,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
+import { PasswordStrengthChecker } from '@/components/PasswordStrengthChecker';
 import api from '@/lib/axios';
 
 const passwordSchema = z
@@ -115,6 +116,7 @@ export default function CompanyRegistrationPage() {
     const [fieldErrors, setFieldErrors] = useState<CompanyFormErrors>({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showPasswordChecker, setShowPasswordChecker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     function handleTextChange(name: keyof FormState, value: string) {
@@ -239,7 +241,10 @@ export default function CompanyRegistrationPage() {
                     </motion.div>
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="corporateName" className={labelBase}>
                                     Razão social {requiredMark}
@@ -316,9 +321,7 @@ export default function CompanyRegistrationPage() {
                                     required
                                     inputMode="numeric"
                                     value={form.cnpj}
-                                    onAccept={(value: string) =>
-                                        handleTextChange('cnpj', value)
-                                    }
+                                    onAccept={(value: string) => handleTextChange('cnpj', value)}
                                     placeholder="00.000.000/0000-00"
                                     className={inputWithIcon}
                                 />
@@ -330,7 +333,10 @@ export default function CompanyRegistrationPage() {
                             )}
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="email" className={labelBase}>
                                     E-mail {requiredMark}
@@ -393,7 +399,10 @@ export default function CompanyRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="password" className={labelBase}>
                                     Senha {requiredMark}
@@ -414,6 +423,8 @@ export default function CompanyRegistrationPage() {
                                         onChange={(e) =>
                                             handleTextChange('password', e.target.value)
                                         }
+                                        onFocus={() => setShowPasswordChecker(true)}
+                                        onBlur={() => setShowPasswordChecker(false)}
                                         placeholder="Mín. 8 caracteres, com letra, número e símbolo"
                                         className={`${inputBase} pr-10 pl-10`}
                                     />
@@ -479,6 +490,14 @@ export default function CompanyRegistrationPage() {
                                     </p>
                                 )}
                             </div>
+                        </motion.div>
+
+                        <motion.div variants={item}>
+                            <PasswordStrengthChecker
+                                password={form.password}
+                                confirmPassword={form.confirmPassword}
+                                visible={showPasswordChecker}
+                            />
                         </motion.div>
 
                         <motion.div variants={item} className="pt-1">

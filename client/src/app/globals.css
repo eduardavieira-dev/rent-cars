@@ -12,6 +12,7 @@
     --primary-foreground: #0c0400;
     --input: #1c1917;
     --destructive: #ef4444;
+    --success: #22c55e;
     --card: #111010;
 }
 
@@ -27,6 +28,7 @@
     --color-primary-foreground: var(--primary-foreground);
     --color-input: var(--input);
     --color-destructive: var(--destructive);
+    --color-success: var(--success);
     --color-card: var(--card);
 
     --font-sans: var(--font-geist-sans);

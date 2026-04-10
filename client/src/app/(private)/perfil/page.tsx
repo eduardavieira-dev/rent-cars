@@ -78,9 +78,22 @@ function normalizeRole(value: unknown): RoleType | null {
     return null;
 }
 
-function parseAddressString(address: string): { cep: string; street: string; complement: string; neighborhood: string; city: string } {
+function parseAddressString(address: string): {
+    cep: string;
+    street: string;
+    complement: string;
+    neighborhood: string;
+    city: string;
+} {
     const match = /^(.*?) - (.*?)\. Bairro (.*?) - (.*)$/.exec(address);
-    if (match) return { cep: '', street: match[1], complement: match[2], neighborhood: match[3], city: match[4] };
+    if (match)
+        return {
+            cep: '',
+            street: match[1],
+            complement: match[2],
+            neighborhood: match[3],
+            city: match[4],
+        };
     return { cep: '', street: address, complement: '', neighborhood: '', city: '' };
 }
 
@@ -146,10 +159,7 @@ const baseProfileSchema = z.object({
     name: z
         .string()
         .min(3, 'O nome deve ter no mínimo 3 caracteres.')
-        .refine(
-            (v) => /^[A-Za-zÀ-ÿ\s]+$/.test(v),
-            'O nome deve conter apenas letras e espaços.'
-        ),
+        .refine((v) => /^[A-Za-zÀ-ÿ\s]+$/.test(v), 'O nome deve conter apenas letras e espaços.'),
     email: z.string().email('Informe um e-mail válido.'),
     phone: z
         .string()
@@ -162,20 +172,10 @@ const baseProfileSchema = z.object({
 const clientProfileSchema = baseProfileSchema.extend({
     cpf: z
         .string()
-        .refine(
-            (v) => v.replace(/\D/g, '').length === 11,
-            'Informe um CPF válido (11 dígitos).'
-        ),
-    rg: z
-        .string()
-        .refine(
-            (v) => v.replace(/[.\-\s]/g, '').length >= 7,
-            'Informe o RG completo.'
-        ),
+        .refine((v) => v.replace(/\D/g, '').length === 11, 'Informe um CPF válido (11 dígitos).'),
+    rg: z.string().refine((v) => v.replace(/[.\-\s]/g, '').length >= 7, 'Informe o RG completo.'),
     profession: z.string().min(3, 'A profissão deve ter no mínimo 3 caracteres.'),
-    cep: z
-        .string()
-        .refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
+    cep: z.string().refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
     street: z.string().min(3, 'A rua deve ter no mínimo 3 caracteres.'),
     complement: z.string(),
     neighborhood: z.string().min(3, 'O bairro deve ter no mínimo 3 caracteres.'),
@@ -185,10 +185,7 @@ const clientProfileSchema = baseProfileSchema.extend({
 const bankProfileSchema = baseProfileSchema.extend({
     cnpj: z
         .string()
-        .refine(
-            (v) => v.replace(/\D/g, '').length === 14,
-            'Informe um CNPJ válido (14 dígitos).'
-        ),
+        .refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido (14 dígitos).'),
     code: z
         .string()
         .refine(
@@ -200,10 +197,7 @@ const bankProfileSchema = baseProfileSchema.extend({
 const companyProfileSchema = baseProfileSchema.extend({
     cnpj: z
         .string()
-        .refine(
-            (v) => v.replace(/\D/g, '').length === 14,
-            'Informe um CNPJ válido (14 dígitos).'
-        ),
+        .refine((v) => v.replace(/\D/g, '').length === 14, 'Informe um CNPJ válido (14 dígitos).'),
     corporateName: z.string().min(3, 'A razão social deve ter no mínimo 3 caracteres.'),
 });
 
@@ -358,7 +352,9 @@ export default function ProfilePage() {
         if (digits.length !== 8) return;
         setIsLoadingCep(true);
         try {
-            const response = await axios.get<ViaCepResponse>(`https://viacep.com.br/ws/${digits}/json/`);
+            const response = await axios.get<ViaCepResponse>(
+                `https://viacep.com.br/ws/${digits}/json/`
+            );
             const data = response.data;
             if (!data.erro) {
                 setForm((prev) => ({

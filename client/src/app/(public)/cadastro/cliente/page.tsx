@@ -28,6 +28,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { BrandLogo } from '@/components/brand-logo';
+import { PasswordStrengthChecker } from '@/components/PasswordStrengthChecker';
 import api from '@/lib/axios';
 
 const passwordSchema = z
@@ -66,14 +67,9 @@ const clientSchema = z
             ),
         rg: z
             .string()
-            .refine(
-                (v) => v.replace(/[.\-\s]/g, '').length >= 7,
-                'Informe o RG completo.'
-            ),
+            .refine((v) => v.replace(/[.\-\s]/g, '').length >= 7, 'Informe o RG completo.'),
         profession: z.string().min(3, 'A profissão deve ter no mínimo 3 caracteres.'),
-        cep: z
-            .string()
-            .refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
+        cep: z.string().refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
         street: z.string().min(3, 'A rua deve ter no mínimo 3 caracteres.'),
         complement: z.string(),
         neighborhood: z.string().min(3, 'O bairro deve ter no mínimo 3 caracteres.'),
@@ -153,6 +149,7 @@ export default function ClientRegistrationPage() {
     const [fieldErrors, setFieldErrors] = useState<ClientFormErrors>({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showPasswordChecker, setShowPasswordChecker] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingCep, setIsLoadingCep] = useState(false);
 
@@ -169,7 +166,9 @@ export default function ClientRegistrationPage() {
 
         setIsLoadingCep(true);
         try {
-            const response = await axios.get<ViaCepResponse>(`https://viacep.com.br/ws/${digits}/json/`);
+            const response = await axios.get<ViaCepResponse>(
+                `https://viacep.com.br/ws/${digits}/json/`
+            );
             const data = response.data;
             if (!data.erro) {
                 setForm((prev) => ({
@@ -311,7 +310,10 @@ export default function ClientRegistrationPage() {
                     </motion.div>
 
                     <form onSubmit={handleSubmit} noValidate className="space-y-4">
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="name" className={labelBase}>
                                     Nome completo {requiredMark}
@@ -369,7 +371,10 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="cpf" className={labelBase}>
                                     CPF {requiredMark}
@@ -433,7 +438,10 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="phone" className={labelBase}>
                                     Telefone {requiredMark}
@@ -498,7 +506,10 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="street" className={labelBase}>
                                     Rua {requiredMark}
@@ -514,9 +525,7 @@ export default function ClientRegistrationPage() {
                                         required
                                         maxLength={200}
                                         value={form.street}
-                                        onChange={(e) =>
-                                            handleTextChange('street', e.target.value)
-                                        }
+                                        onChange={(e) => handleTextChange('street', e.target.value)}
                                         placeholder="Rua das Flores"
                                         className={inputWithIcon}
                                     />
@@ -558,7 +567,10 @@ export default function ClientRegistrationPage() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="neighborhood" className={labelBase}>
                                     Bairro {requiredMark}
@@ -631,9 +643,7 @@ export default function ClientRegistrationPage() {
                                     required
                                     maxLength={100}
                                     value={form.profession}
-                                    onChange={(e) =>
-                                        handleTextChange('profession', e.target.value)
-                                    }
+                                    onChange={(e) => handleTextChange('profession', e.target.value)}
                                     placeholder="Engenheira de Software"
                                     className={inputWithIcon}
                                 />
@@ -645,7 +655,10 @@ export default function ClientRegistrationPage() {
                             )}
                         </motion.div>
 
-                        <motion.div variants={item} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <motion.div
+                            variants={item}
+                            className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
                             <div>
                                 <label htmlFor="password" className={labelBase}>
                                     Senha {requiredMark}
@@ -666,6 +679,8 @@ export default function ClientRegistrationPage() {
                                         onChange={(e) =>
                                             handleTextChange('password', e.target.value)
                                         }
+                                        onFocus={() => setShowPasswordChecker(true)}
+                                        onBlur={() => setShowPasswordChecker(false)}
                                         placeholder="Mín. 8 caracteres, com letra, número e símbolo"
                                         className={`${inputBase} pr-10 pl-10`}
                                     />
@@ -714,9 +729,7 @@ export default function ClientRegistrationPage() {
                                         type="button"
                                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                                         aria-label={
-                                            showConfirmPassword
-                                                ? 'Ocultar senha'
-                                                : 'Mostrar senha'
+                                            showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'
                                         }
                                         className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors"
                                     >
@@ -733,6 +746,14 @@ export default function ClientRegistrationPage() {
                                     </p>
                                 )}
                             </div>
+                        </motion.div>
+
+                        <motion.div variants={item}>
+                            <PasswordStrengthChecker
+                                password={form.password}
+                                confirmPassword={form.confirmPassword}
+                                visible={showPasswordChecker}
+                            />
                         </motion.div>
 
                         <motion.div variants={item} className="pt-1">
