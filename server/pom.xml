@@ -21,7 +21,7 @@
     <micronaut.version>4.10.10</micronaut.version>
     <micronaut.aot.enabled>false</micronaut.aot.enabled>
     <micronaut.aot.packageName>br.pucminas.aot.generated</micronaut.aot.packageName>
-    <micronaut.runtime>http_server_jdk</micronaut.runtime>
+    <micronaut.runtime>netty</micronaut.runtime>
     <micronaut.test.resources.enabled>false</micronaut.test.resources.enabled>
     <exec.mainClass>br.pucminas.Application</exec.mainClass>
   </properties>
@@ -55,8 +55,8 @@
     </dependency>
 
     <dependency>
-      <groupId>io.micronaut.servlet</groupId>
-      <artifactId>micronaut-http-server-jdk</artifactId>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-http-server-netty</artifactId>
       <scope>compile</scope>
     </dependency>
 
