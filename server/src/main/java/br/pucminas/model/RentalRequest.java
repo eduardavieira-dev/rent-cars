@@ -1,5 +1,6 @@
 package br.pucminas.model;
 
+import br.pucminas.enums.ApprovalStatus;
 import io.micronaut.core.annotation.Introspected;
 import jakarta.persistence.*;
 

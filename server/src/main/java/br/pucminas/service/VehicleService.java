@@ -10,7 +10,7 @@ import br.pucminas.exception.VehicleNotFoundException;
 import br.pucminas.model.Company;
 import br.pucminas.model.User;
 import br.pucminas.model.Vehicle;
-import br.pucminas.model.VehicleStatus;
+import br.pucminas.enums.VehicleStatus;
 import br.pucminas.repository.CompanyRepository;
 import br.pucminas.repository.UserRepository;
 import br.pucminas.repository.VehicleRepository;

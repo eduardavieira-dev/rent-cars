@@ -1,4 +1,4 @@
-# 🚗 Rent Cars -  Aluguel de carros
+# 🚗 Rent Cars - Aluguel de carros
 
 O Rent Cars é um sistema web voltado à gestão de aluguel de automóveis, desenvolvido por estudantes de Engenharia de Software da PUC Minas — Artur Bomtempo Colen, Eduarda Vieira Gonçalves e Vitor Azevedo — como projeto acadêmico sob orientação do Prof. Dr. João Paulo Aramuni.
 
@@ -24,6 +24,7 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 ---
 
 ## 📚 Índice
+
 - [Links Úteis](#-links-úteis)
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades Principais](#-funcionalidades-principais)
@@ -53,28 +54,31 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 ---
 
 ## 🔗 Links Úteis
-* 🌐 **Demo Online:** [Acesse a Aplicação Web](<link-da-demo-web>)
+
+- 🌐 **Demo Online:** [Acesse a Aplicação Web](link-da-demo-web)
   > 💻 **Descrição:** Link para a aplicação em ambiente de produção (Ex: hospedado na Vercel, Netlify ou AWS S3).
-* 📱 **Download Mobile:** [App Store](<link-app-store>) | [Google Play](<link-google-play>) | [APK Direto](<link-para-apk-direto>)
+- 📱 **Download Mobile:** [App Store](link-app-store) | [Google Play](link-google-play) | [APK Direto](link-para-apk-direto)
   > 📱 **Descrição:** Links diretos para download nas lojas de aplicativos (se aplicável) e para o arquivo de instalação direta no Android (APK).
-* 📖 **Documentação:** [Leia a Wiki/Docs](<link-para-docs>)
+- 📖 **Documentação:** [Leia a Wiki/Docs](link-para-docs)
   > 📚 **Descrição:** Acesso à documentação técnica completa do projeto (Ex: Swagger/OpenAPI para API, ou Wiki interna).
 
 ---
 
 ## 📝 Sobre o Projeto
+
 Nesta seção, descreva de forma clara e objetiva **o propósito do seu projeto**, explicando:
 
-- **Por que ele existe** — qual motivação levou à sua criação.  
-- **Qual problema ele resolve** — que dor, necessidade ou oportunidade ele atende.  
-- **Qual o contexto** — acadêmico, profissional, pessoal, experimental, etc.  
-- **Onde ele pode ser utilizado** — cenários reais ou simulados.  
+- **Por que ele existe** — qual motivação levou à sua criação.
+- **Qual problema ele resolve** — que dor, necessidade ou oportunidade ele atende.
+- **Qual o contexto** — acadêmico, profissional, pessoal, experimental, etc.
+- **Onde ele pode ser utilizado** — cenários reais ou simulados.
 
 Procure responder perguntas como:
-- *Qual foi a ideia inicial do projeto?*
-- *O que ele entrega de valor ao usuário?*
-- *Por que alguém utilizaria ou contribuiria com esse projeto?*
-- *O que o torna relevante ou interessante?*
+
+- _Qual foi a ideia inicial do projeto?_
+- _O que ele entrega de valor ao usuário?_
+- _Por que alguém utilizaria ou contribuiria com esse projeto?_
+- _O que o torna relevante ou interessante?_
 
 Escreva de forma objetiva, mas completa, para que qualquer pessoa entenda rapidamente **o que é** e **por que importa**.
 
@@ -84,6 +88,7 @@ Escreva de forma objetiva, mas completa, para que qualquer pessoa entenda rapida
 ---
 
 ## ✨ Funcionalidades Principais
+
 Liste as funcionalidades de forma clara e objetiva.
 
 - 🔐 **Autenticação Segura:** Login, Cadastro e Recuperação de Senha.
@@ -103,30 +108,31 @@ As seguintes ferramentas, frameworks e bibliotecas foram utilizados na construç
 
 ### 💻 Front-end
 
-* **Framework/Biblioteca:** Vue.js
-* **Linguagem/Superset:** TypeScript
-* **Estilização:** Tailwind CSS
-* **Build Tool:** Vite
+- **Framework:** Next.js
+- **Linguagem:** TypeScript
+- **Estilização:** Tailwind CSS
+- **Biblioteca UI:** shadcn/ui
 
 ### 🖥️ Back-end
 
-* **Linguagem:** Java 17
-* **Framework:** Micronaut
-* **Banco de Dados:** PostgreSQL
-* **ORM:** JPA / Hibernate
-* **Autenticação:** JWT
+- **Linguagem:** Java 21
+- **Framework:** Micronaut
+- **Banco de Dados:** PostgreSQL
+- **ORM:** Micronaut Data + Hibernate JPA
+- **Autenticação:** JWT
+- **Upload de Imagens:** Cloudinary
 
 ### 📱 Mobile (Opcional)
 
-* **Framework:** [Ex: React Native, Flutter, Kotlin Multiplatform]
-* **Ferramentas:** [Ex: Expo, Android Studio, Xcode]
+- **Framework:** [Ex: React Native, Flutter, Kotlin Multiplatform]
+- **Ferramentas:** [Ex: Expo, Android Studio, Xcode]
 
 ### ⚙️ Infraestrutura & DevOps
 
-* **Containerização:** Docker
-* **Orquestração:** [Ex: Kubernetes (K8s)]
-* **Cloud:** [Ex: AWS (EC2, RDS, S3), Vercel, Heroku, Google Cloud]
-* **CI/CD:** [Ex: GitHub Actions, Jenkins, SonarQube]
+- **Containerização:** Docker
+- **Orquestração:** [Ex: Kubernetes (K8s)]
+- **Cloud:** [Ex: AWS (EC2, RDS, S3), Vercel, Heroku, Google Cloud]
+- **CI/CD:** [Ex: GitHub Actions, Jenkins, SonarQube]
 
 ---
 
@@ -148,25 +154,26 @@ Você pode incluir:
 
 Para melhor visualização e entendimento da estrutura do sistema, os diagramas principais estão organizados lado a lado.
 
-| Diagrama de Arquitetura | Detalhe da Arquitetura |
-| :---: | :---: |
-| **Visão Geral (Macro)** | **Camada de Serviço (Micro)** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Visão Geral do Sistema" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Componentes ou Serviço X" width="120px" height="120px"> |
-| **Modelo de Dados (Entidades)** | **Fluxo de Autenticação** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Entidade-Relacionamento (DER)" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Sequência de Login" width="120px" height="120px"> |
-| **Infraestrutura (Cloud)** | **API Gateway (Rotas)** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Deploy na AWS/Vercel" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Mapa de Endpoints da API" width="120px" height="120px"> |
+|                                                              Diagrama de Arquitetura                                                              |                                                            Detalhe da Arquitetura                                                            |
+| :-----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
+|                                                              **Visão Geral (Macro)**                                                              |                                                        **Camada de Serviço (Micro)**                                                         |
+|    <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Visão Geral do Sistema" width="120px" height="120px">     | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Componentes ou Serviço X" width="120px" height="120px"> |
+|                                                          **Modelo de Dados (Entidades)**                                                          |                                                          **Fluxo de Autenticação**                                                           |
+| <img src="https://joaopauloaramuni.github.io/image/saramunilogo.png" alt="Diagrama de Entidade-Relacionamento (DER)" width="120px" height="120px"> |    <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Sequência de Login" width="120px" height="120px">    |
+|                                                            **Infraestrutura (Cloud)**                                                             |                                                           **API Gateway (Rotas)**                                                            |
+|     <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Deploy na AWS/Vercel" width="120px" height="120px">      |       <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Mapa de Endpoints da API" width="120px" height="120px">       |
 
 ---
 
 ## 🔧 Instalação e Execução
 
 ### Pré-requisitos
+
 Certifique-se de que o usuário tenha o ambiente configurado:
 
-* **Docker** (Necessário) — [Instale o Docker Desktop](https://www.docker.com/products/docker-desktop)
-* **Docker Compose** (Incluído no Docker Desktop) — Para orquestração de múltiplos serviços
-* **Git** (Opcional) — Para clonar o repositório
+- **Docker** (Necessário) — [Instale o Docker Desktop](https://www.docker.com/products/docker-desktop)
+- **Docker Compose** (Incluído no Docker Desktop) — Para orquestração de múltiplos serviços
+- **Git** (Opcional) — Para clonar o repositório
 
 ---
 
@@ -178,15 +185,18 @@ Crie um arquivo **`.env`** na raiz do projeto (mesmo nível do `docker-compose.y
 
 O arquivo `.env` precisa conter as seguintes variáveis:
 
-| Variável | Descrição | Exemplo | Padrão |
-| :--- | :--- | :--- | :--- |
-| `DB_NAME` | Nome do banco de dados PostgreSQL. | `rentcars` | `rentcars` |
-| `DB_USER` | Usuário do banco de dados. | `postgres` | `postgres` |
-| `DB_PASSWORD` | Senha do banco de dados. | `postgres123` | `postgres` |
-| `DB_PORT_HOST` | Porta exposta do PostgreSQL na máquina host. | `5432` | `5432` |
-| `APP_PORT` | Porta onde a aplicação Micronaut será executada. | `8080` | `8080` |
-| `SECURITY_ENABLED` | Ativar/desativar segurança JWT. | `false` ou `true` | `false` |
-| `JWT_GENERATOR_SIGNATURE_SECRET` | Chave secreta para assinatura de tokens JWT. | `sua_chave_secreta_aqui` | (Obrigatório) |
+| Variável                         | Descrição                                        | Exemplo                  | Padrão        |
+| :------------------------------- | :----------------------------------------------- | :----------------------- | :------------ |
+| `DB_NAME`                        | Nome do banco de dados PostgreSQL.               | `rentcars`               | `rentcars`    |
+| `DB_USER`                        | Usuário do banco de dados.                       | `postgres`               | `postgres`    |
+| `DB_PASSWORD`                    | Senha do banco de dados.                         | `postgres123`            | `postgres`    |
+| `DB_PORT_HOST`                   | Porta exposta do PostgreSQL na máquina host.     | `5432`                   | `5432`        |
+| `APP_PORT`                       | Porta onde a aplicação Micronaut será executada. | `8080`                   | `8080`        |
+| `SECURITY_ENABLED`               | Ativar/desativar segurança JWT.                  | `false` ou `true`        | `false`       |
+| `JWT_GENERATOR_SIGNATURE_SECRET` | Chave secreta para assinatura de tokens JWT.     | `sua_chave_secreta_aqui` | (Obrigatório) |
+| `CLOUDINARY_CLOUD_NAME`          | Nome da cloud no Cloudinary (upload de imagens). | `my_cloud`               | (Obrigatório) |
+| `CLOUDINARY_API_KEY`             | Chave de API do Cloudinary.                      | `123456789012345`        | (Obrigatório) |
+| `CLOUDINARY_API_SECRET`          | Segredo de API do Cloudinary.                    | `abcdefghijk`            | (Obrigatório) |
 
 **Exemplo de arquivo `.env`:**
 
@@ -203,6 +213,11 @@ APP_PORT=8080
 # Security Configuration
 SECURITY_ENABLED=false
 JWT_GENERATOR_SIGNATURE_SECRET=my-secret-key-change-in-production
+
+# Cloudinary Configuration (upload de imagens)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 > ⚠️ **Segurança:** Altere a senha do banco de dados e a chave JWT em **produção**. Nunca cometa o arquivo `.env` com valores reais em um repositório público.
@@ -231,6 +246,9 @@ DB_PORT_HOST=5432
 APP_PORT=8080
 SECURITY_ENABLED=false
 JWT_GENERATOR_SIGNATURE_SECRET=minha-chave-secreta
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 > 💡 **Dica:** Se o arquivo `.env` já existir no repositório, verifique se os valores estão corretos para seu ambiente.
@@ -277,6 +295,7 @@ docker-compose ps
 ```
 
 Você deve ver:
+
 - `rentcars-db` (PostgreSQL) com status `Healthy`
 - `rentcars-app` (Micronaut API) com status `Running`
 
@@ -290,7 +309,7 @@ docker-compose logs -f app
 docker-compose logs app
 ```
 
-🚀 *A API estará disponível em **http://localhost:8080***
+🚀 \*A API estará disponível em **http://localhost:8080\***
 
 ---
 
@@ -300,6 +319,7 @@ Com a aplicação rodando, você pode verificar rapidamente o funcionamento bás
 Para a lista completa de todos os endpoints com exemplos detalhados, consulte a seção [Endpoints da API](#-endpoints-da-api).
 
 **Registrar um cliente:**
+
 ```bash
 curl -X POST http://localhost:8080/auth/register/client \
   -H "Content-Type: application/json" \
@@ -307,6 +327,7 @@ curl -X POST http://localhost:8080/auth/register/client \
 ```
 
 **Fazer login:**
+
 ```bash
 curl -X POST http://localhost:8080/login \
   -H "Content-Type: application/json" \
@@ -314,6 +335,7 @@ curl -X POST http://localhost:8080/login \
 ```
 
 **Listar todos os usuários (autenticado):**
+
 ```bash
 curl http://localhost:8080/users \
   -H "Authorization: Bearer <access_token>"
@@ -348,12 +370,12 @@ docker-compose up -d --build
 
 #### 🔧 Troubleshooting Rápido
 
-| Problema | Solução |
-| :--- | :--- |
-| Erro: "no configuration file provided" | Execute o comando na raiz do projeto (onde está `docker-compose.yml`) |
-| Erro: "port 8080 is already in use" | Altere `APP_PORT` no arquivo `.env` para outra porta (ex: `9090`) |
-| Containers não iniciam | Verifique se o Docker Desktop está rodando e execute: `docker system prune` |
-| Erro de conexão com banco | Verifique os logs: `docker-compose logs db` |
+| Problema                               | Solução                                                                     |
+| :------------------------------------- | :-------------------------------------------------------------------------- |
+| Erro: "no configuration file provided" | Execute o comando na raiz do projeto (onde está `docker-compose.yml`)       |
+| Erro: "port 8080 is already in use"    | Altere `APP_PORT` no arquivo `.env` para outra porta (ex: `9090`)           |
+| Containers não iniciam                 | Verifique se o Docker Desktop está rodando e execute: `docker system prune` |
+| Erro de conexão com banco              | Verifique os logs: `docker-compose logs db`                                 |
 
 ---
 
@@ -370,6 +392,7 @@ docker-compose logs db     # Banco de dados
 # Acessar o banco PostgreSQL diretamente
 docker-compose exec db psql -U postgres -d rentcars -c "\dt"
 ```
+
 ---
 
 ## 🚀 Deploy
@@ -420,8 +443,11 @@ Descreva o propósito das pastas principais.
 │       │   ├── /controller      # 🎛️ Controllers REST (endpoints).
 │       │   ├── /service         # 🔧 Lógica de negócio.
 │       │   ├── /repository      # 💾 Acesso a dados (JPA).
-│       │   ├── /model           # 📋 Entidades/DTOs.
-│       │   └── /...             # Outras camadas conforme necessário.
+│       │   ├── /model           # 📋 Entidades JPA.
+│       │   ├── /enums           # 📌 Enumerações do domínio.
+│       │   ├── /dto             # 📬 Objetos de transferência (request/response).
+│       │   ├── /exception       # ⚠️ Exceções de domínio e handlers.
+│       │   └── /security        # 🔐 Autenticação e autorização.
 │       │
 │       ├── /main/resources                       # 📁 Recursos
 │       │   ├── application.properties            # ⚙️ Configurações da aplicação.
@@ -456,14 +482,14 @@ Descreva o propósito das pastas principais.
 
 Para melhor visualização, as telas principais estão organizadas lado a lado.
 
-| Tela | Captura de Tela |
-| :---: | :---: |
-| **Página Inicial (Home)** | **Página de Login** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela Inicial da Aplicação Web" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Login" width="120px" height="120px"> |
-| **Cadastro de Clientes** | **Cadastro de Produtos** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Cadastro de Clientes" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Cadastro de Produtos" width="120px" height="120px"> |
-| **Dashboard (Visão Geral)** | **Página Admin / Configurações** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Dashboard" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela Administrativa" width="120px" height="120px"> |
+|                                                                 Tela                                                                  |                                                           Captura de Tela                                                            |
+| :-----------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------: |
+|                                                       **Página Inicial (Home)**                                                       |                                                         **Página de Login**                                                          |
+| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela Inicial da Aplicação Web" width="120px" height="120px"> |        <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Login" width="120px" height="120px">         |
+|                                                       **Cadastro de Clientes**                                                        |                                                       **Cadastro de Produtos**                                                       |
+| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Cadastro de Clientes" width="120px" height="120px">  | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Cadastro de Produtos" width="120px" height="120px"> |
+|                                                      **Dashboard (Visão Geral)**                                                      |                                                   **Página Admin / Configurações**                                                   |
+|       <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Dashboard" width="120px" height="120px">       |     <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela Administrativa" width="120px" height="120px">      |
 
 ### 💻 Exemplo de Saída no Terminal (para Back-end, API, CLI)
 
@@ -480,6 +506,7 @@ curl -X GET 'http://localhost:3000/api/v1/users' \
 ```
 
 **Saída Esperada:**
+
 ```json
 {
   "total": 2,
@@ -512,6 +539,7 @@ npm run cli validate:schema --target=production
 ```
 
 **Saída Esperada:**
+
 ```text
 [INFO] Iniciando validação do banco de dados...
 [SUCCESS] 15/15 tabelas verificadas.
@@ -535,6 +563,7 @@ A API disponibiliza os seguintes endpoints. Os endpoints marcados com 🔒 reque
 ### 🔓 Autenticação
 
 **Login**
+
 ```bash
 curl -X POST http://localhost:8080/login \
   -H "Content-Type: application/json" \
@@ -542,6 +571,7 @@ curl -X POST http://localhost:8080/login \
 ```
 
 **Registrar cliente**
+
 ```bash
 curl -X POST http://localhost:8080/auth/register/client \
   -H "Content-Type: application/json" \
@@ -558,6 +588,7 @@ curl -X POST http://localhost:8080/auth/register/client \
 ```
 
 **Registrar banco**
+
 ```bash
 curl -X POST http://localhost:8080/auth/register/bank \
   -H "Content-Type: application/json" \
@@ -572,6 +603,7 @@ curl -X POST http://localhost:8080/auth/register/bank \
 ```
 
 **Registrar empresa**
+
 ```bash
 curl -X POST http://localhost:8080/auth/register/company \
   -H "Content-Type: application/json" \
@@ -590,18 +622,21 @@ curl -X POST http://localhost:8080/auth/register/company \
 ### 👤 Usuários 🔒
 
 **Listar todos os usuários**
+
 ```bash
 curl http://localhost:8080/users \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Buscar usuário por ID**
+
 ```bash
 curl http://localhost:8080/users/<uuid> \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Atualizar cliente**
+
 ```bash
 curl -X PUT http://localhost:8080/users/client/<uuid> \
   -H "Content-Type: application/json" \
@@ -617,6 +652,7 @@ curl -X PUT http://localhost:8080/users/client/<uuid> \
 ```
 
 **Atualizar banco**
+
 ```bash
 curl -X PUT http://localhost:8080/users/bank/<uuid> \
   -H "Content-Type: application/json" \
@@ -631,6 +667,7 @@ curl -X PUT http://localhost:8080/users/bank/<uuid> \
 ```
 
 **Atualizar empresa**
+
 ```bash
 curl -X PUT http://localhost:8080/users/company/<uuid> \
   -H "Content-Type: application/json" \
@@ -645,6 +682,7 @@ curl -X PUT http://localhost:8080/users/company/<uuid> \
 ```
 
 **Excluir usuário**
+
 ```bash
 curl -X DELETE http://localhost:8080/users/<uuid> \
   -H "Authorization: Bearer <access_token>"
@@ -655,6 +693,7 @@ curl -X DELETE http://localhost:8080/users/<uuid> \
 ### 🏢 Entidades Empregadoras 🔒
 
 **Criar entidade empregadora**
+
 ```bash
 curl -X POST http://localhost:8080/employer-entities \
   -H "Content-Type: application/json" \
@@ -666,18 +705,21 @@ curl -X POST http://localhost:8080/employer-entities \
 ```
 
 **Listar todas as entidades empregadoras**
+
 ```bash
 curl http://localhost:8080/employer-entities \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Buscar entidade empregadora por ID**
+
 ```bash
 curl http://localhost:8080/employer-entities/<uuid> \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Atualizar entidade empregadora**
+
 ```bash
 curl -X PUT http://localhost:8080/employer-entities/<uuid> \
   -H "Content-Type: application/json" \
@@ -689,6 +731,7 @@ curl -X PUT http://localhost:8080/employer-entities/<uuid> \
 ```
 
 **Excluir entidade empregadora**
+
 ```bash
 curl -X DELETE http://localhost:8080/employer-entities/<uuid> \
   -H "Authorization: Bearer <access_token>"
@@ -699,6 +742,7 @@ curl -X DELETE http://localhost:8080/employer-entities/<uuid> \
 ### 💼 Vínculos Empregatícios 🔒
 
 **Criar vínculo empregatício**
+
 ```bash
 curl -X POST http://localhost:8080/employments \
   -H "Content-Type: application/json" \
@@ -712,24 +756,28 @@ curl -X POST http://localhost:8080/employments \
 ```
 
 **Listar todos os vínculos empregatícios**
+
 ```bash
 curl http://localhost:8080/employments \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Buscar vínculo por ID**
+
 ```bash
 curl http://localhost:8080/employments/<uuid> \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Listar vínculos por cliente**
+
 ```bash
 curl http://localhost:8080/employments/client/<uuid-do-cliente> \
   -H "Authorization: Bearer <access_token>"
 ```
 
 **Atualizar vínculo empregatício**
+
 ```bash
 curl -X PUT http://localhost:8080/employments/<uuid> \
   -H "Content-Type: application/json" \
@@ -742,6 +790,7 @@ curl -X PUT http://localhost:8080/employments/<uuid> \
 ```
 
 **Excluir vínculo empregatício**
+
 ```bash
 curl -X DELETE http://localhost:8080/employments/<uuid> \
   -H "Authorization: Bearer <access_token>"
@@ -749,47 +798,124 @@ curl -X DELETE http://localhost:8080/employments/<uuid> \
 
 ---
 
+### 🚗 Veículos
+
+**Cadastrar veículo** 🔒 _(COMPANY)_
+
+```bash
+curl -X POST http://localhost:8080/vehicles \
+  -H "Authorization: Bearer <access_token>" \
+  -F "registrationCode=RC-001" \
+  -F "year=2024" \
+  -F "brand=Toyota" \
+  -F "model=Corolla" \
+  -F "plate=ABC-1234" \
+  -F "image=@/caminho/para/imagem.jpg"
+```
+
+> 💡 O campo `image` é opcional. A requisição usa `multipart/form-data`.
+
+**Listar veículos disponíveis** _(Pública)_
+
+```bash
+curl http://localhost:8080/vehicles
+```
+
+**Buscar veículo por ID** _(Pública)_
+
+```bash
+curl http://localhost:8080/vehicles/<uuid>
+```
+
+**Listar veículos por empresa** 🔒
+
+```bash
+curl http://localhost:8080/vehicles/company/<uuid-da-empresa> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Atualizar veículo** 🔒 _(COMPANY)_
+
+```bash
+curl -X PUT http://localhost:8080/vehicles/<uuid> \
+  -H "Authorization: Bearer <access_token>" \
+  -F "registrationCode=RC-002" \
+  -F "year=2025" \
+  -F "brand=Honda" \
+  -F "model=Civic" \
+  -F "plate=XYZ-5678" \
+  -F "image=@/caminho/para/nova-imagem.jpg"
+```
+
+**Excluir veículo (exclusão lógica)** 🔒 _(COMPANY)_
+
+```bash
+curl -X DELETE http://localhost:8080/vehicles/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
+
+### 📋 Pedidos de Aluguel 🔒
+
+**Solicitar aluguel de veículo** _(CLIENT)_
+
+```bash
+curl -X POST http://localhost:8080/rental-requests/<uuid-do-veiculo> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Aprovação pela empresa** _(COMPANY)_
+
+```bash
+curl -X PUT http://localhost:8080/rental-requests/company-approval \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{"rentalRequestId": "<uuid-do-pedido>", "approved": true}'
+```
+
+**Aprovação pelo banco** _(BANK)_
+
+```bash
+curl -X PUT http://localhost:8080/rental-requests/bank-approval \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <access_token>" \
+  -d '{"rentalRequestId": "<uuid-do-pedido>", "approved": true}'
+```
+
+**Listar todos os pedidos de aluguel**
+
+```bash
+curl http://localhost:8080/rental-requests \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Buscar pedido por ID**
+
+```bash
+curl http://localhost:8080/rental-requests/<uuid> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Listar pedidos por veículo**
+
+```bash
+curl http://localhost:8080/rental-requests/vehicle/<uuid-do-veiculo> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+**Listar pedidos por cliente**
+
+```bash
+curl http://localhost:8080/rental-requests/client/<uuid-do-cliente> \
+  -H "Authorization: Bearer <access_token>"
+```
+
+---
+
 ## 🧪 Testes
 
-O projeto utiliza **JUnit 5** como framework de testes e **Mockito** para mocking, executados via **Micronaut Test** — que provisiona um contexto de aplicação Micronaut completo para testes de integração com banco H2 em memória.
-
-### Estrutura dos testes
-
-| Tipo | Descrição | Exemplos |
-| :--- | :--- | :--- |
-| **Unitários** | Testam a lógica de negócio de forma isolada, com mocks dos repositórios via Mockito | `UserServiceTest`, `EmployerEntityServiceTest`, `EmploymentServiceTest` |
-| **Integração** | Testam os endpoints HTTP com servidor Micronaut real e banco H2 em memória | `UserControllerTest`, `EmployerEntityControllerTest`, `EmploymentControllerTest`, `AuthControllerTest`, `AuthenticationTest` |
-
-### Como executar os testes
-
-Entre na pasta `server` e execute via Maven Wrapper:
-
-```bash
-cd server
-./mvnw test
-```
-
-Para rodar um arquivo de teste específico:
-```bash
-./mvnw test -Dtest=UserServiceTest
-```
-
-Para rodar um método de teste específico:
-```bash
-./mvnw test -Dtest=UserServiceTest#shouldCreateUserSuccessfully
-```
-
-### Resultado esperado
-
-```
-Tests run: 93, Failures: 0, Errors: 0, Skipped: 0
-BUILD SUCCESS
-```
-
-Os relatórios detalhados em XML e TXT ficam disponíveis em:
-```
-server/target/surefire-reports/
-```
+Os testes automatizados ainda não foram implementados nesta versão do projeto. A validação das funcionalidades é feita manualmente via cURL ou ferramentas como Postman/Insomnia.
 
 ---
 
@@ -797,34 +923,34 @@ server/target/surefire-reports/
 
 Liste aqui links para documentação técnica, referências de bibliotecas complexas ou guias de estilo que foram cruciais para o projeto.
 
-* 📖 **Framework/Biblioteca (Front-end):** [Documentação Oficial do **React**](https://react.dev/reference/react)
-* 📖 **Build Tool (Front-end):** [Guia de Configuração do **Vite**](https://vitejs.dev/config/)
-* 📖 **Framework (Back-end):** [Documentação Oficial do **Spring Boot**](https://docs.spring.io/spring-boot/docs/current/reference/html/)
-* 📖 **Containerização:** [Documentação de Referência do **Docker**](https://docs.docker.com/)
-* 📖 **Guia de Estilo:** [**Conventional Commits** (Padrão de Mensagens)](https://www.conventionalcommits.org/en/v1.0.0/)
-* 📖 **Documentação Interna:** [Design System do Projeto](./docs/design-system.md)
+- 📖 **Framework (Front-end):** [Documentação Oficial do **Next.js**](https://nextjs.org/docs)
+- 📖 **Framework (Back-end):** [Documentação Oficial do **Micronaut**](https://docs.micronaut.io/latest/guide/)
+- 📖 **ORM (Back-end):** [Micronaut Data](https://micronaut-projects.github.io/micronaut-data/latest/guide/)
+- 📖 **Upload de Imagens:** [Documentação da API do **Cloudinary**](https://cloudinary.com/documentation/image_upload_api_reference)
+- 📖 **Containerização:** [Documentação de Referência do **Docker**](https://docs.docker.com/)
+- 📖 **Guia de Estilo:** [**Conventional Commits** (Padrão de Mensagens)](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ---
 
 ## 👥 Autores
+
 Liste os principais contribuidores. Você pode usar links para seus perfis.
 
 | 👤 Nome                  | 🖼️ Foto                                                                                                                                           | :octocat: GitHub                                                                                                                                                                                   | 💼 LinkedIn                                                                                                                                                                                                                          | 📤 Gmail                                                                                                                                                                                                 |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Artur Bomtempo Colen     | <div align="center"><img src="https://avatars.githubusercontent.com/u/96635074?v=4" width="70px" height="70px" style="object-fit: cover;"></div>  | <div align="center"><a href="https://github.com/arturbomtempo-dev"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/github.png" width="50px" height="50px"></a></div> | <div align="center"><a href="https://www.linkedin.com/in/artur-bomtempo/"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/linkedin.png" width="50px" height="50px"></a></div>                          | <div align="center"><a href="mailto:arturbcolen@gmail.com"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/gmail.png" width="50px" height="50px"></a></div>                |
 | Eduarda Vieira Gonçalves | <div align="center"><img src="https://avatars.githubusercontent.com/u/159597766?v=4" width="70px" height="70px" style="object-fit: cover;"></div> | <div align="center"><a href="https://github.com/eduardavieira-dev"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/github.png" width="50px" height="50px"></a></div> | <div align="center"><a href="https://www.linkedin.com/in/eduarda-vieira-gon%C3%A7alves-01a584297/"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/linkedin.png" width="50px" height="50px"></a></div> | <div align="center"><a href="mailto:eduarda.vieira.goncalves7@gmail.com"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/gmail.png" width="50px" height="50px" ></a></div> |
-| Vitor Azevedo | <div align="center"><img src="https://avatars.githubusercontent.com/u/116930371?v=4" width="70px" height="70px" style="object-fit: cover;"></div> | <div align="center"><a href="https://github.com/vitorazevedop7"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/github.png" width="50px" height="50px"></a></div> | <div align="center"><a href="https://www.linkedin.com/in/vitor-azevedo-293609343/"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/linkedin.png" width="50px" height="50px"></a></div> | <div align="center"><a href="mailto:vitorazevedo.p7@gmail.com"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/gmail.png" width="50px" height="50px"></a></div> |
-
-
+| Vitor Azevedo            | <div align="center"><img src="https://avatars.githubusercontent.com/u/116930371?v=4" width="70px" height="70px" style="object-fit: cover;"></div> | <div align="center"><a href="https://github.com/vitorazevedop7"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/github.png" width="50px" height="50px"></a></div>    | <div align="center"><a href="https://www.linkedin.com/in/vitor-azevedo-293609343/"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/linkedin.png" width="50px" height="50px"></a></div>                 | <div align="center"><a href="mailto:vitorazevedo.p7@gmail.com"><img src="https://arturbomtempo-dev.github.io/artur-bomtempo-cdn/assets/icons/gmail.png" width="50px" height="50px"></a></div>            |
 
 ---
 
 ## 🤝 Contribuição
+
 Guia para contribuições ao projeto.
 
 1.  Faça um `fork` do projeto.
 2.  Crie uma branch para sua feature (`git checkout -b feature/minha-feature`).
-3. Commit suas mudanças (`git commit -m 'feat: Adiciona nova funcionalidade X'`). **(Utilize [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/))**
+3.  Commit suas mudanças (`git commit -m 'feat: Adiciona nova funcionalidade X'`). **(Utilize [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/))**
 4.  Faça o `push` para a branch (`git push origin feature/minha-feature`).
 5.  Abra um **Pull Request (PR)**.
 
@@ -832,6 +958,7 @@ Guia para contribuições ao projeto.
 > 📝 **Regras:** Por favor, verifique o arquivo [`CONTRIBUTING.md`](./CONTRIBUTING.md) para detalhes sobre nosso guia de estilo de código e o processo de submissão de PRs.
 
 ---
+
 ## 🙏 Agradecimentos
 
 Esta seção reconhece as instituições, professores e iniciativas que contribuíram significativamente para a realização deste projeto acadêmico.

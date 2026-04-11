@@ -4,6 +4,8 @@ import br.pucminas.dto.response.RentalRequestResponse;
 import br.pucminas.exception.RentalRequestNotFoundException;
 import br.pucminas.exception.VehicleNotAvailableException;
 import br.pucminas.exception.VehicleNotFoundException;
+import br.pucminas.enums.ApprovalStatus;
+import br.pucminas.enums.VehicleStatus;
 import br.pucminas.model.*;
 import br.pucminas.repository.RentalRequestRepository;
 import br.pucminas.repository.UserRepository;

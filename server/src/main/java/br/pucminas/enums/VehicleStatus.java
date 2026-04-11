@@ -1,4 +1,4 @@
-package br.pucminas.model;
+package br.pucminas.enums;
 
 public enum VehicleStatus {
     AVAILABLE,

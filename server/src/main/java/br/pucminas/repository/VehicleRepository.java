@@ -1,7 +1,7 @@
 package br.pucminas.repository;
 
 import br.pucminas.model.Vehicle;
-import br.pucminas.model.VehicleStatus;
+import br.pucminas.enums.VehicleStatus;
 import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.CrudRepository;
 
