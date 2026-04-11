@@ -787,7 +787,6 @@ export default function ProfilePage() {
             </form>
 
             <ProfileDangerZone
-                isEditing={isEditing}
                 isSaving={isSaving}
                 isDeleting={isDeleting}
                 onDeleteAccount={handleDeleteAccount}

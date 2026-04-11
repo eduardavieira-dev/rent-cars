@@ -1,0 +1,149 @@
+'use client';
+
+import Link from 'next/link';
+import { ArrowLeft } from '@phosphor-icons/react';
+import { useMemo, useState } from 'react';
+import { useParams } from 'next/navigation';
+
+import { useAuth } from '@/hooks/useAuth';
+import { createRentalRequest, getVehicleById, statusLabel } from '@/lib/vehicle-store';
+
+export default function VehicleDetailsPage() {
+    const params = useParams();
+    const { user, hasRole } = useAuth();
+    const vehicleId = Array.isArray(params.id) ? params.id[0] : params.id;
+    const vehicle = useMemo(() => (vehicleId ? getVehicleById(vehicleId) : undefined), [vehicleId]);
+    const [message, setMessage] = useState<string | null>(null);
+
+    const isClient = hasRole('CLIENT');
+
+    if (!vehicle) {
+        return (
+            <section className="space-y-4">
+                <h1 className="text-2xl font-bold">Veiculo nao encontrado</h1>
+                <p className="text-muted-foreground">
+                    Esse veiculo nao esta disponivel no momento.
+                </p>
+                <Link href="/veiculos" className="text-primary text-sm font-medium">
+                    Voltar para veiculos
+                </Link>
+            </section>
+        );
+    }
+
+    function handleRequest(): void {
+        if (!vehicle) return;
+        if (!user?.sub) {
+            setMessage('Voce precisa estar logado para solicitar um veiculo.');
+            return;
+        }
+        const created = createRentalRequest(vehicle, user.sub);
+        if (!created) {
+            setMessage('Ja existe uma solicitacao em analise para este veiculo.');
+            return;
+        }
+        setMessage('Solicitacao enviada! Acompanhe em Meus pedidos.');
+    }
+
+    return (
+        <section className="space-y-8">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <Link
+                    href="/veiculos"
+                    className="text-primary inline-flex items-center gap-2 text-sm font-semibold"
+                >
+                    <ArrowLeft size={18} weight="bold" />
+                    Voltar para veiculos
+                </Link>
+                <span className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold">
+                    {statusLabel(vehicle.status)}
+                </span>
+            </div>
+
+            <div className="bg-gradient-card border-border/70 grid gap-6 rounded-3xl border p-6 lg:grid-cols-[1.35fr_1fr]">
+                <div className="space-y-5">
+                    <div>
+                        <p className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
+                            {vehicle.category}
+                        </p>
+                        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
+                            {vehicle.brand} {vehicle.model}
+                        </h1>
+                        <p className="text-muted-foreground mt-2 text-sm">
+                            Carro premium para viagens, trabalho e experiencias especiais.
+                        </p>
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="bg-secondary/70 rounded-2xl p-4">
+                            <p className="text-muted-foreground text-xs">Registro</p>
+                            <p className="text-lg font-semibold">{vehicle.registration}</p>
+                        </div>
+                        <div className="bg-secondary/70 rounded-2xl p-4">
+                            <p className="text-muted-foreground text-xs">Placa</p>
+                            <p className="text-lg font-semibold">{vehicle.plate}</p>
+                        </div>
+                        <div className="bg-secondary/70 rounded-2xl p-4">
+                            <p className="text-muted-foreground text-xs">Ano</p>
+                            <p className="text-lg font-semibold">{vehicle.year}</p>
+                        </div>
+                        <div className="bg-secondary/70 rounded-2xl p-4">
+                            <p className="text-muted-foreground text-xs">Avaliacao</p>
+                            <p className="text-lg font-semibold">{vehicle.rating} / 5</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                        <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
+                            Categoria: {vehicle.category}
+                        </span>
+                        <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
+                            Diaria estimada: R$ {vehicle.pricePerDay}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="border-border bg-card relative overflow-hidden rounded-2xl border">
+                        <img
+                            src={vehicle.imageUrl}
+                            alt={`${vehicle.brand} ${vehicle.model}`}
+                            className="h-full w-full object-cover"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/55 via-black/10 to-transparent" />
+                    </div>
+
+                    <div className="bg-secondary/50 rounded-2xl p-5">
+                        <p className="text-muted-foreground text-xs">Valor mensal estimado</p>
+                        <p className="text-primary text-3xl font-bold">
+                            R$ {Math.round(vehicle.pricePerDay * 30)}
+                        </p>
+                        <p className="text-muted-foreground text-xs">Baseado em 30 dias</p>
+                    </div>
+
+                    {isClient && vehicle.status === 'AVAILABLE' && (
+                        <button
+                            type="button"
+                            onClick={handleRequest}
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                        >
+                            Solicitar aluguel
+                        </button>
+                    )}
+
+                    {isClient && vehicle.status !== 'AVAILABLE' && (
+                        <div className="border-border/70 bg-secondary/40 rounded-lg border px-4 py-3 text-sm">
+                            Veiculo indisponivel no momento para novas solicitacoes.
+                        </div>
+                    )}
+
+                    {message && (
+                        <div className="border-border/70 bg-secondary/40 rounded-lg border px-4 py-3 text-sm">
+                            {message}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </section>
+    );
+}

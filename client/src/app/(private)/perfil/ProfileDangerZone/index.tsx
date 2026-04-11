@@ -4,23 +4,17 @@ import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface ProfileDangerZoneProps {
-    isEditing: boolean;
     isSaving: boolean;
     isDeleting: boolean;
     onDeleteAccount: () => void;
 }
 
 export function ProfileDangerZone({
-    isEditing,
     isSaving,
     isDeleting,
     onDeleteAccount,
 }: ProfileDangerZoneProps) {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-    if (!isEditing) {
-        return null;
-    }
 
     return (
         <section className="border-destructive/40 bg-destructive/5 rounded-2xl border p-5">
@@ -28,7 +22,7 @@ export function ProfileDangerZone({
                 Zona de risco
             </h3>
             <p className="text-muted-foreground mt-2 text-sm">
-                A exclusão desativa sua conta e você será desconectada imediatamente.
+                A exclusão desativa sua conta e você será desconectado imediatamente.
             </p>
 
             {!showDeleteConfirm ? (
