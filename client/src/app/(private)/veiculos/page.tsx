@@ -7,25 +7,20 @@ import { toast } from 'sonner';
 import CardCar from '@/components/card-car';
 import { useAuth } from '@/hooks/useAuth';
 import {
-    addVehicle,
-    deleteVehicle,
-    getVehicles,
-    statusLabel,
-    updateVehicle,
-} from '@/lib/vehicle-store';
+    createVehicle,
+    deleteVehicleApi,
+    fetchVehicles,
+    updateVehicleApi,
+} from '@/lib/vehicle-api';
+import { statusLabel } from '@/lib/vehicle-store';
 import type { Vehicle, VehicleStatus } from '@/types/vehicle';
 
-const emptyForm: Omit<Vehicle, 'id'> = {
+const emptyForm: Omit<Vehicle, 'id' | 'imageUrl' | 'status'> = {
     registration: '',
     year: new Date().getFullYear(),
     brand: '',
     model: '',
     plate: '',
-    category: '',
-    pricePerDay: 320,
-    rating: 4.6,
-    imageUrl: '/cars/car-1.png',
-    status: 'AVAILABLE',
 };
 
 export default function VehiclesPage() {
@@ -35,29 +30,53 @@ export default function VehiclesPage() {
     const isReviewer = hasRole('COMPANY') || hasRole('BANK');
 
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<VehicleStatus | 'ALL'>('ALL');
     const [formOpen, setFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState(emptyForm);
-    const [priceInput, setPriceInput] = useState(String(emptyForm.pricePerDay));
     const [yearInput, setYearInput] = useState(String(emptyForm.year));
-    const [ratingInput, setRatingInput] = useState(String(emptyForm.rating));
+    const [statusInput, setStatusInput] = useState<VehicleStatus>('AVAILABLE');
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     useEffect(() => {
-        setVehicles(getVehicles());
+        let isActive = true;
+        const load = async () => {
+            try {
+                setIsLoading(true);
+                const data = await fetchVehicles();
+                if (isActive) setVehicles(data);
+            } catch {
+                toast.error('Nao foi possivel carregar os veiculos.');
+            } finally {
+                if (isActive) setIsLoading(false);
+            }
+        };
+        load();
+        return () => {
+            isActive = false;
+        };
     }, []);
 
-    function refreshVehicles(): void {
-        setVehicles(getVehicles());
+    async function refreshVehicles(): Promise<void> {
+        try {
+            setIsLoading(true);
+            const data = await fetchVehicles();
+            setVehicles(data);
+        } catch {
+            toast.error('Nao foi possivel atualizar os veiculos.');
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     function handleOpenCreate(): void {
         setEditingId(null);
         setForm({ ...emptyForm });
-        setPriceInput(String(emptyForm.pricePerDay));
         setYearInput(String(emptyForm.year));
-        setRatingInput(String(emptyForm.rating));
+        setStatusInput('AVAILABLE');
+        setImageFile(null);
         setFormOpen(true);
     }
 
@@ -69,47 +88,41 @@ export default function VehiclesPage() {
             brand: vehicle.brand,
             model: vehicle.model,
             plate: vehicle.plate,
-            category: vehicle.category,
-            pricePerDay: vehicle.pricePerDay,
-            rating: vehicle.rating,
-            imageUrl: vehicle.imageUrl,
-            status: vehicle.status,
         });
-        setPriceInput(String(vehicle.pricePerDay));
         setYearInput(String(vehicle.year));
-        setRatingInput(String(vehicle.rating));
+        setStatusInput(vehicle.status);
+        setImageFile(null);
         setFormOpen(true);
     }
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+    async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault();
-        const price = Number(priceInput);
         const year = Number(yearInput);
-        const rating = Number(ratingInput.replace(',', '.'));
-        if (!price || Number.isNaN(price)) {
-            toast.error('Informe um preco valido.');
-            return;
-        }
         if (!year || Number.isNaN(year)) {
             toast.error('Informe um ano valido.');
             return;
         }
-        if (!rating || Number.isNaN(rating)) {
-            toast.error('Informe uma avaliacao valida.');
-            return;
+        const payload = { ...form, year };
+        try {
+            if (editingId) {
+                await updateVehicleApi({
+                    id: editingId,
+                    ...payload,
+                    imageFile,
+                });
+                toast.success('Veiculo atualizado com sucesso.');
+            } else {
+                await createVehicle({
+                    ...payload,
+                    imageFile,
+                });
+                toast.success('Veiculo cadastrado com sucesso.');
+            }
+            await refreshVehicles();
+            setFormOpen(false);
+        } catch {
+            toast.error('Nao foi possivel salvar o veiculo.');
         }
-        if (rating < 0 || rating > 5) {
-            toast.error('A avaliacao deve estar entre 0 e 5.');
-            return;
-        }
-        const payload = { ...form, pricePerDay: price, year, rating };
-        if (editingId) {
-            updateVehicle(editingId, payload);
-        } else {
-            addVehicle(payload);
-        }
-        refreshVehicles();
-        setFormOpen(false);
     }
 
     function handleDelete(vehicle: Vehicle): void {
@@ -122,9 +135,10 @@ export default function VehiclesPage() {
             action: {
                 label: 'Desativar',
                 onClick: () => {
-                    deleteVehicle(vehicle.id);
-                    refreshVehicles();
-                    toast.success('Veiculo desativado com sucesso.');
+                    deleteVehicleApi(vehicle.id)
+                        .then(() => refreshVehicles())
+                        .then(() => toast.success('Veiculo desativado com sucesso.'))
+                        .catch(() => toast.error('Nao foi possivel desativar o veiculo.'));
                 },
             },
         });
@@ -186,9 +200,6 @@ export default function VehiclesPage() {
                             { label: 'Disponiveis', value: 'AVAILABLE' },
                             { label: 'Em analise', value: 'IN_REVIEW' },
                             { label: 'Alugados', value: 'RENTED' },
-                            ...(isCompany
-                                ? [{ label: 'Indisponiveis', value: 'UNAVAILABLE' }]
-                                : []),
                         ] as Array<{ label: string; value: VehicleStatus | 'ALL' }>
                     ).map((item) => (
                         <button
@@ -212,10 +223,8 @@ export default function VehiclesPage() {
                     <CardCar
                         key={vehicle.id}
                         imageSrc={vehicle.imageUrl}
-                        category={`${vehicle.year} · ${vehicle.category}`}
+                        category={`Ano ${vehicle.year}`}
                         model={`${vehicle.brand} ${vehicle.model}`}
-                        price={`R$ ${vehicle.pricePerDay}/dia`}
-                        score={vehicle.rating}
                         href={`/veiculos/${vehicle.id}`}
                         statusLabel={statusLabel(vehicle.status)}
                         actions={
@@ -337,82 +346,33 @@ export default function VehiclesPage() {
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
                             </label>
-                            <label className="grid gap-2 text-sm">
-                                Categoria
-                                <input
-                                    required
-                                    value={form.category}
-                                    onChange={(event) =>
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            category: event.target.value,
-                                        }))
-                                    }
-                                    placeholder="SUV"
-                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
-                                />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Preco/dia
-                                <input
-                                    required
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    value={priceInput}
-                                    onChange={(event) => {
-                                        const cleaned = event.target.value.replace(/\D/g, '');
-                                        setPriceInput(cleaned);
-                                    }}
-                                    placeholder="350"
-                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
-                                />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Avaliacao
-                                <input
-                                    required
-                                    inputMode="decimal"
-                                    pattern="[0-9]+([\.,][0-9]+)?"
-                                    value={ratingInput}
-                                    onChange={(event) =>
-                                        setRatingInput(event.target.value.replace(/[^0-9.,]/g, ''))
-                                    }
-                                    placeholder="4.8"
-                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
-                                />
-                            </label>
                             <label className="grid gap-2 text-sm sm:col-span-2">
-                                URL da imagem
+                                Imagem do veiculo
                                 <input
-                                    required
-                                    value={form.imageUrl}
+                                    type="file"
+                                    accept="image/*"
                                     onChange={(event) =>
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            imageUrl: event.target.value,
-                                        }))
+                                        setImageFile(event.target.files?.[0] ?? null)
                                     }
-                                    placeholder="/cars/car-1.png"
-                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
+                                    className="bg-secondary border-border rounded-lg border px-3 py-2 text-sm"
                                 />
+                                <span className="text-muted-foreground text-xs">
+                                    Selecione uma imagem para upload (Cloudinary).
+                                </span>
                             </label>
                             {editingId && (
                                 <label className="grid gap-2 text-sm">
                                     Status
                                     <select
-                                        value={form.status}
+                                        value={statusInput}
                                         onChange={(event) =>
-                                            setForm((prev) => ({
-                                                ...prev,
-                                                status: event.target.value as VehicleStatus,
-                                            }))
+                                            setStatusInput(event.target.value as VehicleStatus)
                                         }
                                         className="bg-secondary border-border rounded-lg border px-3 py-2"
                                     >
                                         <option value="AVAILABLE">Disponivel</option>
                                         <option value="IN_REVIEW">Em analise</option>
                                         <option value="RENTED">Alugado</option>
-                                        <option value="UNAVAILABLE">Indisponivel</option>
                                     </select>
                                 </label>
                             )}

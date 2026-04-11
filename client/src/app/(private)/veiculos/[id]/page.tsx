@@ -2,20 +2,50 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import { useAuth } from '@/hooks/useAuth';
-import { createRentalRequest, getVehicleById, statusLabel } from '@/lib/vehicle-store';
+import { createRentalRequest, statusLabel } from '@/lib/vehicle-store';
+import { fetchVehicle } from '@/lib/vehicle-api';
+import type { Vehicle } from '@/types/vehicle';
 
 export default function VehicleDetailsPage() {
     const params = useParams();
     const { user, hasRole } = useAuth();
     const vehicleId = Array.isArray(params.id) ? params.id[0] : params.id;
-    const vehicle = useMemo(() => (vehicleId ? getVehicleById(vehicleId) : undefined), [vehicleId]);
+    const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [message, setMessage] = useState<string | null>(null);
 
     const isClient = hasRole('CLIENT');
+
+    useEffect(() => {
+        let isActive = true;
+        const load = async () => {
+            if (!vehicleId) return;
+            try {
+                const data = await fetchVehicle(vehicleId);
+                if (isActive) setVehicle(data);
+            } catch {
+                if (isActive) setVehicle(null);
+            } finally {
+                if (isActive) setIsLoading(false);
+            }
+        };
+        load();
+        return () => {
+            isActive = false;
+        };
+    }, [vehicleId]);
+
+    if (isLoading) {
+        return (
+            <section className="space-y-4">
+                <h1 className="text-2xl font-bold">Carregando veiculo...</h1>
+            </section>
+        );
+    }
 
     if (!vehicle) {
         return (
@@ -63,9 +93,6 @@ export default function VehicleDetailsPage() {
             <div className="bg-gradient-card border-border/70 grid gap-6 rounded-3xl border p-6 lg:grid-cols-[1.35fr_1fr]">
                 <div className="space-y-5">
                     <div>
-                        <p className="text-primary text-xs font-semibold tracking-[0.3em] uppercase">
-                            {vehicle.category}
-                        </p>
                         <h1 className="mt-2 text-3xl font-bold sm:text-4xl">
                             {vehicle.brand} {vehicle.model}
                         </h1>
@@ -88,17 +115,14 @@ export default function VehicleDetailsPage() {
                             <p className="text-lg font-semibold">{vehicle.year}</p>
                         </div>
                         <div className="bg-secondary/70 rounded-2xl p-4">
-                            <p className="text-muted-foreground text-xs">Avaliacao</p>
-                            <p className="text-lg font-semibold">{vehicle.rating} / 5</p>
+                            <p className="text-muted-foreground text-xs">Status</p>
+                            <p className="text-lg font-semibold">{statusLabel(vehicle.status)}</p>
                         </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
                         <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
-                            Categoria: {vehicle.category}
-                        </span>
-                        <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
-                            Diaria estimada: R$ {vehicle.pricePerDay}
+                            Valor sob consulta
                         </span>
                     </div>
                 </div>
@@ -115,10 +139,8 @@ export default function VehicleDetailsPage() {
 
                     <div className="bg-secondary/50 rounded-2xl p-5">
                         <p className="text-muted-foreground text-xs">Valor mensal estimado</p>
-                        <p className="text-primary text-3xl font-bold">
-                            R$ {Math.round(vehicle.pricePerDay * 30)}
-                        </p>
-                        <p className="text-muted-foreground text-xs">Baseado em 30 dias</p>
+                        <p className="text-primary text-3xl font-bold">Sob consulta</p>
+                        <p className="text-muted-foreground text-xs">Consulte a empresa</p>
                     </div>
 
                     {isClient && vehicle.status === 'AVAILABLE' && (

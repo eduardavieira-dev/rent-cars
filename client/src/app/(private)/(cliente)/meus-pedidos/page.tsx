@@ -51,7 +51,10 @@ export default function MyOrdersPage() {
                         <div>
                             <p className="font-semibold">{request.vehicleLabel}</p>
                             <p className="text-muted-foreground text-sm">
-                                {request.durationMonths} meses • R$ {request.monthlyPrice}/mes
+                                {request.durationMonths} meses •{' '}
+                                {request.monthlyPrice
+                                    ? `R$ ${request.monthlyPrice}/mes`
+                                    : 'Valor sob consulta'}
                             </p>
                             <p className="text-muted-foreground text-xs">
                                 Solicitado em {new Date(request.createdAt).toLocaleDateString()}

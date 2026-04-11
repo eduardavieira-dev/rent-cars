@@ -1,4 +1,4 @@
-export type VehicleStatus = 'AVAILABLE' | 'IN_REVIEW' | 'RENTED' | 'UNAVAILABLE';
+export type VehicleStatus = 'AVAILABLE' | 'IN_REVIEW' | 'RENTED';
 
 export interface Vehicle {
     id: string;
@@ -7,9 +7,6 @@ export interface Vehicle {
     brand: string;
     model: string;
     plate: string;
-    category: string;
-    pricePerDay: number;
-    rating: number;
     imageUrl: string;
     status: VehicleStatus;
 }

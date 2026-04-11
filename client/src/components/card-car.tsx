@@ -3,10 +3,10 @@ import type { ReactNode } from 'react';
 
 interface CardCarProps {
     imageSrc: string;
-    category: string;
+    category?: string;
     model: string;
-    price: string;
-    score: number;
+    price?: string;
+    score?: number;
     href?: string;
     statusLabel?: string;
     actions?: ReactNode;
@@ -39,16 +39,20 @@ function CardContent({
             </div>
             <div className="space-y-3 p-4">
                 <div>
-                    <p className="text-primary text-[11px] font-semibold tracking-[0.2em] uppercase">
-                        {category}
-                    </p>
+                    {category && (
+                        <p className="text-primary text-[11px] font-semibold tracking-[0.2em] uppercase">
+                            {category}
+                        </p>
+                    )}
                     <h3 className="mt-1 text-lg font-semibold">{model}</h3>
                 </div>
                 <div className="flex items-center justify-between">
-                    <p className="text-primary text-sm font-bold">{price}</p>
-                    <p className="text-muted-foreground text-xs">
-                        <span className="text-yellow-500">★</span> {score}
-                    </p>
+                    <p className="text-primary text-sm font-bold">{price || 'Consulte valores'}</p>
+                    {typeof score === 'number' && (
+                        <p className="text-muted-foreground text-xs">
+                            <span className="text-yellow-500">★</span> {score}
+                        </p>
+                    )}
                 </div>
             </div>
         </>
