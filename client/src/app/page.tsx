@@ -308,14 +308,16 @@ export default function Home() {
                     )}
                 </div>
 
-                <div className="mt-8 text-center">
-                    <Link
-                        href="/cadastro"
-                        className="border-primary/60 text-primary hover:bg-primary/10 inline-flex rounded-full border px-5 py-2 text-sm font-medium transition-colors"
-                    >
-                        Ver toda frota
-                    </Link>
-                </div>
+                {fleetVehicles.length >= 3 && (
+                    <div className="mt-8 text-center">
+                        <Link
+                            href="/cadastro"
+                            className="border-primary/60 text-primary hover:bg-primary/10 inline-flex rounded-full border px-5 py-2 text-sm font-medium transition-colors"
+                        >
+                            Ver toda frota
+                        </Link>
+                    </div>
+                )}
             </section>
 
             <section className="border-border bg-secondary/40 mt-10 border-y">

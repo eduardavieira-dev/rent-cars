@@ -150,3 +150,7 @@ export async function uploadVehicleImage(id: string, file: File): Promise<Vehicl
 export async function deleteVehicleApi(id: string): Promise<void> {
     await request<void>(`/vehicles/${id}`, { method: 'DELETE' });
 }
+
+export async function reactivateVehicleApi(id: string): Promise<void> {
+    await request<void>(`/vehicles/${id}/reactivate`, { method: 'PATCH' });
+}

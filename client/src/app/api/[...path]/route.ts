@@ -21,6 +21,7 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
     const headers = new Headers(request.headers);
     headers.delete('host');
     headers.delete('content-length');
+    headers.delete('origin');
 
     if (isPublicVehicleReadRoute(request.method, pathSegments)) {
         headers.delete('authorization');
@@ -57,6 +58,13 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
     responseHeaders.delete('content-encoding');
     responseHeaders.delete('content-length');
     responseHeaders.delete('www-authenticate');
+
+    if (upstreamResponse.status === 204) {
+        return new Response(null, {
+            status: 204,
+            headers: responseHeaders,
+        });
+    }
 
     const responseBody = await upstreamResponse.arrayBuffer();
 

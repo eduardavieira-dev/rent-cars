@@ -1,6 +1,6 @@
 'use client';
 
-import { ImagePlus, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { ImagePlus, Pencil, Plus, Power, PowerOff, Search, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { useIMask } from 'react-imask';
 import { toast } from 'sonner';
@@ -12,6 +12,7 @@ import {
     deleteVehicleApi,
     fetchMyVehicles,
     fetchVehicles,
+    reactivateVehicleApi,
     updateVehicleApi,
     uploadVehicleImage,
 } from '@/lib/vehicle-api';
@@ -220,11 +221,7 @@ export default function VehiclesPage() {
         }
     }
 
-    function handleDelete(vehicle: Vehicle): void {
-        if (vehicle.status !== 'AVAILABLE') {
-            toast.error('Somente veículos disponíveis podem ser desativados.');
-            return;
-        }
+    function handleDeactivate(vehicle: Vehicle): void {
         toast('Deseja desativar este veículo?', {
             description: `${vehicle.brand} ${vehicle.model} • ${vehicle.plate}`,
             action: {
@@ -234,6 +231,21 @@ export default function VehiclesPage() {
                         .then(() => refreshVehicles())
                         .then(() => toast.success('Veículo desativado com sucesso.'))
                         .catch(() => toast.error('Não foi possível desativar o veículo.'));
+                },
+            },
+        });
+    }
+
+    function handleReactivate(vehicle: Vehicle): void {
+        toast('Deseja reativar este veículo?', {
+            description: `${vehicle.brand} ${vehicle.model} • ${vehicle.plate}`,
+            action: {
+                label: 'Reativar',
+                onClick: () => {
+                    reactivateVehicleApi(vehicle.id)
+                        .then(() => refreshVehicles())
+                        .then(() => toast.success('Veículo reativado com sucesso.'))
+                        .catch(() => toast.error('Não foi possível reativar o veículo.'));
                 },
             },
         });
@@ -328,24 +340,40 @@ export default function VehiclesPage() {
                                     <button
                                         type="button"
                                         onClick={() => handleOpenEdit(vehicle)}
-                                        className="text-secondary-foreground hover:bg-primary/15 hover:text-primary inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-200 ease-in-out"
+                                        disabled={vehicle.status === 'UNAVAILABLE'}
+                                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors duration-200 ease-in-out ${
+                                            vehicle.status === 'UNAVAILABLE'
+                                                ? 'text-muted-foreground cursor-not-allowed opacity-50'
+                                                : 'text-secondary-foreground hover:bg-primary/15 hover:text-primary cursor-pointer'
+                                        }`}
                                     >
                                         <Pencil size={14} />
                                         Editar
                                     </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleDelete(vehicle)}
-                                        disabled={vehicle.status !== 'AVAILABLE'}
-                                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
-                                            vehicle.status === 'AVAILABLE'
-                                                ? 'text-destructive hover:bg-destructive/10 cursor-pointer'
-                                                : 'text-muted-foreground cursor-not-allowed'
-                                        }`}
-                                    >
-                                        <Trash2 size={14} />
-                                        Desativar
-                                    </button>
+                                    {vehicle.status === 'UNAVAILABLE' ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleReactivate(vehicle)}
+                                            className="text-primary hover:bg-primary/15 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors"
+                                        >
+                                            <Power size={14} />
+                                            Reativar
+                                        </button>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeactivate(vehicle)}
+                                            disabled={vehicle.status !== 'AVAILABLE'}
+                                            className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-colors ${
+                                                vehicle.status === 'AVAILABLE'
+                                                    ? 'text-destructive hover:bg-destructive/10 cursor-pointer'
+                                                    : 'text-muted-foreground cursor-not-allowed'
+                                            }`}
+                                        >
+                                            <PowerOff size={14} />
+                                            Desativar
+                                        </button>
+                                    )}
                                 </>
                             ) : null
                         }

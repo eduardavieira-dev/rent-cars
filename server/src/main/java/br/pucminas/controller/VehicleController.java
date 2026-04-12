@@ -85,4 +85,11 @@ public class VehicleController {
         vehicleService.delete(id, principal.getName());
         return HttpResponse.noContent();
     }
+
+    @Patch("/{id}/reactivate")
+    @Secured({ "COMPANY" })
+    public HttpResponse<Void> reactivate(UUID id, Principal principal) {
+        vehicleService.reactivate(id, principal.getName());
+        return HttpResponse.noContent();
+    }
 }

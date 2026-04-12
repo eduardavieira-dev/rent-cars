@@ -9,11 +9,9 @@ import br.pucminas.exception.RegistrationCodeAlreadyExistsException;
 import br.pucminas.exception.VehicleNotFoundException;
 import br.pucminas.exception.VehicleOwnershipException;
 import br.pucminas.model.Company;
-import br.pucminas.model.User;
 import br.pucminas.model.Vehicle;
 import br.pucminas.enums.VehicleStatus;
 import br.pucminas.repository.CompanyRepository;
-import br.pucminas.repository.UserRepository;
 import br.pucminas.repository.VehicleRepository;
 import io.micronaut.http.multipart.CompletedFileUpload;
 import jakarta.inject.Singleton;
@@ -27,13 +25,13 @@ import java.util.stream.Collectors;
 public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
-    private final UserRepository userRepository;
+    private final CompanyRepository companyRepository;
     private final CloudinaryService cloudinaryService;
 
-    public VehicleService(VehicleRepository vehicleRepository, UserRepository userRepository,
+    public VehicleService(VehicleRepository vehicleRepository,
             CompanyRepository companyRepository, CloudinaryService cloudinaryService) {
         this.vehicleRepository = vehicleRepository;
-        this.userRepository = userRepository;
+        this.companyRepository = companyRepository;
         this.cloudinaryService = cloudinaryService;
     }
 
@@ -139,13 +137,23 @@ public class VehicleService {
         vehicleRepository.update(vehicle);
     }
 
-    private Company resolveCompany(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (!(user instanceof Company company)) {
-            throw new IllegalArgumentException("User is not a Company");
+    @Transactional
+    public void reactivate(UUID id, String companyEmail) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new VehicleNotFoundException(id));
+
+        Company company = resolveCompany(companyEmail);
+        if (!vehicle.getCompany().getId().equals(company.getId())) {
+            throw new VehicleOwnershipException(id);
         }
-        return company;
+
+        vehicle.setStatus(VehicleStatus.AVAILABLE);
+        vehicleRepository.update(vehicle);
+    }
+
+    private Company resolveCompany(String email) {
+        return companyRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found: " + email));
     }
 
     private void validateRegistrationCodeUniqueness(String registrationCode) {
