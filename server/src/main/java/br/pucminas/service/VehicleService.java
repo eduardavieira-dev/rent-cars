@@ -54,6 +54,8 @@ public class VehicleService {
         Vehicle vehicle = new Vehicle(
                 request.registrationCode(), request.year(), request.brand(), request.model(),
                 request.plate(), imageUrl, imagePublicId, VehicleStatus.AVAILABLE, company);
+        vehicle.setDescription(request.description());
+        vehicle.setDailyRate(request.dailyRate());
         return toResponse(vehicleRepository.save(vehicle));
     }
 
@@ -98,6 +100,8 @@ public class VehicleService {
         vehicle.setBrand(request.brand());
         vehicle.setModel(request.model());
         vehicle.setPlate(request.plate());
+        vehicle.setDescription(request.description());
+        vehicle.setDailyRate(request.dailyRate());
 
         if (image != null && image.getSize() > 0) {
             if (vehicle.getImagePublicId() != null) {
@@ -169,6 +173,8 @@ public class VehicleService {
                 vehicle.getImageUrl(),
                 vehicle.getStatus().name(),
                 vehicle.getCompany().getId(),
-                vehicle.getCompany().getName());
+                vehicle.getCompany().getCorporateName(),
+                vehicle.getDescription(),
+                vehicle.getDailyRate());
     }
 }

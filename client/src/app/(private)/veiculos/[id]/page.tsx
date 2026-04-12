@@ -138,7 +138,7 @@ export default function VehicleDetailsPage() {
                             {vehicle.brand} {vehicle.model}
                         </h1>
                         <p className="text-muted-foreground mt-2 text-sm">
-                            Carro premium para viagens, trabalho e experiencias especiais.
+                            {vehicle.description ?? 'Sem descricao disponivel.'}
                         </p>
                     </div>
 
@@ -162,9 +162,16 @@ export default function VehicleDetailsPage() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
-                        <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
-                            Valor sob consulta
-                        </span>
+                        {vehicle.dailyRate != null && (
+                            <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
+                                R${' '}
+                                {vehicle.dailyRate.toLocaleString('pt-BR', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })}
+                                /dia
+                            </span>
+                        )}
                     </div>
                 </div>
 
@@ -179,9 +186,24 @@ export default function VehicleDetailsPage() {
                     </div>
 
                     <div className="bg-secondary/50 rounded-2xl p-5">
-                        <p className="text-muted-foreground text-xs">Valor mensal estimado</p>
-                        <p className="text-primary text-3xl font-bold">Sob consulta</p>
-                        <p className="text-muted-foreground text-xs">Consulte a empresa</p>
+                        <p className="text-muted-foreground text-xs">Valor diario</p>
+                        {vehicle.dailyRate != null ? (
+                            <>
+                                <p className="text-primary text-3xl font-bold">
+                                    R${' '}
+                                    {vehicle.dailyRate.toLocaleString('pt-BR', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    })}
+                                </p>
+                                <p className="text-muted-foreground text-xs">por dia</p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-primary text-3xl font-bold">Sob consulta</p>
+                                <p className="text-muted-foreground text-xs">Consulte a empresa</p>
+                            </>
+                        )}
                     </div>
 
                     {isClient && vehicle.status === 'AVAILABLE' && (

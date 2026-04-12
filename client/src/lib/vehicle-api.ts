@@ -15,7 +15,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     if (token) {
         headers.set('Authorization', `Bearer ${token}`);
     }
-    
+
     const response = await fetch(`${API_BASE}${path}`, {
         ...options,
         headers,
@@ -24,9 +24,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
     if (!response.ok) {
         const errorBody = await response.text();
-        const message = response.status === 403 
-            ? `❌ Acesso negado (403): Verifique se você está logado e tem permissão para acessar essa funcionalidade.` 
-            : `❌ Erro ${response.status}: ${errorBody || 'Erro desconhecido'}`;
+        const message =
+            response.status === 403
+                ? `❌ Acesso negado (403): Verifique se você está logado e tem permissão para acessar essa funcionalidade.`
+                : `❌ Erro ${response.status}: ${errorBody || 'Erro desconhecido'}`;
         console.error(`[Vehicle API] Error on ${options.method || 'GET'} ${path}:`, message);
         throw new Error(message);
     }
@@ -45,6 +46,8 @@ interface CarResponse {
     imageUrl?: string | null;
     companyId?: string;
     companyName?: string;
+    description?: string | null;
+    dailyRate?: number | null;
 }
 
 function mapCarToVehicle(car: CarResponse): Vehicle {
@@ -57,6 +60,8 @@ function mapCarToVehicle(car: CarResponse): Vehicle {
         plate: car.plate,
         status: car.status,
         imageUrl: car.imageUrl ?? '/cars/car-1.png',
+        description: car.description ?? null,
+        dailyRate: car.dailyRate ?? null,
     };
 }
 
@@ -76,6 +81,8 @@ export async function createVehicle(payload: {
     brand: string;
     model: string;
     plate: string;
+    description?: string | null;
+    dailyRate?: number | null;
     imageFile?: File | null;
 }): Promise<Vehicle> {
     const formData = new FormData();
@@ -84,6 +91,15 @@ export async function createVehicle(payload: {
     formData.append('brand', payload.brand);
     formData.append('model', payload.model);
     formData.append('plate', payload.plate);
+
+    if (payload.description) {
+        formData.append('description', payload.description);
+    }
+
+    if (payload.dailyRate != null) {
+        formData.append('dailyRate', String(payload.dailyRate));
+    }
+
     if (payload.imageFile) {
         formData.append('image', payload.imageFile);
     }
@@ -103,6 +119,8 @@ export async function updateVehicleApi(payload: {
     brand: string;
     model: string;
     plate: string;
+    description?: string | null;
+    dailyRate?: number | null;
     imageFile?: File | null;
 }): Promise<Vehicle> {
     const formData = new FormData();
@@ -111,6 +129,15 @@ export async function updateVehicleApi(payload: {
     formData.append('brand', payload.brand);
     formData.append('model', payload.model);
     formData.append('plate', payload.plate);
+
+    if (payload.description) {
+        formData.append('description', payload.description);
+    }
+
+    if (payload.dailyRate != null) {
+        formData.append('dailyRate', String(payload.dailyRate));
+    }
+
     if (payload.imageFile) {
         formData.append('image', payload.imageFile);
     }

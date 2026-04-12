@@ -21,6 +21,8 @@ const emptyForm: Omit<Vehicle, 'id' | 'imageUrl' | 'status'> = {
     brand: '',
     model: '',
     plate: '',
+    description: null,
+    dailyRate: null,
 };
 
 export default function VehiclesPage() {
@@ -88,6 +90,8 @@ export default function VehiclesPage() {
             brand: vehicle.brand,
             model: vehicle.model,
             plate: vehicle.plate,
+            description: vehicle.description ?? null,
+            dailyRate: vehicle.dailyRate ?? null,
         });
         setYearInput(String(vehicle.year));
         setStatusInput(vehicle.status);
@@ -343,6 +347,40 @@ export default function VehiclesPage() {
                                         setForm((prev) => ({ ...prev, plate: event.target.value }))
                                     }
                                     placeholder="ABC1D23"
+                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
+                                />
+                            </label>
+                            <label className="grid gap-2 text-sm sm:col-span-2">
+                                Descricao
+                                <textarea
+                                    value={form.description ?? ''}
+                                    onChange={(event) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            description: event.target.value || null,
+                                        }))
+                                    }
+                                    rows={3}
+                                    placeholder="Descreva as caracteristicas e diferenciais do veiculo..."
+                                    className="bg-secondary border-border resize-none rounded-lg border px-3 py-2 text-sm"
+                                />
+                            </label>
+                            <label className="grid gap-2 text-sm">
+                                Valor diario (R$)
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    value={form.dailyRate ?? ''}
+                                    onChange={(event) =>
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            dailyRate: event.target.value
+                                                ? Number(event.target.value)
+                                                : null,
+                                        }))
+                                    }
+                                    placeholder="189.90"
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
                             </label>

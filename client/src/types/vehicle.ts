@@ -9,6 +9,8 @@ export interface Vehicle {
     plate: string;
     imageUrl: string;
     status: VehicleStatus;
+    description?: string | null;
+    dailyRate?: number | null;
 }
 
 export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';

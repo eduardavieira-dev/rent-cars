@@ -13,6 +13,7 @@ import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.validation.Validated;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -37,10 +38,12 @@ public class VehicleController {
             @Part("brand") String brand,
             @Part("model") String model,
             @Part("plate") String plate,
+            @Nullable @Part("description") String description,
+            @Nullable @Part("dailyRate") BigDecimal dailyRate,
             @Nullable @Part("image") CompletedFileUpload image,
             Principal principal) {
         CreateVehicleRequest request = new CreateVehicleRequest(
-                registrationCode, year, brand, model, plate);
+                registrationCode, year, brand, model, plate, description, dailyRate);
         return HttpResponse.created(vehicleService.create(request, image, principal.getName()));
     }
 
@@ -76,10 +79,12 @@ public class VehicleController {
             @Part("brand") String brand,
             @Part("model") String model,
             @Part("plate") String plate,
+            @Nullable @Part("description") String description,
+            @Nullable @Part("dailyRate") BigDecimal dailyRate,
             @Nullable @Part("image") CompletedFileUpload image,
             Principal principal) {
         UpdateVehicleRequest request = new UpdateVehicleRequest(
-                registrationCode, year, brand, model, plate);
+                registrationCode, year, brand, model, plate, description, dailyRate);
         return vehicleService.update(id, request, image, principal.getName());
     }
 

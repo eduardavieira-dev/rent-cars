@@ -4,6 +4,7 @@ import br.pucminas.enums.VehicleStatus;
 import io.micronaut.core.annotation.Introspected;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -44,6 +45,12 @@ public class Vehicle {
     @ManyToOne(optional = false)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
+
+    @Column(length = 500)
+    private String description;
+
+    @Column(name = "daily_rate", precision = 10, scale = 2)
+    private BigDecimal dailyRate;
 
     protected Vehicle() {
     }
@@ -135,5 +142,21 @@ public class Vehicle {
 
     public void setCompany(Company company) {
         this.company = company;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getDailyRate() {
+        return dailyRate;
+    }
+
+    public void setDailyRate(BigDecimal dailyRate) {
+        this.dailyRate = dailyRate;
     }
 }
