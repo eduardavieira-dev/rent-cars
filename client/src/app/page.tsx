@@ -1,50 +1,21 @@
 'use client';
 
+import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { BrandLogo } from '@/components/brand-logo';
-import Footer from '@/components/Footer';
 import CardCar from '@/components/card-car';
+import Footer from '@/components/Footer';
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-
-const fleet = [
-    {
-        imageSrc: '/cars/car-1.png',
-        category: 'Executivo',
-        model: 'Sedan Executivo',
-        price: 'R$ 189/dia',
-        score: 4.8,
-    },
-    {
-        imageSrc: '/cars/car-2.png',
-        category: 'SUV',
-        model: 'SUV Familiar',
-        price: 'R$ 249/dia',
-        score: 4.9,
-    },
-    {
-        imageSrc: '/cars/car-3.png',
-        category: 'Econômico',
-        model: 'Hatch Econômico',
-        price: 'R$ 99/dia',
-        score: 4.7,
-    },
-    {
-        imageSrc: '/cars/car-4.png',
-        category: 'Utilitário',
-        model: 'Pickup Adventure',
-        price: 'R$ 299/dia',
-        score: 4.8,
-    },
-];
+import { fetchVehicles } from '@/lib/vehicle-api';
+import type { Vehicle } from '@/types/vehicle';
 
 const faq = [
     {
@@ -64,6 +35,7 @@ const faq = [
 export default function Home() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hasScrolled, setHasScrolled] = useState(false);
+    const [fleetVehicles, setFleetVehicles] = useState<Vehicle[]>([]);
 
     useEffect(() => {
         const onScroll = () => setHasScrolled(window.scrollY > 24);
@@ -71,6 +43,18 @@ export default function Home() {
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+        fetchVehicles()
+            .then((data) => {
+                if (active) setFleetVehicles(data.slice(0, 4));
+            })
+            .catch(() => {});
+        return () => {
+            active = false;
+        };
     }, []);
 
     return (
@@ -303,16 +287,25 @@ export default function Home() {
                 </p>
 
                 <div className="mt-10 grid gap-4 px-4 sm:grid-cols-2 sm:p-1 lg:grid-cols-4">
-                    {fleet.map((car) => (
-                        <CardCar
-                            key={car.model}
-                            imageSrc={car.imageSrc}
-                            category={car.category}
-                            model={car.model}
-                            price={car.price}
-                            score={car.score}
-                        />
-                    ))}
+                    {fleetVehicles.length > 0 ? (
+                        fleetVehicles.map((v) => (
+                            <CardCar
+                                key={v.id}
+                                imageSrc={v.imageUrl || '/cars/car-1.png'}
+                                category={`Ano ${v.year}`}
+                                model={`${v.brand} ${v.model}`}
+                                price={
+                                    v.dailyRate != null
+                                        ? `R$ ${v.dailyRate.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/dia`
+                                        : undefined
+                                }
+                            />
+                        ))
+                    ) : (
+                        <p className="text-muted-foreground col-span-full py-12 text-center text-sm">
+                            Nenhum veículo disponível no momento.
+                        </p>
+                    )}
                 </div>
 
                 <div className="mt-8 text-center">

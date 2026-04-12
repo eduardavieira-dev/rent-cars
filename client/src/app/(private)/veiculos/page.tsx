@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { Plus, Search, Trash2, Pencil } from 'lucide-react';
+import { ImagePlus, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useIMask } from 'react-imask';
 import { toast } from 'sonner';
 
 import CardCar from '@/components/card-car';
@@ -9,20 +10,39 @@ import { useAuth } from '@/hooks/useAuth';
 import {
     createVehicle,
     deleteVehicleApi,
+    fetchMyVehicles,
     fetchVehicles,
     updateVehicleApi,
+    uploadVehicleImage,
 } from '@/lib/vehicle-api';
 import { statusLabel } from '@/lib/vehicle-store';
 import type { Vehicle, VehicleStatus } from '@/types/vehicle';
 
-const emptyForm: Omit<Vehicle, 'id' | 'imageUrl' | 'status'> = {
+function parseBRLCurrency(masked: string): number {
+    return parseFloat(masked.replace(/\./g, '').replace(',', '.')) || 0;
+}
+
+function formatBRLForDisplay(value: number): string {
+    return value.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+}
+
+type FormFieldErrors = Partial<
+    Record<
+        'registration' | 'year' | 'brand' | 'model' | 'plate' | 'description' | 'dailyRate',
+        string
+    >
+>;
+
+const emptyForm: Omit<Vehicle, 'id' | 'imageUrl' | 'status' | 'dailyRate'> = {
     registration: '',
     year: new Date().getFullYear(),
     brand: '',
     model: '',
     plate: '',
     description: null,
-    dailyRate: null,
 };
 
 export default function VehiclesPage() {
@@ -41,13 +61,33 @@ export default function VehiclesPage() {
     const [yearInput, setYearInput] = useState(String(emptyForm.year));
     const [statusInput, setStatusInput] = useState<VehicleStatus>('AVAILABLE');
     const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<FormFieldErrors>({});
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const {
+        ref: dailyRateIMaskRef,
+        value: dailyRateDisplay,
+        setValue: setDailyRateDisplay,
+    } = useIMask({
+        mask: Number,
+        scale: 2,
+        signed: false,
+        thousandsSeparator: '.',
+        padFractionalZeros: true,
+        normalizeZeros: true,
+        radix: ',',
+        mapToRadix: ['.'],
+    });
+    const dailyRateRef = dailyRateIMaskRef as unknown as RefObject<HTMLInputElement>;
 
     useEffect(() => {
         let isActive = true;
         const load = async () => {
             try {
                 setIsLoading(true);
-                const data = await fetchVehicles();
+                const data = isCompany ? await fetchMyVehicles() : await fetchVehicles();
                 if (isActive) setVehicles(data);
             } catch {
                 toast.error('Não foi possível carregar os veículos.');
@@ -59,12 +99,12 @@ export default function VehiclesPage() {
         return () => {
             isActive = false;
         };
-    }, []);
+    }, [isCompany]);
 
     async function refreshVehicles(): Promise<void> {
         try {
             setIsLoading(true);
-            const data = await fetchVehicles();
+            const data = isCompany ? await fetchMyVehicles() : await fetchVehicles();
             setVehicles(data);
         } catch {
             toast.error('Não foi possível atualizar os veículos.');
@@ -79,6 +119,10 @@ export default function VehiclesPage() {
         setYearInput(String(emptyForm.year));
         setStatusInput('AVAILABLE');
         setImageFile(null);
+        setImagePreview(null);
+        setExistingImageUrl(null);
+        setDailyRateDisplay('');
+        setFieldErrors({});
         setFormOpen(true);
     }
 
@@ -91,35 +135,76 @@ export default function VehiclesPage() {
             model: vehicle.model,
             plate: vehicle.plate,
             description: vehicle.description ?? null,
-            dailyRate: vehicle.dailyRate ?? null,
         });
         setYearInput(String(vehicle.year));
         setStatusInput(vehicle.status);
         setImageFile(null);
+        setImagePreview(null);
+        setExistingImageUrl(vehicle.imageUrl || null);
+        setDailyRateDisplay(
+            vehicle.dailyRate != null ? formatBRLForDisplay(vehicle.dailyRate) : ''
+        );
+        setFieldErrors({});
         setFormOpen(true);
+    }
+
+    function handleImageChange(file: File | null): void {
+        if (file) {
+            setImageFile(file);
+            const url = URL.createObjectURL(file);
+            setImagePreview(url);
+        } else {
+            setImageFile(null);
+            setImagePreview(null);
+        }
+    }
+
+    function handleRemoveImage(): void {
+        setImageFile(null);
+        setImagePreview(null);
+        setExistingImageUrl(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
     }
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
         event.preventDefault();
+        const errors: FormFieldErrors = {};
+
+        if (!form.registration.trim()) errors.registration = 'Informe o registro do veículo.';
+
         const year = Number(yearInput);
-        if (!year || Number.isNaN(year)) {
-            toast.error('Informe um ano válido.');
+        if (!yearInput || !year || Number.isNaN(year)) errors.year = 'Informe um ano válido.';
+
+        if (!form.brand.trim()) errors.brand = 'Informe a marca do veículo.';
+        if (!form.model.trim()) errors.model = 'Informe o modelo do veículo.';
+        if (!form.plate.trim()) errors.plate = 'Informe a placa do veículo.';
+
+        const rawDailyRate = (dailyRateRef.current as HTMLInputElement | null)?.value ?? '';
+        const parsedDailyRate = parseBRLCurrency(rawDailyRate);
+        if (!rawDailyRate || parsedDailyRate <= 0)
+            errors.dailyRate = 'Informe um valor diário válido maior que zero.';
+
+        const description = form.description?.trim();
+        if (!description) errors.description = 'Informe a descrição do veículo.';
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
             return;
         }
-        const payload = { ...form, year };
+
+        setFieldErrors({});
+        const payload = { ...form, year, description: description!, dailyRate: parsedDailyRate };
         try {
+            let vehicleId: string;
             if (editingId) {
-                await updateVehicleApi({
-                    id: editingId,
-                    ...payload,
-                    imageFile,
-                });
+                await updateVehicleApi({ id: editingId, ...payload });
+                vehicleId = editingId;
+                if (imageFile) await uploadVehicleImage(vehicleId, imageFile);
                 toast.success('Veículo atualizado com sucesso.');
             } else {
-                await createVehicle({
-                    ...payload,
-                    imageFile,
-                });
+                const created = await createVehicle(payload);
+                vehicleId = created.id;
+                if (imageFile) await uploadVehicleImage(vehicleId, imageFile);
                 toast.success('Veículo cadastrado com sucesso.');
             }
             await refreshVehicles();
@@ -285,119 +370,232 @@ export default function VehiclesPage() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="mt-4 grid gap-4 sm:grid-cols-2">
-                            <label className="grid gap-2 text-sm">
-                                Registro
+                            <div className="grid gap-2 text-sm">
+                                <span>
+                                    Registro <span className="text-destructive">*</span>
+                                </span>
                                 <input
-                                    required
                                     value={form.registration}
-                                    onChange={(event) =>
+                                    onChange={(event) => {
                                         setForm((prev) => ({
                                             ...prev,
                                             registration: event.target.value,
-                                        }))
-                                    }
+                                        }));
+                                        if (fieldErrors.registration)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                registration: undefined,
+                                            }));
+                                    }}
                                     placeholder="ABC123"
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Ano
+                                {fieldErrors.registration && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.registration}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm">
+                                <span>
+                                    Ano <span className="text-destructive">*</span>
+                                </span>
                                 <input
-                                    required
                                     inputMode="numeric"
                                     pattern="[0-9]*"
                                     value={yearInput}
-                                    onChange={(event) =>
-                                        setYearInput(event.target.value.replace(/\D/g, ''))
-                                    }
+                                    onChange={(event) => {
+                                        setYearInput(event.target.value.replace(/\D/g, ''));
+                                        if (fieldErrors.year)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                year: undefined,
+                                            }));
+                                    }}
                                     placeholder="2024"
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Marca
+                                {fieldErrors.year && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.year}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm">
+                                <span>
+                                    Marca <span className="text-destructive">*</span>
+                                </span>
                                 <input
-                                    required
                                     value={form.brand}
-                                    onChange={(event) =>
-                                        setForm((prev) => ({ ...prev, brand: event.target.value }))
-                                    }
+                                    onChange={(event) => {
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            brand: event.target.value,
+                                        }));
+                                        if (fieldErrors.brand)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                brand: undefined,
+                                            }));
+                                    }}
                                     placeholder="Toyota"
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Modelo
+                                {fieldErrors.brand && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.brand}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm">
+                                <span>
+                                    Modelo <span className="text-destructive">*</span>
+                                </span>
                                 <input
-                                    required
                                     value={form.model}
-                                    onChange={(event) =>
-                                        setForm((prev) => ({ ...prev, model: event.target.value }))
-                                    }
+                                    onChange={(event) => {
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            model: event.target.value,
+                                        }));
+                                        if (fieldErrors.model)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                model: undefined,
+                                            }));
+                                    }}
                                     placeholder="Corolla"
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Placa
+                                {fieldErrors.model && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.model}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm">
+                                <span>
+                                    Placa <span className="text-destructive">*</span>
+                                </span>
                                 <input
-                                    required
                                     value={form.plate}
-                                    onChange={(event) =>
-                                        setForm((prev) => ({ ...prev, plate: event.target.value }))
-                                    }
+                                    onChange={(event) => {
+                                        setForm((prev) => ({
+                                            ...prev,
+                                            plate: event.target.value,
+                                        }));
+                                        if (fieldErrors.plate)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                plate: undefined,
+                                            }));
+                                    }}
                                     placeholder="ABC1D23"
                                     className="bg-secondary border-border rounded-lg border px-3 py-2"
                                 />
-                            </label>
-                            <label className="grid gap-2 text-sm sm:col-span-2">
-                                Descrição
+                                {fieldErrors.plate && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.plate}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm">
+                                <span>
+                                    Valor diário (R$) <span className="text-destructive">*</span>
+                                </span>
+                                <input
+                                    ref={dailyRateRef}
+                                    placeholder="0,00"
+                                    inputMode="decimal"
+                                    onChange={() => {
+                                        if (fieldErrors.dailyRate)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                dailyRate: undefined,
+                                            }));
+                                    }}
+                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
+                                />
+                                {fieldErrors.dailyRate && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.dailyRate}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm sm:col-span-2">
+                                <span>
+                                    Descrição <span className="text-destructive">*</span>
+                                </span>
                                 <textarea
                                     value={form.description ?? ''}
-                                    onChange={(event) =>
+                                    onChange={(event) => {
                                         setForm((prev) => ({
                                             ...prev,
                                             description: event.target.value || null,
-                                        }))
-                                    }
+                                        }));
+                                        if (fieldErrors.description)
+                                            setFieldErrors((prev) => ({
+                                                ...prev,
+                                                description: undefined,
+                                            }));
+                                    }}
                                     rows={3}
                                     placeholder="Descreva as características e diferenciais do veículo..."
                                     className="bg-secondary border-border resize-none rounded-lg border px-3 py-2 text-sm"
                                 />
-                            </label>
-                            <label className="grid gap-2 text-sm">
-                                Valor diário (R$)
+                                {fieldErrors.description && (
+                                    <p className="text-destructive text-xs font-bold">
+                                        {fieldErrors.description}
+                                    </p>
+                                )}
+                            </div>
+                            <div className="grid gap-2 text-sm sm:col-span-2">
+                                <span>Imagem do veículo</span>
+                                {imagePreview || existingImageUrl ? (
+                                    <div className="border-border relative overflow-hidden rounded-lg border">
+                                        <img
+                                            src={imagePreview ?? existingImageUrl ?? ''}
+                                            alt="Pré-visualização"
+                                            className="h-44 w-full object-cover"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveImage}
+                                            className="bg-background/80 text-destructive hover:bg-background absolute top-2 right-2 cursor-pointer rounded-full p-1.5 backdrop-blur-sm transition-colors"
+                                            aria-label="Remover imagem"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="bg-background/80 text-foreground hover:bg-background absolute right-2 bottom-2 cursor-pointer rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm transition-colors"
+                                        >
+                                            Alterar imagem
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="border-border hover:border-primary/60 hover:bg-secondary/60 flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed px-4 py-8 transition-colors"
+                                    >
+                                        <ImagePlus size={24} className="text-muted-foreground" />
+                                        <span className="text-muted-foreground text-xs">
+                                            Clique para selecionar uma imagem
+                                        </span>
+                                    </button>
+                                )}
                                 <input
-                                    type="number"
-                                    min="0"
-                                    step="0.01"
-                                    value={form.dailyRate ?? ''}
-                                    onChange={(event) =>
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            dailyRate: event.target.value
-                                                ? Number(event.target.value)
-                                                : null,
-                                        }))
-                                    }
-                                    placeholder="189.90"
-                                    className="bg-secondary border-border rounded-lg border px-3 py-2"
-                                />
-                            </label>
-                            <label className="grid gap-2 text-sm sm:col-span-2">
-                                Imagem do veículo
-                                <input
+                                    ref={fileInputRef}
                                     type="file"
                                     accept="image/*"
                                     onChange={(event) =>
-                                        setImageFile(event.target.files?.[0] ?? null)
+                                        handleImageChange(event.target.files?.[0] ?? null)
                                     }
-                                    className="bg-secondary border-border rounded-lg border px-3 py-2 text-sm"
+                                    className="hidden"
                                 />
-                                <span className="text-muted-foreground text-xs">
-                                    Selecione uma imagem para upload (Cloudinary).
-                                </span>
-                            </label>
+                            </div>
                             {editingId && (
                                 <label className="grid gap-2 text-sm">
                                     Status

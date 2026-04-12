@@ -4,7 +4,6 @@ import br.pucminas.dto.request.CreateVehicleRequest;
 import br.pucminas.dto.request.UpdateVehicleRequest;
 import br.pucminas.dto.response.VehicleResponse;
 import br.pucminas.service.VehicleService;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.*;
@@ -12,8 +11,8 @@ import io.micronaut.http.multipart.CompletedFileUpload;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.validation.Validated;
+import jakarta.validation.Valid;
 
-import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -29,22 +28,11 @@ public class VehicleController {
     }
 
     @Post
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({ "COMPANY" })
-    public HttpResponse<VehicleResponse> create(
-            @Part("registrationCode") String registrationCode,
-            @Part("year") Integer year,
-            @Part("brand") String brand,
-            @Part("model") String model,
-            @Part("plate") String plate,
-            @Nullable @Part("description") String description,
-            @Nullable @Part("dailyRate") BigDecimal dailyRate,
-            @Nullable @Part("image") CompletedFileUpload image,
-            Principal principal) {
-        CreateVehicleRequest request = new CreateVehicleRequest(
-                registrationCode, year, brand, model, plate, description, dailyRate);
-        return HttpResponse.created(vehicleService.create(request, image, principal.getName()));
+    public HttpResponse<VehicleResponse> create(@Valid @Body CreateVehicleRequest request, Principal principal) {
+        return HttpResponse.created(vehicleService.create(request, principal.getName()));
     }
 
     @Get
@@ -68,24 +56,27 @@ public class VehicleController {
         return vehicleService.listByCompany(companyId);
     }
 
+    @Get("/my-vehicles")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Secured({ "COMPANY" })
+    public List<VehicleResponse> listMyVehicles(Principal principal) {
+        return vehicleService.listByCompanyEmail(principal.getName());
+    }
+
     @Put("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Secured({ "COMPANY" })
+    public VehicleResponse update(UUID id, @Valid @Body UpdateVehicleRequest request, Principal principal) {
+        return vehicleService.update(id, request, principal.getName());
+    }
+
+    @Put("/{id}/image")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({ "COMPANY" })
-    public VehicleResponse update(
-            UUID id,
-            @Part("registrationCode") String registrationCode,
-            @Part("year") Integer year,
-            @Part("brand") String brand,
-            @Part("model") String model,
-            @Part("plate") String plate,
-            @Nullable @Part("description") String description,
-            @Nullable @Part("dailyRate") BigDecimal dailyRate,
-            @Nullable @Part("image") CompletedFileUpload image,
-            Principal principal) {
-        UpdateVehicleRequest request = new UpdateVehicleRequest(
-                registrationCode, year, brand, model, plate, description, dailyRate);
-        return vehicleService.update(id, request, image, principal.getName());
+    public VehicleResponse uploadImage(UUID id, @Part("image") CompletedFileUpload image, Principal principal) {
+        return vehicleService.uploadImage(id, image, principal.getName());
     }
 
     @Delete("/{id}")

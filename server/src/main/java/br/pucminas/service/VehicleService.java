@@ -7,6 +7,7 @@ import br.pucminas.dto.response.VehicleResponse;
 import br.pucminas.exception.PlateAlreadyExistsException;
 import br.pucminas.exception.RegistrationCodeAlreadyExistsException;
 import br.pucminas.exception.VehicleNotFoundException;
+import br.pucminas.exception.VehicleOwnershipException;
 import br.pucminas.model.Company;
 import br.pucminas.model.User;
 import br.pucminas.model.Vehicle;
@@ -37,23 +38,15 @@ public class VehicleService {
     }
 
     @Transactional
-    public VehicleResponse create(CreateVehicleRequest request, CompletedFileUpload image, String companyEmail) {
+    public VehicleResponse create(CreateVehicleRequest request, String companyEmail) {
         Company company = resolveCompany(companyEmail);
 
         validateRegistrationCodeUniqueness(request.registrationCode());
         validatePlateUniqueness(request.plate());
 
-        String imageUrl = null;
-        String imagePublicId = null;
-        if (image != null && image.getSize() > 0) {
-            CloudinaryUploadResult uploadResult = cloudinaryService.upload(image);
-            imageUrl = uploadResult.url();
-            imagePublicId = uploadResult.publicId();
-        }
-
         Vehicle vehicle = new Vehicle(
                 request.registrationCode(), request.year(), request.brand(), request.model(),
-                request.plate(), imageUrl, imagePublicId, VehicleStatus.AVAILABLE, company);
+                request.plate(), null, null, VehicleStatus.AVAILABLE, company);
         vehicle.setDescription(request.description());
         vehicle.setDailyRate(request.dailyRate());
         return toResponse(vehicleRepository.save(vehicle));
@@ -77,15 +70,21 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    public List<VehicleResponse> listByCompanyEmail(String companyEmail) {
+        Company company = resolveCompany(companyEmail);
+        return vehicleRepository.findByCompanyId(company.getId()).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
-    public VehicleResponse update(UUID id, UpdateVehicleRequest request, CompletedFileUpload image,
-            String companyEmail) {
+    public VehicleResponse update(UUID id, UpdateVehicleRequest request, String companyEmail) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleNotFoundException(id));
 
         Company company = resolveCompany(companyEmail);
         if (!vehicle.getCompany().getId().equals(company.getId())) {
-            throw new IllegalArgumentException("Vehicle does not belong to this company");
+            throw new VehicleOwnershipException(id);
         }
 
         if (!vehicle.getRegistrationCode().equals(request.registrationCode())) {
@@ -103,15 +102,26 @@ public class VehicleService {
         vehicle.setDescription(request.description());
         vehicle.setDailyRate(request.dailyRate());
 
-        if (image != null && image.getSize() > 0) {
-            if (vehicle.getImagePublicId() != null) {
-                cloudinaryService.delete(vehicle.getImagePublicId());
-            }
-            CloudinaryUploadResult uploadResult = cloudinaryService.upload(image);
-            vehicle.setImageUrl(uploadResult.url());
-            vehicle.setImagePublicId(uploadResult.publicId());
+        return toResponse(vehicleRepository.update(vehicle));
+    }
+
+    @Transactional
+    public VehicleResponse uploadImage(UUID id, CompletedFileUpload image, String companyEmail) {
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new VehicleNotFoundException(id));
+
+        Company company = resolveCompany(companyEmail);
+        if (!vehicle.getCompany().getId().equals(company.getId())) {
+            throw new VehicleOwnershipException(id);
         }
 
+        if (vehicle.getImagePublicId() != null) {
+            cloudinaryService.delete(vehicle.getImagePublicId());
+        }
+
+        CloudinaryUploadResult uploadResult = cloudinaryService.upload(image);
+        vehicle.setImageUrl(uploadResult.url());
+        vehicle.setImagePublicId(uploadResult.publicId());
         return toResponse(vehicleRepository.update(vehicle));
     }
 
@@ -122,7 +132,7 @@ public class VehicleService {
 
         Company company = resolveCompany(companyEmail);
         if (!vehicle.getCompany().getId().equals(company.getId())) {
-            throw new IllegalArgumentException("Vehicle does not belong to this company");
+            throw new VehicleOwnershipException(id);
         }
 
         vehicle.setStatus(VehicleStatus.UNAVAILABLE);

@@ -5,7 +5,12 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8080';
 function isPublicVehicleReadRoute(method: string, pathSegments: string[]): boolean {
     if (method !== 'GET') return false;
     if (pathSegments.length === 1 && pathSegments[0] === 'vehicles') return true;
-    if (pathSegments.length === 2 && pathSegments[0] === 'vehicles') return true;
+    if (
+        pathSegments.length === 2 &&
+        pathSegments[0] === 'vehicles' &&
+        pathSegments[1] !== 'my-vehicles'
+    )
+        return true;
     return false;
 }
 

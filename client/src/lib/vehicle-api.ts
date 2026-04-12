@@ -1,7 +1,5 @@
 import type { Vehicle, VehicleStatus } from '@/types/vehicle';
 
-// Use the Next.js proxy instead of calling backend directly
-// This ensures cookies are properly forwarded with auth tokens
 const API_BASE = '/api';
 
 function getAccessToken(): string | null {
@@ -19,7 +17,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const response = await fetch(`${API_BASE}${path}`, {
         ...options,
         headers,
-        credentials: 'include', // Include cookies
+        credentials: 'include',
     });
 
     if (!response.ok) {
@@ -31,7 +29,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         console.error(`[Vehicle API] Error on ${options.method || 'GET'} ${path}:`, message);
         throw new Error(message);
     }
-    console.log(`[Vehicle API] ✅ ${options.method || 'GET'} ${path}`);
+
+    if (response.status === 204) {
+        return undefined as T;
+    }
+
     return response.json() as Promise<T>;
 }
 
@@ -70,6 +72,11 @@ export async function fetchVehicles(): Promise<Vehicle[]> {
     return data.map(mapCarToVehicle);
 }
 
+export async function fetchMyVehicles(): Promise<Vehicle[]> {
+    const data = await request<CarResponse[]>('/vehicles/my-vehicles');
+    return data.map(mapCarToVehicle);
+}
+
 export async function fetchVehicle(id: string): Promise<Vehicle> {
     const data = await request<CarResponse>(`/vehicles/${id}`);
     return mapCarToVehicle(data);
@@ -81,32 +88,21 @@ export async function createVehicle(payload: {
     brand: string;
     model: string;
     plate: string;
-    description?: string | null;
-    dailyRate?: number | null;
-    imageFile?: File | null;
+    description: string;
+    dailyRate: number;
 }): Promise<Vehicle> {
-    const formData = new FormData();
-    formData.append('registrationCode', payload.registration);
-    formData.append('year', String(payload.year));
-    formData.append('brand', payload.brand);
-    formData.append('model', payload.model);
-    formData.append('plate', payload.plate);
-
-    if (payload.description) {
-        formData.append('description', payload.description);
-    }
-
-    if (payload.dailyRate != null) {
-        formData.append('dailyRate', String(payload.dailyRate));
-    }
-
-    if (payload.imageFile) {
-        formData.append('image', payload.imageFile);
-    }
-
     const data = await request<CarResponse>('/vehicles', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            registrationCode: payload.registration,
+            year: payload.year,
+            brand: payload.brand,
+            model: payload.model,
+            plate: payload.plate,
+            description: payload.description,
+            dailyRate: payload.dailyRate,
+        }),
     });
 
     return mapCarToVehicle(data);
@@ -119,30 +115,31 @@ export async function updateVehicleApi(payload: {
     brand: string;
     model: string;
     plate: string;
-    description?: string | null;
-    dailyRate?: number | null;
-    imageFile?: File | null;
+    description: string;
+    dailyRate: number;
 }): Promise<Vehicle> {
-    const formData = new FormData();
-    formData.append('registrationCode', payload.registration);
-    formData.append('year', String(payload.year));
-    formData.append('brand', payload.brand);
-    formData.append('model', payload.model);
-    formData.append('plate', payload.plate);
-
-    if (payload.description) {
-        formData.append('description', payload.description);
-    }
-
-    if (payload.dailyRate != null) {
-        formData.append('dailyRate', String(payload.dailyRate));
-    }
-
-    if (payload.imageFile) {
-        formData.append('image', payload.imageFile);
-    }
-
     const data = await request<CarResponse>(`/vehicles/${payload.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            registrationCode: payload.registration,
+            year: payload.year,
+            brand: payload.brand,
+            model: payload.model,
+            plate: payload.plate,
+            description: payload.description,
+            dailyRate: payload.dailyRate,
+        }),
+    });
+
+    return mapCarToVehicle(data);
+}
+
+export async function uploadVehicleImage(id: string, file: File): Promise<Vehicle> {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const data = await request<CarResponse>(`/vehicles/${id}/image`, {
         method: 'PUT',
         body: formData,
     });
