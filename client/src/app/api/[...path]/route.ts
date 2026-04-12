@@ -54,9 +54,13 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
 
     const responseHeaders = new Headers(upstreamResponse.headers);
     responseHeaders.delete('transfer-encoding');
+    responseHeaders.delete('content-encoding');
+    responseHeaders.delete('content-length');
     responseHeaders.delete('www-authenticate');
 
-    return new Response(upstreamResponse.body, {
+    const responseBody = await upstreamResponse.arrayBuffer();
+
+    return new Response(responseBody, {
         status: upstreamResponse.status,
         headers: responseHeaders,
     });
