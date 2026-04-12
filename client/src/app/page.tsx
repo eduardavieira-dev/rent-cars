@@ -108,7 +108,13 @@ export default function Home() {
                             </a>
                         </nav>
 
-                        <div className="hidden md:block">
+                        <div className="hidden items-center gap-2 md:flex">
+                            <Link
+                                href="/cadastro"
+                                className="border-primary text-primary hover:bg-primary/10 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
+                            >
+                                Cadastrar
+                            </Link>
                             <Link
                                 href="/login"
                                 className="bg-primary text-primary-foreground rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
@@ -188,13 +194,22 @@ export default function Home() {
                         </a>
                     </nav>
 
-                    <Link
-                        href="/login"
-                        onClick={() => setIsMenuOpen(false)}
-                        className="bg-primary text-primary-foreground mt-8 inline-flex rounded-full px-5 py-2 text-sm font-semibold"
-                    >
-                        Entrar
-                    </Link>
+                    <div className="mt-8 flex flex-col gap-3">
+                        <Link
+                            href="/cadastro"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="border-primary text-primary hover:bg-primary/10 inline-flex rounded-full border px-5 py-2 text-sm font-semibold transition-colors"
+                        >
+                            Cadastrar
+                        </Link>
+                        <Link
+                            href="/login"
+                            onClick={() => setIsMenuOpen(false)}
+                            className="bg-primary text-primary-foreground inline-flex rounded-full px-5 py-2 text-sm font-semibold"
+                        >
+                            Entrar
+                        </Link>
+                    </div>
                 </aside>
 
                 <div
