@@ -50,7 +50,7 @@ export default function VehiclesPage() {
                 const data = await fetchVehicles();
                 if (isActive) setVehicles(data);
             } catch {
-                toast.error('Nao foi possivel carregar os veiculos.');
+                toast.error('Não foi possível carregar os veículos.');
             } finally {
                 if (isActive) setIsLoading(false);
             }
@@ -67,7 +67,7 @@ export default function VehiclesPage() {
             const data = await fetchVehicles();
             setVehicles(data);
         } catch {
-            toast.error('Nao foi possivel atualizar os veiculos.');
+            toast.error('Não foi possível atualizar os veículos.');
         } finally {
             setIsLoading(false);
         }
@@ -103,7 +103,7 @@ export default function VehiclesPage() {
         event.preventDefault();
         const year = Number(yearInput);
         if (!year || Number.isNaN(year)) {
-            toast.error('Informe um ano valido.');
+            toast.error('Informe um ano válido.');
             return;
         }
         const payload = { ...form, year };
@@ -114,35 +114,35 @@ export default function VehiclesPage() {
                     ...payload,
                     imageFile,
                 });
-                toast.success('Veiculo atualizado com sucesso.');
+                toast.success('Veículo atualizado com sucesso.');
             } else {
                 await createVehicle({
                     ...payload,
                     imageFile,
                 });
-                toast.success('Veiculo cadastrado com sucesso.');
+                toast.success('Veículo cadastrado com sucesso.');
             }
             await refreshVehicles();
             setFormOpen(false);
         } catch {
-            toast.error('Nao foi possivel salvar o veiculo.');
+            toast.error('Não foi possível salvar o veículo.');
         }
     }
 
     function handleDelete(vehicle: Vehicle): void {
         if (vehicle.status !== 'AVAILABLE') {
-            toast.error('Somente veiculos disponiveis podem ser desativados.');
+            toast.error('Somente veículos disponíveis podem ser desativados.');
             return;
         }
-        toast('Deseja desativar este veiculo?', {
+        toast('Deseja desativar este veículo?', {
             description: `${vehicle.brand} ${vehicle.model} • ${vehicle.plate}`,
             action: {
                 label: 'Desativar',
                 onClick: () => {
                     deleteVehicleApi(vehicle.id)
                         .then(() => refreshVehicles())
-                        .then(() => toast.success('Veiculo desativado com sucesso.'))
-                        .catch(() => toast.error('Nao foi possivel desativar o veiculo.'));
+                        .then(() => toast.success('Veículo desativado com sucesso.'))
+                        .catch(() => toast.error('Não foi possível desativar o veículo.'));
                 },
             },
         });
@@ -165,11 +165,11 @@ export default function VehiclesPage() {
         <section className="space-y-8">
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Veiculos</h1>
+                    <h1 className="text-2xl font-bold">Veículos</h1>
                     <p className="text-muted-foreground">
                         {isCompany
                             ? 'Gerencie a frota e mantenha os dados atualizados.'
-                            : 'Explore os veiculos disponiveis e escolha o ideal.'}
+                            : 'Explore os veículos disponíveis e escolha o ideal.'}
                     </p>
                 </div>
                 {isCompany && (
@@ -179,7 +179,7 @@ export default function VehiclesPage() {
                         className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold inline-flex cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold"
                     >
                         <Plus size={16} />
-                        Novo veiculo
+                        Novo veículo
                     </button>
                 )}
             </div>
@@ -201,8 +201,8 @@ export default function VehiclesPage() {
                     {(
                         [
                             { label: 'Todos', value: 'ALL' },
-                            { label: 'Disponiveis', value: 'AVAILABLE' },
-                            { label: 'Em analise', value: 'IN_REVIEW' },
+                            { label: 'Disponíveis', value: 'AVAILABLE' },
+                            { label: 'Em análise', value: 'IN_REVIEW' },
                             { label: 'Alugados', value: 'RENTED' },
                         ] as Array<{ label: string; value: VehicleStatus | 'ALL' }>
                     ).map((item) => (
@@ -264,7 +264,7 @@ export default function VehiclesPage() {
 
             {filteredVehicles.length === 0 && (
                 <div className="border-border/70 bg-secondary/40 rounded-2xl border p-6 text-center text-sm">
-                    Nenhum veiculo encontrado com os filtros atuais.
+                    Nenhum veículo encontrado com os filtros atuais.
                 </div>
             )}
 
@@ -351,7 +351,7 @@ export default function VehiclesPage() {
                                 />
                             </label>
                             <label className="grid gap-2 text-sm sm:col-span-2">
-                                Descricao
+                                Descrição
                                 <textarea
                                     value={form.description ?? ''}
                                     onChange={(event) =>
@@ -361,12 +361,12 @@ export default function VehiclesPage() {
                                         }))
                                     }
                                     rows={3}
-                                    placeholder="Descreva as caracteristicas e diferenciais do veiculo..."
+                                    placeholder="Descreva as características e diferenciais do veículo..."
                                     className="bg-secondary border-border resize-none rounded-lg border px-3 py-2 text-sm"
                                 />
                             </label>
                             <label className="grid gap-2 text-sm">
-                                Valor diario (R$)
+                                Valor diário (R$)
                                 <input
                                     type="number"
                                     min="0"
@@ -385,7 +385,7 @@ export default function VehiclesPage() {
                                 />
                             </label>
                             <label className="grid gap-2 text-sm sm:col-span-2">
-                                Imagem do veiculo
+                                Imagem do veículo
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -408,8 +408,8 @@ export default function VehiclesPage() {
                                         }
                                         className="bg-secondary border-border rounded-lg border px-3 py-2"
                                     >
-                                        <option value="AVAILABLE">Disponivel</option>
-                                        <option value="IN_REVIEW">Em analise</option>
+                                        <option value="AVAILABLE">Disponível</option>
+                                        <option value="IN_REVIEW">Em análise</option>
                                         <option value="RENTED">Alugado</option>
                                     </select>
                                 </label>

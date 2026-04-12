@@ -45,13 +45,13 @@ export function closeContract(contractId: string): void {
 export function statusLabel(status: VehicleStatus): string {
     switch (status) {
         case 'AVAILABLE':
-            return 'Disponivel';
+            return 'Disponível';
         case 'UNDER_REVIEW':
-            return 'Em analise';
+            return 'Em análise';
         case 'APPROVED':
             return 'Aprovado';
         case 'UNAVAILABLE':
-            return 'Indisponivel';
+            return 'Indisponível';
         default:
             return status;
     }

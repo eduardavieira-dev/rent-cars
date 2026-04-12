@@ -52,7 +52,7 @@ export default function VehicleDetailsPage() {
     if (isLoading) {
         return (
             <section className="space-y-4">
-                <h1 className="text-2xl font-bold">Carregando veiculo...</h1>
+                <h1 className="text-2xl font-bold">Carregando veículo...</h1>
             </section>
         );
     }
@@ -60,12 +60,12 @@ export default function VehicleDetailsPage() {
     if (!vehicle) {
         return (
             <section className="space-y-4">
-                <h1 className="text-2xl font-bold">Veiculo nao encontrado</h1>
+                <h1 className="text-2xl font-bold">Veículo não encontrado</h1>
                 <p className="text-muted-foreground">
-                    Esse veiculo nao esta disponivel no momento.
+                    Esse veículo não está disponível no momento.
                 </p>
                 <Link href="/veiculos" className="text-primary text-sm font-medium">
-                    Voltar para veiculos
+                    Voltar para veículos
                 </Link>
             </section>
         );
@@ -74,7 +74,7 @@ export default function VehicleDetailsPage() {
     async function handleRequest(): Promise<void> {
         if (!vehicle) return;
         if (!user?.sub) {
-            setMessage('Voce precisa estar logado para solicitar um veiculo.');
+            setMessage('Você precisa estar logado para solicitar um veículo.');
             return;
         }
 
@@ -92,7 +92,7 @@ export default function VehicleDetailsPage() {
             );
 
             if (!currentUser) {
-                setMessage('Nao foi possivel identificar seu usuario.');
+                setMessage('Não foi possível identificar seu usuário.');
                 return;
             }
 
@@ -103,7 +103,7 @@ export default function VehicleDetailsPage() {
 
             if (incomes.length === 0) {
                 setMessage(
-                    'Voce precisa cadastrar pelo menos um rendimento antes de solicitar um aluguel. Acesse "Meus rendimentos" no menu lateral.'
+                    'Você precisa cadastrar pelo menos um rendimento antes de solicitar um aluguel. Acesse "Meus rendimentos" no menu lateral.'
                 );
                 return;
             }
@@ -124,7 +124,7 @@ export default function VehicleDetailsPage() {
                     className="text-primary inline-flex items-center gap-2 text-sm font-semibold"
                 >
                     <ArrowLeft size={18} strokeWidth={2.5} />
-                    Voltar para veiculos
+                    Voltar para veículos
                 </Link>
                 <span className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold">
                     {statusLabel(vehicle.status)}
@@ -138,7 +138,7 @@ export default function VehicleDetailsPage() {
                             {vehicle.brand} {vehicle.model}
                         </h1>
                         <p className="text-muted-foreground mt-2 text-sm">
-                            {vehicle.description ?? 'Sem descricao disponivel.'}
+                            {vehicle.description ?? 'Sem descrição disponível.'}
                         </p>
                     </div>
 
@@ -186,7 +186,7 @@ export default function VehicleDetailsPage() {
                     </div>
 
                     <div className="bg-secondary/50 rounded-2xl p-5">
-                        <p className="text-muted-foreground text-xs">Valor diario</p>
+                        <p className="text-muted-foreground text-xs">Valor diário</p>
                         {vehicle.dailyRate != null ? (
                             <>
                                 <p className="text-primary text-3xl font-bold">
@@ -219,7 +219,7 @@ export default function VehicleDetailsPage() {
 
                     {isClient && vehicle.status !== 'AVAILABLE' && (
                         <div className="border-border/70 bg-secondary/40 rounded-lg border px-4 py-3 text-sm">
-                            Veiculo indisponivel no momento para novas solicitacoes.
+                            Veículo indisponível no momento para novas solicitações.
                         </div>
                     )}
 

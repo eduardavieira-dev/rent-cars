@@ -101,7 +101,7 @@ export default function ReviewOrdersPage() {
 
             toast.success(approved ? 'Pedido aprovado com sucesso.' : 'Pedido recusado.');
         } catch {
-            toast.error('Erro ao processar decisao. Tente novamente.');
+            toast.error('Erro ao processar decisão. Tente novamente.');
         } finally {
             setDecidingId(null);
         }
@@ -121,7 +121,7 @@ export default function ReviewOrdersPage() {
                 <div>
                     <h1 className="text-2xl font-bold">Analisar pedidos</h1>
                     <p className="text-muted-foreground">
-                        Avalie solicitacoes e decida pela aprovacao.
+                        Avalie solicitações e decida pela aprovação.
                     </p>
                 </div>
                 <div className="text-muted-foreground flex items-center gap-2 py-8 text-sm">
@@ -137,7 +137,7 @@ export default function ReviewOrdersPage() {
             <div>
                 <h1 className="text-2xl font-bold">Analisar pedidos</h1>
                 <p className="text-muted-foreground">
-                    Avalie solicitacoes e decida pela aprovacao.
+                    Avalie solicitações e decida pela aprovação.
                 </p>
             </div>
 

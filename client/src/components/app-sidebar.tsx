@@ -39,7 +39,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
     }
 
     if (isClient || isAgent) {
-        roleItems.push({ href: '/veiculos', label: 'Veiculos', icon: Car });
+        roleItems.push({ href: '/veiculos', label: 'Veículos', icon: Car });
     }
 
     if (isAgent) {

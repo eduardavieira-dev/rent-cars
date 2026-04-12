@@ -49,7 +49,7 @@ export function RentalRequestModal({
 
                 setBanks(bankList);
             } catch {
-                toast.error('Erro ao carregar bancos disponiveis.');
+                toast.error('Erro ao carregar bancos disponíveis.');
             } finally {
                 setIsLoadingBanks(false);
             }
@@ -74,7 +74,7 @@ export function RentalRequestModal({
                 bankId: selectedBankId,
             });
 
-            toast.success('Solicitacao de aluguel enviada com sucesso!');
+            toast.success('Solicitação de aluguel enviada com sucesso!');
             onSuccess();
         } catch (error: unknown) {
             const status =
@@ -83,11 +83,11 @@ export function RentalRequestModal({
                     : undefined;
 
             if (status === 409) {
-                toast.error('Ja existe uma solicitacao pendente para este veiculo.');
+                toast.error('Já existe uma solicitação pendente para este veículo.');
             } else if (status === 400) {
-                toast.error('Veiculo indisponivel para locacao.');
+                toast.error('Veículo indisponível para locação.');
             } else {
-                toast.error('Erro ao enviar solicitacao. Tente novamente.');
+                toast.error('Erro ao enviar solicitação. Tente novamente.');
             }
         } finally {
             setIsSubmitting(false);
@@ -110,7 +110,7 @@ export function RentalRequestModal({
                 </div>
 
                 <p className="text-muted-foreground mt-2 text-sm">
-                    Voce esta solicitando o aluguel do veiculo{' '}
+                    Você está solicitando o aluguel do veículo{' '}
                     <span className="text-foreground font-medium">{vehicleLabel}</span>.
                 </p>
 
@@ -127,7 +127,7 @@ export function RentalRequestModal({
                             </div>
                         ) : banks.length === 0 ? (
                             <div className="border-border/70 bg-secondary/40 rounded-lg border px-4 py-3 text-sm">
-                                Nenhum banco disponivel no momento.
+                                Nenhum banco disponível no momento.
                             </div>
                         ) : (
                             <select
@@ -149,7 +149,7 @@ export function RentalRequestModal({
                     <div className="border-border/70 bg-secondary/40 space-y-1 rounded-lg border px-4 py-3">
                         <p className="text-xs font-medium">Como funciona?</p>
                         <p className="text-muted-foreground text-xs">
-                            Sua solicitacao sera enviada para a empresa proprietaria do veiculo e
+                            Sua solicitação será enviada para a empresa proprietária do veículo e
                             para o banco selecionado. Ambos precisam aprovar para que o aluguel seja
                             efetivado.
                         </p>
@@ -169,7 +169,7 @@ export function RentalRequestModal({
                             className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold inline-flex cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {isSubmitting && <Loader2 size={16} className="animate-spin" />}
-                            {isSubmitting ? 'Enviando...' : 'Confirmar solicitacao'}
+                            {isSubmitting ? 'Enviando...' : 'Confirmar solicitação'}
                         </button>
                     </div>
                 </form>

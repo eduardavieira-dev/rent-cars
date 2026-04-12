@@ -32,7 +32,7 @@ function overallLabel(request: RentalRequestResponse): string {
     if (request.companyApproval === 'APPROVED' && request.bankApproval === 'APPROVED') {
         return 'Aprovado';
     }
-    return 'Em analise';
+    return 'Em análise';
 }
 
 function overallBadgeClass(request: RentalRequestResponse): string {
@@ -85,7 +85,7 @@ export default function MyOrdersPage() {
                 <div>
                     <h1 className="text-2xl font-bold">Meus pedidos</h1>
                     <p className="text-muted-foreground">
-                        Acompanhe o andamento das suas solicitacoes de locacao.
+                        Acompanhe o andamento das suas solicitações de locação.
                     </p>
                 </div>
                 <div className="text-muted-foreground flex items-center gap-2 py-8 text-sm">
@@ -101,7 +101,7 @@ export default function MyOrdersPage() {
             <div>
                 <h1 className="text-2xl font-bold">Meus pedidos</h1>
                 <p className="text-muted-foreground">
-                    Acompanhe o andamento das suas solicitacoes de locacao.
+                    Acompanhe o andamento das suas solicitações de locação.
                 </p>
             </div>
 
@@ -139,7 +139,7 @@ export default function MyOrdersPage() {
                                 href={`/veiculos/${request.vehicleId}`}
                                 className="text-primary mt-3 inline-flex text-xs font-semibold"
                             >
-                                Ver detalhes do veiculo
+                                Ver detalhes do veículo
                             </Link>
                         </div>
                     </div>
@@ -148,7 +148,7 @@ export default function MyOrdersPage() {
 
             {requests.length === 0 && (
                 <div className="border-border/70 bg-secondary/40 rounded-2xl border p-6 text-center text-sm">
-                    Nenhuma solicitacao criada ainda.
+                    Nenhuma solicitação criada ainda.
                 </div>
             )}
         </section>

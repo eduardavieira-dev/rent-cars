@@ -41,11 +41,11 @@ export default function ContractsPage() {
                             <p className="text-muted-foreground text-sm">
                                 {contract.clientEmail} •{' '}
                                 {contract.monthlyPrice
-                                    ? `R$ ${contract.monthlyPrice}/mes`
+                                    ? `R$ ${contract.monthlyPrice}/mês`
                                     : 'Valor sob consulta'}
                             </p>
                             <p className="text-muted-foreground text-xs">
-                                Vigencia: {new Date(contract.startDate).toLocaleDateString()} -{' '}
+                                Vigência: {new Date(contract.startDate).toLocaleDateString()} -{' '}
                                 {new Date(contract.endDate).toLocaleDateString()}
                             </p>
                         </div>
