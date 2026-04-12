@@ -1,15 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft } from '@phosphor-icons/react';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 import { useAuth } from '@/hooks/useAuth';
-import { createRentalRequest, statusLabel } from '@/lib/vehicle-store';
+import { statusLabel } from '@/lib/vehicle-store';
 import { fetchVehicle } from '@/lib/vehicle-api';
 import api from '@/lib/axios';
 import type { Vehicle } from '@/types/vehicle';
+import { RentalRequestModal } from './_components/RentalRequestModal';
 
 interface UserRecord {
     id: string;
@@ -18,12 +19,14 @@ interface UserRecord {
 
 export default function VehicleDetailsPage() {
     const params = useParams();
+    const router = useRouter();
     const { user, hasRole } = useAuth();
     const vehicleId = Array.isArray(params.id) ? params.id[0] : params.id;
     const [vehicle, setVehicle] = useState<Vehicle | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [message, setMessage] = useState<string | null>(null);
     const [isCheckingIncome, setIsCheckingIncome] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isClient = hasRole('CLIENT');
 
@@ -105,12 +108,7 @@ export default function VehicleDetailsPage() {
                 return;
             }
 
-            const created = createRentalRequest(vehicle, user.sub);
-            if (!created) {
-                setMessage('Ja existe uma solicitacao em analise para este veiculo.');
-                return;
-            }
-            setMessage('Solicitacao enviada! Acompanhe em Meus pedidos.');
+            setIsModalOpen(true);
         } catch {
             setMessage('Erro ao verificar rendimentos. Tente novamente.');
         } finally {
@@ -125,7 +123,7 @@ export default function VehicleDetailsPage() {
                     href="/veiculos"
                     className="text-primary inline-flex items-center gap-2 text-sm font-semibold"
                 >
-                    <ArrowLeft size={18} weight="bold" />
+                    <ArrowLeft size={18} strokeWidth={2.5} />
                     Voltar para veiculos
                 </Link>
                 <span className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold">
@@ -218,6 +216,18 @@ export default function VehicleDetailsPage() {
                     )}
                 </div>
             </div>
+
+            {isModalOpen && vehicleId && (
+                <RentalRequestModal
+                    vehicleId={vehicleId}
+                    vehicleLabel={`${vehicle.brand} ${vehicle.model}`}
+                    onClose={() => setIsModalOpen(false)}
+                    onSuccess={() => {
+                        setIsModalOpen(false);
+                        router.push('/meus-pedidos');
+                    }}
+                />
+            )}
         </section>
     );
 }

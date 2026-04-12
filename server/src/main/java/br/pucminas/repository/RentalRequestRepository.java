@@ -13,4 +13,8 @@ public interface RentalRequestRepository extends CrudRepository<RentalRequest, U
     List<RentalRequest> findByVehicleId(UUID vehicleId);
 
     List<RentalRequest> findByClientId(UUID clientId);
+
+    List<RentalRequest> findByBankId(UUID bankId);
+
+    List<RentalRequest> findByVehicleCompanyId(UUID companyId);
 }

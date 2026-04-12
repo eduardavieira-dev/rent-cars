@@ -8,12 +8,17 @@ import java.util.UUID;
 @Serdeable
 @Introspected
 public record RentalRequestResponse(
-        UUID id,
-        UUID vehicleId,
-        String vehiclePlate,
-        String vehicleModel,
-        UUID clientId,
-        String clientName,
-        String companyApproval,
-        String bankApproval) {
+                UUID id,
+                UUID vehicleId,
+                String vehiclePlate,
+                String vehicleModel,
+                String vehicleBrand,
+                UUID clientId,
+                String clientName,
+                UUID bankId,
+                String bankName,
+                UUID companyId,
+                String companyName,
+                String companyApproval,
+                String bankApproval) {
 }

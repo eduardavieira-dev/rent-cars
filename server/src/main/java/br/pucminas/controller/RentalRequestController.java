@@ -1,5 +1,6 @@
 package br.pucminas.controller;
 
+import br.pucminas.dto.request.CreateRentalRequest;
 import br.pucminas.dto.request.RentalApprovalRequest;
 import br.pucminas.dto.response.RentalRequestResponse;
 import br.pucminas.service.RentalRequestService;
@@ -26,11 +27,14 @@ public class RentalRequestController {
         this.rentalRequestService = rentalRequestService;
     }
 
-    @Post("/{vehicleId}")
+    @Post
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Secured({ "CLIENT" })
-    public HttpResponse<RentalRequestResponse> requestRental(UUID vehicleId, Principal principal) {
-        return HttpResponse.created(rentalRequestService.requestRental(vehicleId, principal.getName()));
+    public HttpResponse<RentalRequestResponse> requestRental(@Valid @Body CreateRentalRequest request,
+            Principal principal) {
+        return HttpResponse.created(
+                rentalRequestService.requestRental(request.vehicleId(), request.bankId(), principal.getName()));
     }
 
     @Put("/company-approval")
@@ -72,5 +76,19 @@ public class RentalRequestController {
     @Produces(MediaType.APPLICATION_JSON)
     public List<RentalRequestResponse> listByClient(UUID clientId) {
         return rentalRequestService.listByClient(clientId);
+    }
+
+    @Get("/bank/{bankId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Secured({ "BANK" })
+    public List<RentalRequestResponse> listByBank(UUID bankId) {
+        return rentalRequestService.listByBank(bankId);
+    }
+
+    @Get("/company/{companyId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Secured({ "COMPANY" })
+    public List<RentalRequestResponse> listByCompany(UUID companyId) {
+        return rentalRequestService.listByCompany(companyId);
     }
 }

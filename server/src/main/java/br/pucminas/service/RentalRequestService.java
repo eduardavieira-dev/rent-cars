@@ -33,7 +33,7 @@ public class RentalRequestService {
     }
 
     @Transactional
-    public RentalRequestResponse requestRental(UUID vehicleId, String clientEmail) {
+    public RentalRequestResponse requestRental(UUID vehicleId, UUID bankId, String clientEmail) {
         Client client = resolveClient(clientEmail);
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
@@ -43,10 +43,16 @@ public class RentalRequestService {
             throw new VehicleNotAvailableException(vehicleId);
         }
 
+        User bankUser = userRepository.findById(bankId)
+                .orElseThrow(() -> new IllegalArgumentException("Bank not found"));
+        if (!(bankUser instanceof Bank bank)) {
+            throw new IllegalArgumentException("Selected user is not a Bank");
+        }
+
         vehicle.setStatus(VehicleStatus.UNDER_REVIEW);
         vehicleRepository.update(vehicle);
 
-        RentalRequest rentalRequest = new RentalRequest(vehicle, client);
+        RentalRequest rentalRequest = new RentalRequest(vehicle, client, bank);
         return toResponse(rentalRequestRepository.save(rentalRequest));
     }
 
@@ -81,12 +87,16 @@ public class RentalRequestService {
     public RentalRequestResponse approveByBank(UUID rentalRequestId, boolean approved, String bankEmail) {
         User user = userRepository.findByEmail(bankEmail)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        if (!(user instanceof Bank)) {
+        if (!(user instanceof Bank bank)) {
             throw new IllegalArgumentException("User is not a Bank");
         }
 
         RentalRequest rentalRequest = rentalRequestRepository.findById(rentalRequestId)
                 .orElseThrow(() -> new RentalRequestNotFoundException(rentalRequestId));
+
+        if (!rentalRequest.getBank().getId().equals(bank.getId())) {
+            throw new IllegalArgumentException("Rental request does not belong to this bank");
+        }
 
         if (!approved) {
             rentalRequest.setBankApproval(ApprovalStatus.REJECTED);
@@ -124,6 +134,18 @@ public class RentalRequestService {
                 .collect(Collectors.toList());
     }
 
+    public List<RentalRequestResponse> listByBank(UUID bankId) {
+        return rentalRequestRepository.findByBankId(bankId).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<RentalRequestResponse> listByCompany(UUID companyId) {
+        return rentalRequestRepository.findByVehicleCompanyId(companyId).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
     private void checkFullApproval(RentalRequest rentalRequest) {
         if (rentalRequest.getCompanyApproval() == ApprovalStatus.APPROVED
                 && rentalRequest.getBankApproval() == ApprovalStatus.APPROVED) {
@@ -142,13 +164,19 @@ public class RentalRequestService {
     }
 
     private RentalRequestResponse toResponse(RentalRequest rentalRequest) {
+        Company company = rentalRequest.getVehicle().getCompany();
         return new RentalRequestResponse(
                 rentalRequest.getId(),
                 rentalRequest.getVehicle().getId(),
                 rentalRequest.getVehicle().getPlate(),
                 rentalRequest.getVehicle().getModel(),
+                rentalRequest.getVehicle().getBrand(),
                 rentalRequest.getClient().getId(),
                 rentalRequest.getClient().getName(),
+                rentalRequest.getBank().getId(),
+                rentalRequest.getBank().getName(),
+                company.getId(),
+                company.getCorporateName(),
                 rentalRequest.getCompanyApproval().name(),
                 rentalRequest.getBankApproval().name());
     }

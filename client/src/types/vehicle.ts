@@ -1,4 +1,4 @@
-export type VehicleStatus = 'AVAILABLE' | 'IN_REVIEW' | 'RENTED';
+export type VehicleStatus = 'AVAILABLE' | 'UNDER_REVIEW' | 'APPROVED' | 'UNAVAILABLE';
 
 export interface Vehicle {
     id: string;
@@ -11,20 +11,22 @@ export interface Vehicle {
     status: VehicleStatus;
 }
 
-export type DecisionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-export type RentalRequestStatus = 'IN_REVIEW' | 'APPROVED' | 'REJECTED';
+export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
-export interface RentalRequest {
+export interface RentalRequestResponse {
     id: string;
     vehicleId: string;
-    vehicleLabel: string;
-    clientEmail: string;
-    createdAt: string;
-    status: RentalRequestStatus;
-    bankDecision: DecisionStatus;
-    companyDecision: DecisionStatus;
-    monthlyPrice: number;
-    durationMonths: number;
+    vehiclePlate: string;
+    vehicleModel: string;
+    vehicleBrand: string;
+    clientId: string;
+    clientName: string;
+    bankId: string;
+    bankName: string;
+    companyId: string;
+    companyName: string;
+    companyApproval: ApprovalStatus;
+    bankApproval: ApprovalStatus;
 }
 
 export interface Contract {

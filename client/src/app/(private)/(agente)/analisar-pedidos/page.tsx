@@ -1,99 +1,209 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import { useAuth } from '@/hooks/useAuth';
-import { decideRequest, getRequests } from '@/lib/vehicle-store';
-import type { RentalRequest } from '@/types/vehicle';
+import api from '@/lib/axios';
+import type { ApprovalStatus, RentalRequestResponse } from '@/types/vehicle';
 
-function requestStatusLabel(status: RentalRequest['status']): string {
+interface UserRecord {
+    id: string;
+    email: string;
+}
+
+function approvalLabel(status: ApprovalStatus): string {
     switch (status) {
-        case 'IN_REVIEW':
-            return 'Em analise';
         case 'APPROVED':
             return 'Aprovado';
         case 'REJECTED':
             return 'Recusado';
+        case 'PENDING':
         default:
-            return status;
+            return 'Pendente';
     }
 }
 
+function approvalBadgeClass(status: ApprovalStatus): string {
+    if (status === 'APPROVED') return 'bg-emerald-500/15 text-emerald-400';
+    if (status === 'REJECTED') return 'bg-red-500/15 text-red-400';
+    return 'bg-secondary text-secondary-foreground';
+}
+
 export default function ReviewOrdersPage() {
-    const { hasRole } = useAuth();
+    const { user, hasRole } = useAuth();
     const isBank = hasRole('BANK');
     const isCompany = hasRole('COMPANY');
-    const [requests, setRequests] = useState<RentalRequest[]>([]);
+    const [requests, setRequests] = useState<RentalRequestResponse[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [decidingId, setDecidingId] = useState<string | null>(null);
 
     useEffect(() => {
-        setRequests(getRequests());
-    }, []);
+        async function loadRequests(): Promise<void> {
+            if (!user?.sub) return;
 
-    function refresh(): void {
-        setRequests(getRequests());
+            try {
+                const usersRes = await api.get('/users');
+                const users: UserRecord[] = Array.isArray(usersRes.data)
+                    ? usersRes.data
+                    : (usersRes.data?.items ?? usersRes.data?.content ?? []);
+
+                const currentUser = users.find(
+                    (candidate) => candidate.email?.toLowerCase() === user.sub.toLowerCase()
+                );
+
+                if (!currentUser) return;
+
+                let endpoint = '';
+                if (isCompany) {
+                    endpoint = `/rental-requests/company/${currentUser.id}`;
+                } else if (isBank) {
+                    endpoint = `/rental-requests/bank/${currentUser.id}`;
+                }
+
+                if (!endpoint) return;
+
+                const requestsRes = await api.get(endpoint);
+                const data: RentalRequestResponse[] = Array.isArray(requestsRes.data)
+                    ? requestsRes.data
+                    : (requestsRes.data?.items ?? requestsRes.data?.content ?? []);
+
+                setRequests(data);
+            } catch {
+                setRequests([]);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        loadRequests();
+    }, [user, isBank, isCompany]);
+
+    async function handleDecision(requestId: string, approved: boolean): Promise<void> {
+        setDecidingId(requestId);
+
+        const endpoint = isCompany
+            ? '/rental-requests/company-approval'
+            : '/rental-requests/bank-approval';
+
+        try {
+            const response = await api.put(endpoint, {
+                rentalRequestId: requestId,
+                approved,
+            });
+
+            setRequests((previous) =>
+                previous.map((request) =>
+                    request.id === requestId ? (response.data as RentalRequestResponse) : request
+                )
+            );
+
+            toast.success(approved ? 'Pedido aprovado com sucesso.' : 'Pedido recusado.');
+        } catch {
+            toast.error('Erro ao processar decisao. Tente novamente.');
+        } finally {
+            setDecidingId(null);
+        }
     }
 
-    function handleDecision(requestId: string, decision: 'APPROVED' | 'REJECTED'): void {
-        const actor = isCompany ? 'COMPANY' : 'BANK';
-        decideRequest(requestId, actor, decision);
-        refresh();
+    function myApprovalStatus(request: RentalRequestResponse): ApprovalStatus {
+        return isCompany ? request.companyApproval : request.bankApproval;
     }
 
-    const pendingRequests = useMemo(
-        () => requests.filter((request) => request.status === 'IN_REVIEW'),
-        [requests]
-    );
+    function canDecide(request: RentalRequestResponse): boolean {
+        return myApprovalStatus(request) === 'PENDING';
+    }
+
+    if (isLoading) {
+        return (
+            <section className="space-y-6">
+                <div>
+                    <h1 className="text-2xl font-bold">Analisar pedidos</h1>
+                    <p className="text-muted-foreground">
+                        Avalie solicitacoes e decida pela aprovacao.
+                    </p>
+                </div>
+                <div className="text-muted-foreground flex items-center gap-2 py-8 text-sm">
+                    <Loader2 size={16} className="animate-spin" />
+                    Carregando pedidos...
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold">Analisar pedidos</h1>
                 <p className="text-muted-foreground">
-                    Avalie solicitacoes pendentes e decida pela aprovacao.
+                    Avalie solicitacoes e decida pela aprovacao.
                 </p>
             </div>
 
             <div className="grid gap-4">
-                {pendingRequests.map((request) => (
+                {requests.map((request) => (
                     <div
                         key={request.id}
                         className="border-border bg-card flex flex-wrap items-center justify-between gap-4 rounded-2xl border p-4"
                     >
-                        <div>
-                            <p className="font-semibold">{request.vehicleLabel}</p>
+                        <div className="space-y-1">
+                            <p className="font-semibold">
+                                {request.vehicleBrand} {request.vehicleModel}
+                            </p>
                             <p className="text-muted-foreground text-sm">
-                                {request.clientEmail} • {request.durationMonths} meses
+                                Placa: {request.vehiclePlate} • Cliente: {request.clientName}
                             </p>
-                            <p className="text-muted-foreground text-xs">
-                                Banco: {request.bankDecision} • Empresa: {request.companyDecision}
-                            </p>
+                            {isCompany && (
+                                <p className="text-muted-foreground text-xs">
+                                    Banco: {request.bankName} •{' '}
+                                    {approvalLabel(request.bankApproval)}
+                                </p>
+                            )}
+                            {isBank && (
+                                <p className="text-muted-foreground text-xs">
+                                    Empresa: {request.companyName} •{' '}
+                                    {approvalLabel(request.companyApproval)}
+                                </p>
+                            )}
                         </div>
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-xs font-semibold">
-                                {requestStatusLabel(request.status)}
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => handleDecision(request.id, 'APPROVED')}
-                                className="bg-success/20 text-success hover:bg-success/30 cursor-pointer rounded-full px-3 py-1 text-xs font-semibold"
-                            >
-                                Aprovar
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => handleDecision(request.id, 'REJECTED')}
-                                className="bg-destructive/15 text-destructive hover:bg-destructive/25 cursor-pointer rounded-full px-3 py-1 text-xs font-semibold"
-                            >
-                                Recusar
-                            </button>
+                            {canDecide(request) ? (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDecision(request.id, true)}
+                                        disabled={decidingId === request.id}
+                                        className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/25 disabled:opacity-60"
+                                    >
+                                        <CheckCircle size={14} />
+                                        Aprovar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => handleDecision(request.id, false)}
+                                        disabled={decidingId === request.id}
+                                        className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-red-500/15 px-3 py-1 text-xs font-semibold text-red-400 transition-colors hover:bg-red-500/25 disabled:opacity-60"
+                                    >
+                                        <XCircle size={14} />
+                                        Recusar
+                                    </button>
+                                </>
+                            ) : (
+                                <span
+                                    className={`rounded-full px-3 py-1 text-xs font-semibold ${approvalBadgeClass(myApprovalStatus(request))}`}
+                                >
+                                    {approvalLabel(myApprovalStatus(request))}
+                                </span>
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
 
-            {pendingRequests.length === 0 && (
+            {requests.length === 0 && (
                 <div className="border-border/70 bg-secondary/40 rounded-2xl border p-6 text-center text-sm">
-                    Nenhum pedido pendente no momento.
+                    Nenhum pedido encontrado.
                 </div>
             )}
         </section>

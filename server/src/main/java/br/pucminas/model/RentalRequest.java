@@ -24,6 +24,10 @@ public class RentalRequest {
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "bank_id", nullable = false)
+    private Bank bank;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "company_approval", nullable = false)
     private ApprovalStatus companyApproval;
@@ -35,9 +39,10 @@ public class RentalRequest {
     protected RentalRequest() {
     }
 
-    public RentalRequest(Vehicle vehicle, Client client) {
+    public RentalRequest(Vehicle vehicle, Client client, Bank bank) {
         this.vehicle = vehicle;
         this.client = client;
+        this.bank = bank;
         this.companyApproval = ApprovalStatus.PENDING;
         this.bankApproval = ApprovalStatus.PENDING;
     }
@@ -60,6 +65,14 @@ public class RentalRequest {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    public Bank getBank() {
+        return bank;
+    }
+
+    public void setBank(Bank bank) {
+        this.bank = bank;
     }
 
     public ApprovalStatus getCompanyApproval() {
