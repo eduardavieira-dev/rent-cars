@@ -10,6 +10,7 @@ import {
     Eye,
     EyeOff,
     FileText,
+    Hash,
     Home,
     Lock,
     Mail,
@@ -63,6 +64,7 @@ const step1Schema = z.object({
 const step2Schema = z.object({
     cep: z.string().refine((v) => v.replace(/\D/g, '').length === 8, 'Informe um CEP válido.'),
     street: z.string().min(3, 'A rua deve ter no mínimo 3 caracteres.'),
+    number: z.string().min(1, 'Informe o número.'),
     complement: z.string(),
     neighborhood: z.string().min(3, 'O bairro deve ter no mínimo 3 caracteres.'),
     city: z.string().min(3, 'A cidade deve ter no mínimo 3 caracteres.'),
@@ -94,6 +96,7 @@ interface FormState {
     profession: string;
     cep: string;
     street: string;
+    number: string;
     complement: string;
     neighborhood: string;
     city: string;
@@ -112,6 +115,7 @@ const INITIAL_FORM: FormState = {
     profession: '',
     cep: '',
     street: '',
+    number: '',
     complement: '',
     neighborhood: '',
     city: '',
@@ -225,7 +229,7 @@ export default function ClientRegistrationPage() {
     async function handleSubmit() {
         setIsLoading(true);
 
-        const composedAddress = `${form.street} - ${form.complement}. Bairro ${form.neighborhood} - ${form.city}`;
+        const composedAddress = `${form.street}, ${form.number}${form.complement ? ` - ${form.complement}` : ''}. Bairro ${form.neighborhood} - ${form.city}`;
 
         try {
             await api.post('/auth/register/client', {
@@ -552,38 +556,38 @@ export default function ClientRegistrationPage() {
 
                                 {currentStep === 1 && (
                                     <>
-                                        <div>
-                                            <label htmlFor="cep" className={labelBase}>
-                                                CEP {requiredMark}
-                                            </label>
-                                            <div className="relative">
-                                                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                                    <MapPin size={15} />
-                                                </div>
-                                                <IMaskInput
-                                                    id="cep"
-                                                    name="cep"
-                                                    mask="00000-000"
-                                                    type="text"
-                                                    required
-                                                    inputMode="numeric"
-                                                    value={form.cep}
-                                                    onAccept={(value: string) =>
-                                                        handleTextChange('cep', value)
-                                                    }
-                                                    onBlur={handleCepBlur}
-                                                    placeholder="00000-000"
-                                                    className={`${inputWithIcon} ${isLoadingCep ? 'opacity-60' : ''}`}
-                                                />
-                                            </div>
-                                            {fieldErrors.cep && (
-                                                <p className="text-destructive mt-1 text-xs font-bold">
-                                                    {fieldErrors.cep}
-                                                </p>
-                                            )}
-                                        </div>
-
                                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label htmlFor="cep" className={labelBase}>
+                                                    CEP {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <MapPin size={15} />
+                                                    </div>
+                                                    <IMaskInput
+                                                        id="cep"
+                                                        name="cep"
+                                                        mask="00000-000"
+                                                        type="text"
+                                                        required
+                                                        inputMode="numeric"
+                                                        value={form.cep}
+                                                        onAccept={(value: string) =>
+                                                            handleTextChange('cep', value)
+                                                        }
+                                                        onBlur={handleCepBlur}
+                                                        placeholder="00000-000"
+                                                        className={`${inputWithIcon} ${isLoadingCep ? 'opacity-60' : ''}`}
+                                                    />
+                                                </div>
+                                                {fieldErrors.cep && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.cep}
+                                                    </p>
+                                                )}
+                                            </div>
+
                                             <div>
                                                 <label htmlFor="street" className={labelBase}>
                                                     Rua {requiredMark}
@@ -612,6 +616,40 @@ export default function ClientRegistrationPage() {
                                                 {fieldErrors.street && (
                                                     <p className="text-destructive mt-1 text-xs font-bold">
                                                         {fieldErrors.street}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                            <div>
+                                                <label htmlFor="number" className={labelBase}>
+                                                    Número {requiredMark}
+                                                </label>
+                                                <div className="relative">
+                                                    <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                        <Hash size={15} />
+                                                    </div>
+                                                    <input
+                                                        id="number"
+                                                        name="number"
+                                                        type="text"
+                                                        required
+                                                        maxLength={20}
+                                                        value={form.number}
+                                                        onChange={(e) =>
+                                                            handleTextChange(
+                                                                'number',
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        placeholder="123"
+                                                        className={inputWithIcon}
+                                                    />
+                                                </div>
+                                                {fieldErrors.number && (
+                                                    <p className="text-destructive mt-1 text-xs font-bold">
+                                                        {fieldErrors.number}
                                                     </p>
                                                 )}
                                             </div>
