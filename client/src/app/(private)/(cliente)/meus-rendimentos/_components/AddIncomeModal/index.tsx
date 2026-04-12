@@ -1,7 +1,7 @@
 'use client';
 
 import { isAxiosError } from 'axios';
-import { Banknote, Briefcase, Building2, Loader2, Plus, Search } from 'lucide-react';
+import { Banknote, Briefcase, Building2, Loader2, Plus, Search, X } from 'lucide-react';
 import { useMemo, useState, type RefObject } from 'react';
 import { IMaskInput, useIMask } from 'react-imask';
 import { toast } from 'sonner';
@@ -191,9 +191,10 @@ export function AddIncomeModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-muted-foreground cursor-pointer text-sm"
+                        className="text-muted-foreground hover:bg-secondary inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition-colors"
+                        aria-label="Fechar"
                     >
-                        Fechar
+                        <X size={18} />
                     </button>
                 </div>
 

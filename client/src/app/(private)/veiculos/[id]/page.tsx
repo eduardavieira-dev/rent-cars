@@ -160,19 +160,6 @@ export default function VehicleDetailsPage() {
                             <p className="text-lg font-semibold">{statusLabel(vehicle.status)}</p>
                         </div>
                     </div>
-
-                    <div className="flex flex-wrap items-center gap-3">
-                        {vehicle.dailyRate != null && (
-                            <span className="bg-secondary text-secondary-foreground rounded-full px-4 py-2 text-xs font-semibold">
-                                R${' '}
-                                {vehicle.dailyRate.toLocaleString('pt-BR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })}
-                                /dia
-                            </span>
-                        )}
-                    </div>
                 </div>
 
                 <div className="space-y-6">

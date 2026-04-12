@@ -62,7 +62,7 @@ function mapCarToVehicle(car: CarResponse): Vehicle {
         plate: car.plate,
         status: car.status,
         imageUrl: car.imageUrl ?? '/cars/car-1.png',
-        description: car.description ?? null,
+        description: car.description?.trim() || null,
         dailyRate: car.dailyRate ?? null,
     };
 }

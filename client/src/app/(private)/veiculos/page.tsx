@@ -38,7 +38,7 @@ type FormFieldErrors = Partial<
 
 const emptyForm: Omit<Vehicle, 'id' | 'imageUrl' | 'status' | 'dailyRate'> = {
     registration: '',
-    year: new Date().getFullYear(),
+    year: 0,
     brand: '',
     model: '',
     plate: '',
@@ -58,19 +58,15 @@ export default function VehiclesPage() {
     const [formOpen, setFormOpen] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState(emptyForm);
-    const [yearInput, setYearInput] = useState(String(emptyForm.year));
-    const [statusInput, setStatusInput] = useState<VehicleStatus>('AVAILABLE');
+    const [yearInput, setYearInput] = useState('');
+
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<FormFieldErrors>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const {
-        ref: dailyRateIMaskRef,
-        value: dailyRateDisplay,
-        setValue: setDailyRateDisplay,
-    } = useIMask({
+    const { ref: dailyRateIMaskRef, maskRef: dailyRateMaskRef } = useIMask({
         mask: Number,
         scale: 2,
         signed: false,
@@ -81,6 +77,14 @@ export default function VehiclesPage() {
         mapToRadix: ['.'],
     });
     const dailyRateRef = dailyRateIMaskRef as unknown as RefObject<HTMLInputElement>;
+    const pendingDailyRate = useRef<string>('');
+
+    useEffect(() => {
+        if (!formOpen) return;
+        const mask = dailyRateMaskRef.current;
+        if (!mask) return;
+        mask.value = pendingDailyRate.current;
+    }, [formOpen]);
 
     useEffect(() => {
         let isActive = true;
@@ -116,12 +120,11 @@ export default function VehiclesPage() {
     function handleOpenCreate(): void {
         setEditingId(null);
         setForm({ ...emptyForm });
-        setYearInput(String(emptyForm.year));
-        setStatusInput('AVAILABLE');
+        setYearInput('');
         setImageFile(null);
         setImagePreview(null);
         setExistingImageUrl(null);
-        setDailyRateDisplay('');
+        pendingDailyRate.current = '';
         setFieldErrors({});
         setFormOpen(true);
     }
@@ -137,13 +140,11 @@ export default function VehiclesPage() {
             description: vehicle.description ?? null,
         });
         setYearInput(String(vehicle.year));
-        setStatusInput(vehicle.status);
         setImageFile(null);
         setImagePreview(null);
         setExistingImageUrl(vehicle.imageUrl || null);
-        setDailyRateDisplay(
-            vehicle.dailyRate != null ? formatBRLForDisplay(vehicle.dailyRate) : ''
-        );
+        pendingDailyRate.current =
+            vehicle.dailyRate != null ? formatBRLForDisplay(vehicle.dailyRate) : '';
         setFieldErrors({});
         setFormOpen(true);
     }
@@ -173,7 +174,12 @@ export default function VehiclesPage() {
         if (!form.registration.trim()) errors.registration = 'Informe o registro do veículo.';
 
         const year = Number(yearInput);
-        if (!yearInput || !year || Number.isNaN(year)) errors.year = 'Informe um ano válido.';
+        const currentYear = new Date().getFullYear();
+        if (!yearInput || !year || Number.isNaN(year)) {
+            errors.year = 'Informe um ano válido.';
+        } else if (year > currentYear) {
+            errors.year = `O ano não pode ser superior a ${currentYear}.`;
+        }
 
         if (!form.brand.trim()) errors.brand = 'Informe a marca do veículo.';
         if (!form.model.trim()) errors.model = 'Informe o modelo do veículo.';
@@ -363,9 +369,10 @@ export default function VehiclesPage() {
                             <button
                                 type="button"
                                 onClick={() => setFormOpen(false)}
-                                className="text-muted-foreground cursor-pointer text-sm"
+                                className="text-muted-foreground hover:bg-secondary inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition-colors"
+                                aria-label="Fechar"
                             >
-                                Fechar
+                                <X size={18} />
                             </button>
                         </div>
 
@@ -596,22 +603,7 @@ export default function VehiclesPage() {
                                     className="hidden"
                                 />
                             </div>
-                            {editingId && (
-                                <label className="grid gap-2 text-sm">
-                                    Status
-                                    <select
-                                        value={statusInput}
-                                        onChange={(event) =>
-                                            setStatusInput(event.target.value as VehicleStatus)
-                                        }
-                                        className="bg-secondary border-border rounded-lg border px-3 py-2"
-                                    >
-                                        <option value="AVAILABLE">Disponível</option>
-                                        <option value="IN_REVIEW">Em análise</option>
-                                        <option value="RENTED">Alugado</option>
-                                    </select>
-                                </label>
-                            )}
+
                             <div className="flex items-end justify-end gap-2 sm:col-span-2">
                                 <button
                                     type="button"
