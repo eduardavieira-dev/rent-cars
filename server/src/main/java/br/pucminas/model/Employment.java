@@ -29,6 +29,9 @@ public class Employment {
     @JoinColumn(name = "employer_entity_id", nullable = false)
     private EmployerEntity employerEntity;
 
+    protected Employment() {
+    }
+
     public Employment(Double earnedIncome, String jobTitle, Client client, EmployerEntity employerEntity) {
         this.earnedIncome = earnedIncome;
         this.jobTitle = jobTitle;

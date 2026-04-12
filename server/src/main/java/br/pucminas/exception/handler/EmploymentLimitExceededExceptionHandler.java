@@ -19,6 +19,6 @@ public class EmploymentLimitExceededExceptionHandler
     @Override
     @SuppressWarnings("rawtypes")
     public HttpResponse<ErrorResponse> handle(HttpRequest request, EmploymentLimitExceededException exception) {
-        return HttpResponse.status(HttpStatus.CONFLICT).body(new ErrorResponse(exception.getMessage()));
+        return HttpResponse.status(HttpStatus.UNPROCESSABLE_ENTITY).body(new ErrorResponse(exception.getMessage()));
     }
 }

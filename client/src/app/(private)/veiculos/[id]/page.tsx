@@ -8,7 +8,13 @@ import { useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { createRentalRequest, statusLabel } from '@/lib/vehicle-store';
 import { fetchVehicle } from '@/lib/vehicle-api';
+import api from '@/lib/axios';
 import type { Vehicle } from '@/types/vehicle';
+
+interface UserRecord {
+    id: string;
+    email: string;
+}
 
 export default function VehicleDetailsPage() {
     const params = useParams();
@@ -17,6 +23,7 @@ export default function VehicleDetailsPage() {
     const [vehicle, setVehicle] = useState<Vehicle | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [message, setMessage] = useState<string | null>(null);
+    const [isCheckingIncome, setIsCheckingIncome] = useState(false);
 
     const isClient = hasRole('CLIENT');
 
@@ -61,18 +68,54 @@ export default function VehicleDetailsPage() {
         );
     }
 
-    function handleRequest(): void {
+    async function handleRequest(): Promise<void> {
         if (!vehicle) return;
         if (!user?.sub) {
             setMessage('Voce precisa estar logado para solicitar um veiculo.');
             return;
         }
-        const created = createRentalRequest(vehicle, user.sub);
-        if (!created) {
-            setMessage('Ja existe uma solicitacao em analise para este veiculo.');
-            return;
+
+        setIsCheckingIncome(true);
+        setMessage(null);
+
+        try {
+            const usersRes = await api.get('/users');
+            const users: UserRecord[] = Array.isArray(usersRes.data)
+                ? usersRes.data
+                : (usersRes.data?.items ?? usersRes.data?.content ?? []);
+
+            const currentUser = users.find(
+                (candidate) => candidate.email?.toLowerCase() === user.sub.toLowerCase()
+            );
+
+            if (!currentUser) {
+                setMessage('Nao foi possivel identificar seu usuario.');
+                return;
+            }
+
+            const incomesRes = await api.get(`/employments/client/${currentUser.id}`);
+            const incomes = Array.isArray(incomesRes.data)
+                ? incomesRes.data
+                : (incomesRes.data?.items ?? incomesRes.data?.content ?? []);
+
+            if (incomes.length === 0) {
+                setMessage(
+                    'Voce precisa cadastrar pelo menos um rendimento antes de solicitar um aluguel. Acesse "Meus rendimentos" no menu lateral.'
+                );
+                return;
+            }
+
+            const created = createRentalRequest(vehicle, user.sub);
+            if (!created) {
+                setMessage('Ja existe uma solicitacao em analise para este veiculo.');
+                return;
+            }
+            setMessage('Solicitacao enviada! Acompanhe em Meus pedidos.');
+        } catch {
+            setMessage('Erro ao verificar rendimentos. Tente novamente.');
+        } finally {
+            setIsCheckingIncome(false);
         }
-        setMessage('Solicitacao enviada! Acompanhe em Meus pedidos.');
     }
 
     return (
@@ -147,9 +190,10 @@ export default function VehicleDetailsPage() {
                         <button
                             type="button"
                             onClick={handleRequest}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold w-full cursor-pointer rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                            disabled={isCheckingIncome}
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold w-full cursor-pointer rounded-lg px-4 py-3 text-sm font-semibold transition-colors disabled:opacity-60"
                         >
-                            Solicitar aluguel
+                            {isCheckingIncome ? 'Verificando...' : 'Solicitar aluguel'}
                         </button>
                     )}
 
@@ -162,6 +206,14 @@ export default function VehicleDetailsPage() {
                     {message && (
                         <div className="border-border/70 bg-secondary/40 rounded-lg border px-4 py-3 text-sm">
                             {message}
+                            {message.includes('rendimento') && (
+                                <Link
+                                    href="/meus-rendimentos"
+                                    className="text-primary mt-2 block text-sm font-semibold"
+                                >
+                                    Ir para Meus rendimentos
+                                </Link>
+                            )}
                         </div>
                     )}
                 </div>

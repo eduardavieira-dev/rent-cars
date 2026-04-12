@@ -29,6 +29,7 @@ public class EmploymentController {
     @Post
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured({ "CLIENT" })
     public HttpResponse<EmploymentResponse> create(@Valid @Body CreateEmploymentRequest request) {
         return HttpResponse.created(service.create(request));
     }

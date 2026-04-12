@@ -1,6 +1,6 @@
 'use client';
 
-import { Car, ClipboardList, FileText, LayoutGrid, LogOut, User, X } from 'lucide-react';
+import { Banknote, Car, ClipboardList, FileText, LayoutGrid, LogOut, User, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -35,6 +35,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
 
     if (isClient) {
         roleItems.push({ href: '/meus-pedidos', label: 'Meus pedidos', icon: ClipboardList });
+        roleItems.push({ href: '/meus-rendimentos', label: 'Meus rendimentos', icon: Banknote });
     }
 
     if (isClient || isAgent) {

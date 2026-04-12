@@ -29,6 +29,7 @@ public class EmployerEntityController {
     @Post
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Secured({ "CLIENT" })
     public HttpResponse<EmployerEntityResponse> create(@Valid @Body CreateEmployerEntityRequest request) {
         return HttpResponse.created(service.create(request));
     }

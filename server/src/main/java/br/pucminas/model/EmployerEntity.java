@@ -18,8 +18,11 @@ public class EmployerEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String cnpj;
+
+    public EmployerEntity() {
+    }
 
     public EmployerEntity(String name, String cnpj) {
         this.name = name;

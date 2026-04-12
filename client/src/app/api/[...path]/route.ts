@@ -17,7 +17,6 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
     headers.delete('host');
     headers.delete('content-length');
 
-    // Public vehicle reads should work even with stale/invalid client token.
     if (isPublicVehicleReadRoute(request.method, pathSegments)) {
         headers.delete('authorization');
     } else if (!headers.has('authorization')) {
@@ -30,12 +29,23 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
     const hasBody = !['GET', 'HEAD'].includes(request.method);
     const body = hasBody ? await request.arrayBuffer() : undefined;
 
-    const upstreamResponse = await fetch(targetUrl, {
-        method: request.method,
-        headers,
-        body,
-        redirect: 'manual',
-    });
+    let upstreamResponse: Response;
+    try {
+        upstreamResponse = await fetch(targetUrl, {
+            method: request.method,
+            headers,
+            body,
+            redirect: 'manual',
+        });
+    } catch {
+        return new Response(
+            JSON.stringify({ message: 'Serviço indisponível. Tente novamente mais tarde.' }),
+            {
+                status: 503,
+                headers: { 'content-type': 'application/json' },
+            }
+        );
+    }
 
     const responseHeaders = new Headers(upstreamResponse.headers);
     responseHeaders.delete('transfer-encoding');
