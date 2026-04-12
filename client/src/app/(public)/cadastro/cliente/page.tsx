@@ -536,7 +536,7 @@ export default function ClientRegistrationPage() {
                                                                 e.target.value
                                                             )
                                                         }
-                                                        placeholder="Engenheira de Software"
+                                                        placeholder="Engenheiro de Software"
                                                         className={inputWithIcon}
                                                     />
                                                 </div>

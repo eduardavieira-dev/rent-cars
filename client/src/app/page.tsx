@@ -120,7 +120,7 @@ export default function Home() {
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen((prev) => !prev)}
-                            className="text-secondary-foreground hover:text-foreground inline-flex items-center justify-center rounded-lg p-2 transition-colors md:hidden"
+                            className="text-secondary-foreground hover:text-foreground inline-flex cursor-pointer items-center justify-center rounded-lg p-2 transition-colors md:hidden"
                             aria-label={isMenuOpen ? 'Fechar menu' : 'Abrir menu'}
                             aria-expanded={isMenuOpen}
                         >
@@ -150,7 +150,7 @@ export default function Home() {
                         <button
                             type="button"
                             onClick={() => setIsMenuOpen(false)}
-                            className="border-border/70 text-secondary-foreground rounded-lg border p-2"
+                            className="border-border/70 text-secondary-foreground cursor-pointer rounded-lg border p-2"
                             aria-label="Fechar menu"
                         >
                             <X size={18} />

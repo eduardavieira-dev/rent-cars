@@ -147,7 +147,7 @@ export default function VehicleDetailsPage() {
                         <button
                             type="button"
                             onClick={handleRequest}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold w-full rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold w-full cursor-pointer rounded-lg px-4 py-3 text-sm font-semibold transition-colors"
                         >
                             Solicitar aluguel
                         </button>

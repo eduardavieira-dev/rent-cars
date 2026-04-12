@@ -23,7 +23,7 @@
     <micronaut.aot.packageName>br.pucminas.aot.generated</micronaut.aot.packageName>
     <micronaut.runtime>netty</micronaut.runtime>
     <micronaut.test.resources.enabled>false</micronaut.test.resources.enabled>
-    <exec.mainClass>br.pucminas.Application</exec.mainClass>
+    <exec.mainClass>br.pucminas.application.Application</exec.mainClass>
   </properties>
 
   <repositories>

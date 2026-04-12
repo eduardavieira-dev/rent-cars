@@ -76,7 +76,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-secondary-foreground hover:bg-secondary inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors md:hidden"
+                        className="text-secondary-foreground hover:bg-secondary inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md transition-colors md:hidden"
                         aria-label="Fechar menu"
                     >
                         <X size={18} />
@@ -108,7 +108,7 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
                 <button
                     type="button"
                     onClick={handleLogout}
-                    className="text-secondary-foreground hover:bg-destructive/15 hover:text-destructive mt-2 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                    className="text-secondary-foreground hover:bg-destructive/15 hover:text-destructive mt-2 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 >
                     <LogOut size={18} />
                     <span>Sair</span>

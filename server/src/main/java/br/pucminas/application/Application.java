@@ -1,4 +1,4 @@
-package br.pucminas;
+package br.pucminas.application;
 
 import io.micronaut.runtime.Micronaut;
 

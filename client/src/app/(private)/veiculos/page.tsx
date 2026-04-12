@@ -172,7 +172,7 @@ export default function VehiclesPage() {
                     <button
                         type="button"
                         onClick={handleOpenCreate}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold inline-flex cursor-pointer items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold"
                     >
                         <Plus size={16} />
                         Novo veiculo
@@ -206,7 +206,7 @@ export default function VehiclesPage() {
                             key={item.value}
                             type="button"
                             onClick={() => setStatusFilter(item.value)}
-                            className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
+                            className={`cursor-pointer rounded-full px-4 py-2 text-xs font-semibold transition-colors ${
                                 statusFilter === item.value
                                     ? 'bg-primary text-primary-foreground'
                                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/70'
@@ -269,12 +269,12 @@ export default function VehiclesPage() {
                     <div className="bg-background border-border w-full max-w-2xl rounded-2xl border p-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-semibold">
-                                {editingId ? 'Editar veiculo' : 'Cadastrar veiculo'}
+                                {editingId ? 'Editar veículo' : 'Cadastrar veículo'}
                             </h2>
                             <button
                                 type="button"
                                 onClick={() => setFormOpen(false)}
-                                className="text-muted-foreground text-sm"
+                                className="text-muted-foreground cursor-pointer text-sm"
                             >
                                 Fechar
                             </button>
@@ -380,13 +380,13 @@ export default function VehiclesPage() {
                                 <button
                                     type="button"
                                     onClick={() => setFormOpen(false)}
-                                    className="text-secondary-foreground hover:bg-secondary rounded-full px-4 py-2 text-sm"
+                                    className="text-secondary-foreground hover:bg-secondary cursor-pointer rounded-full px-4 py-2 text-sm"
                                 >
                                     Cancelar
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-5 py-2 text-sm font-semibold"
+                                    className="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-full px-5 py-2 text-sm font-semibold"
                                 >
                                     Salvar
                                 </button>

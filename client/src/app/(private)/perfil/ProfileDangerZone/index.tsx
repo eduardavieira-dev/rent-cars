@@ -30,7 +30,7 @@ export function ProfileDangerZone({
                     type="button"
                     onClick={() => setShowDeleteConfirm(true)}
                     disabled={isSaving || isDeleting}
-                    className="border-destructive/60 text-destructive mt-4 inline-flex h-10 items-center gap-2 rounded-md border px-4 text-sm font-medium disabled:opacity-60"
+                    className="border-destructive/60 text-destructive mt-4 inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border px-4 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <Trash2 size={14} />
                     Excluir conta
@@ -46,7 +46,7 @@ export function ProfileDangerZone({
                             type="button"
                             onClick={() => setShowDeleteConfirm(false)}
                             disabled={isDeleting}
-                            className="border-border text-foreground h-9 rounded-md border px-3 text-sm font-medium"
+                            className="border-border text-foreground h-9 cursor-pointer rounded-md border px-3 text-sm font-medium disabled:cursor-not-allowed"
                         >
                             Voltar
                         </button>
@@ -57,7 +57,7 @@ export function ProfileDangerZone({
                                 setShowDeleteConfirm(false);
                             }}
                             disabled={isDeleting}
-                            className="bg-destructive text-destructive-foreground h-9 rounded-md px-3 text-sm font-medium disabled:opacity-60"
+                            className="bg-destructive text-destructive-foreground h-9 cursor-pointer rounded-md px-3 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             {isDeleting ? 'Excluindo...' : 'Confirmar exclusão'}
                         </button>

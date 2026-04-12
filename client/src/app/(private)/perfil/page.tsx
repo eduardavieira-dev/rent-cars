@@ -515,7 +515,7 @@ export default function ProfilePage() {
                 <button
                     type="button"
                     onClick={() => window.location.reload()}
-                    className="border-border text-foreground hover:bg-secondary rounded-md border px-4 py-2 text-sm font-medium"
+                    className="border-border text-foreground hover:bg-secondary cursor-pointer rounded-md border px-4 py-2 text-sm font-medium"
                 >
                     Tentar novamente
                 </button>
@@ -633,7 +633,7 @@ export default function ProfilePage() {
                             <InputField
                                 label="Profissão"
                                 name="profession"
-                                placeholder="Engenheira de Software"
+                                placeholder="Engenheiro de Software"
                                 value={form.profession}
                                 onChange={handleChange}
                                 disabled={!isEditing}
@@ -769,7 +769,7 @@ export default function ProfilePage() {
                                     setIsEditing(false);
                                 }}
                                 disabled={isSaving || isDeleting}
-                                className="border-border text-foreground h-10 rounded-md border px-4 text-sm font-medium"
+                                className="border-border text-foreground h-10 cursor-pointer rounded-md border px-4 text-sm font-medium disabled:cursor-not-allowed"
                             >
                                 Cancelar
                             </button>

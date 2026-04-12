@@ -75,14 +75,14 @@ export default function ReviewOrdersPage() {
                             <button
                                 type="button"
                                 onClick={() => handleDecision(request.id, 'APPROVED')}
-                                className="bg-success/20 text-success hover:bg-success/30 rounded-full px-3 py-1 text-xs font-semibold"
+                                className="bg-success/20 text-success hover:bg-success/30 cursor-pointer rounded-full px-3 py-1 text-xs font-semibold"
                             >
                                 Aprovar
                             </button>
                             <button
                                 type="button"
                                 onClick={() => handleDecision(request.id, 'REJECTED')}
-                                className="bg-destructive/15 text-destructive hover:bg-destructive/25 rounded-full px-3 py-1 text-xs font-semibold"
+                                className="bg-destructive/15 text-destructive hover:bg-destructive/25 cursor-pointer rounded-full px-3 py-1 text-xs font-semibold"
                             >
                                 Recusar
                             </button>

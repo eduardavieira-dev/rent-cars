@@ -52,7 +52,7 @@ export default function ContractsPage() {
                         <button
                             type="button"
                             onClick={() => handleClose(contract.id)}
-                            className="text-primary hover:bg-primary/10 rounded-full px-3 py-2 text-xs font-semibold"
+                            className="text-primary hover:bg-primary/10 cursor-pointer rounded-full px-3 py-2 text-xs font-semibold"
                         >
                             Finalizar contrato
                         </button>

@@ -38,7 +38,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
                 <button
                     type="button"
                     onClick={() => setIsSidebarOpen(false)}
-                    className="fixed inset-0 z-40 bg-black/45 md:hidden"
+                    className="fixed inset-0 z-40 cursor-pointer bg-black/45 md:hidden"
                     aria-label="Fechar menu lateral"
                 />
             )}
@@ -48,7 +48,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
                     <button
                         type="button"
                         onClick={() => setIsSidebarOpen(true)}
-                        className="text-secondary-foreground hover:bg-secondary inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors"
+                        className="text-secondary-foreground hover:bg-secondary inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md transition-colors"
                         aria-label="Abrir menu"
                     >
                         <Menu size={20} />
