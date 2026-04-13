@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: rentcars-backend
+    runtime: docker
+    dockerfilePath: ./server/Dockerfile
+    region: us-east-1
+    envVars:
+      - key: APP_PORT
+        value: 8080
+      - key: SECURITY_ENABLED
+        value: true
+      - key: JWT_GENERATOR_SIGNATURE_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        value: neondb
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
