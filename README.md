@@ -506,82 +506,27 @@ Descreva o propósito das pastas principais.
 
 ## 📺 Demonstração
 
-### 📱 Aplicativo Mobile
-
-| **Tela Inicial (Home)** | **Tela de Perfil / Settings** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 1 do Mobile" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 2 do Mobile" width="120px" height="120px"> |
-| **Tela de Cadastro** | **Tela de Lista / Detalhes** |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 3 do Mobile" width="120px" height="120px"> | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela 4 do Mobile" width="120px" height="120px"> |
-
 ### 🌐 Aplicação Web
 
-Para melhor visualização, as telas principais estão organizadas lado a lado.
+Aqui estão algumas telas reais da aplicação:
 
-|                                                                 Tela                                                                  |                                                           Captura de Tela                                                            |
-| :-----------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------: |
-|                                                       **Página Inicial (Home)**                                                       |                                                         **Página de Login**                                                          |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela Inicial da Aplicação Web" width="120px" height="120px"> |        <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Login" width="120px" height="120px">         |
-|                                                       **Cadastro de Clientes**                                                        |                                                       **Cadastro de Produtos**                                                       |
-| <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Cadastro de Clientes" width="120px" height="120px">  | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Cadastro de Produtos" width="120px" height="120px"> |
-|                                                      **Dashboard (Visão Geral)**                                                      |                                                   **Página Admin / Configurações**                                                   |
-|       <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela de Dashboard" width="120px" height="120px">       |     <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Tela Administrativa" width="120px" height="120px">      |
+| Home | Login | Cadastro |
+| --- | --- | --- |
+| ![Home](docs/images/home.png) | ![Login](docs/images/login.png) | ![Cadastro](docs/images/registration.png) |
 
-### 💻 Exemplo de Saída no Terminal (para Back-end, API, CLI)
+| Cadastro geral | Veículos | Perfil |
+| --- | --- | --- |
+| ![Cadastro geral](docs/images/all-registration.png) | ![Veículos](docs/images/cars.png) | ![Perfil](docs/images/profile.png) |
 
-Caso o projeto seja focado em serviços de Back-end (API, microserviço, CLI), utilize esta seção para demonstrar a interação com o sistema e a resposta esperada.
+| Analisar pedidos | Meus pedidos | Meus rendimentos |
+| --- | --- | --- |
+| ![Analisar pedidos](docs/images/analyze-orders.png) | ![Meus pedidos](docs/images/my-orders.png) | ![Meus rendimentos](docs/images/income.png) |
 
-#### 1. Demonstração da API (Exemplo com cURL)
+### 🖼 Destaque visual
 
-Mostra uma chamada simples para um endpoint da API (ex: GET de listagem).
-
-```bash
-# Chama o endpoint de listagem de usuários com o token de autenticação
-curl -X GET 'http://localhost:3000/api/v1/users' \
-     -H 'Authorization: Bearer <seu-jwt-token>'
-```
-
-**Saída Esperada:**
-
-```json
-{
-  "total": 2,
-  "users": [
-    {
-      "id": "1a2b3c",
-      "name": "Prof. Aramuni",
-      "email": "contato@exemplo.com",
-      "status": "active"
-    },
-    {
-      "id": "4d5e6f",
-      "name": "Colaborador Teste",
-      "email": "teste@exemplo.com",
-      "status": "inactive"
-    }
-  ]
-}
-```
-
----
-
-#### 2. Demonstração de Execução de CLI/Script
-
-Mostra como executar uma ferramenta de linha de comando ou um script de manutenção do projeto (ex: rodar migrações ou um job agendado).
-
-```bash
-# Executa a ferramenta de validação de Schema
-npm run cli validate:schema --target=production
-```
-
-**Saída Esperada:**
-
-```text
-[INFO] Iniciando validação do banco de dados...
-[SUCCESS] 15/15 tabelas verificadas.
-[WARNING] Coluna 'descricao' na tabela 'produtos' é nullable.
-[SUCCESS] Validação concluída. Nenhum erro crítico encontrado.
-Tempo de execução: 1.25s
-```
+| Página inicial | Lista de veículos |
+| --- | --- |
+| ![Página inicial](docs/images/home.png) | ![Lista de veículos](docs/images/cars.png) |
 
 ---
 
