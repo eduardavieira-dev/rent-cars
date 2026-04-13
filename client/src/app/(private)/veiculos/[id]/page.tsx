@@ -144,7 +144,7 @@ export default function VehicleDetailsPage() {
 
                     <div className="grid gap-3 sm:grid-cols-2">
                         <div className="bg-secondary/70 rounded-2xl p-4">
-                            <p className="text-muted-foreground text-xs">Registro</p>
+                            <p className="text-muted-foreground text-xs">Matrícula</p>
                             <p className="text-lg font-semibold">{vehicle.registration}</p>
                         </div>
                         <div className="bg-secondary/70 rounded-2xl p-4">

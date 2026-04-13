@@ -172,7 +172,7 @@ export default function VehiclesPage() {
         event.preventDefault();
         const errors: FormFieldErrors = {};
 
-        if (!form.registration.trim()) errors.registration = 'Informe o registro do veículo.';
+        if (!form.registration.trim()) errors.registration = 'Informe a matrícula do veículo.';
 
         const year = Number(yearInput);
         const currentYear = new Date().getFullYear();
@@ -407,7 +407,7 @@ export default function VehiclesPage() {
                         <form onSubmit={handleSubmit} className="mt-4 grid gap-4 sm:grid-cols-2">
                             <div className="grid gap-2 text-sm">
                                 <span>
-                                    Registro <span className="text-destructive">*</span>
+                                    Matrícula <span className="text-destructive">*</span>
                                 </span>
                                 <input
                                     value={form.registration}
