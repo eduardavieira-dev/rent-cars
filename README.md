@@ -66,30 +66,21 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 
 ## 📝 Sobre o Projeto
 
-Nesta seção, descreva de forma clara e objetiva **o propósito do seu projeto**, explicando:
+O Rent Cars foi criado para centralizar e simplificar o processo de aluguel de veículos em um único sistema, conectando perfis como cliente, empresa, banco e agente em fluxos de cadastro, análise e gestão de pedidos.
 
-- **Por que ele existe** — qual motivação levou à sua criação.
-- **Qual problema ele resolve** — que dor, necessidade ou oportunidade ele atende.
-- **Qual o contexto** — acadêmico, profissional, pessoal, experimental, etc.
-- **Onde ele pode ser utilizado** — cenários reais ou simulados.
+No contexto acadêmico da Engenharia de Software (PUC Minas), o projeto aplica na prática conceitos de modelagem UML, arquitetura em camadas, APIs REST, autenticação com JWT e persistência relacional.
 
-Procure responder perguntas como:
+O sistema resolve problemas comuns de operação manual e descentralizada, como:
 
-- _Qual foi a ideia inicial do projeto?_
-- _O que ele entrega de valor ao usuário?_
-- _Por que alguém utilizaria ou contribuiria com esse projeto?_
-- _O que o torna relevante ou interessante?_
+- dificuldade de rastrear pedidos e contratos;
+- inconsistência no cadastro de usuários e veículos;
+- falta de visão unificada para análise e aprovação de solicitações.
 
-Escreva de forma objetiva, mas completa, para que qualquer pessoa entenda rapidamente **o que é** e **por que importa**.
-
-> [!NOTE]
-> Esta seção segue boas práticas de documentação profissional e deve ser ajustada conforme o tipo e o objetivo do seu projeto.
+Com isso, o projeto entrega uma base funcional e evolutiva para gestão de locação de carros, com separação clara entre front-end, back-end e banco de dados, facilitando manutenção, testes e evolução incremental.
 
 ---
 
 ## ✨ Funcionalidades Principais
-
-Liste as funcionalidades de forma clara e objetiva.
 
 - 🔐 **Autenticação Segura:** Login, Cadastro e Recuperação de Senha.
 - 📈 **Painel de Controle:** Visualização de dados em tempo real com gráficos.
@@ -112,6 +103,7 @@ As seguintes ferramentas, frameworks e bibliotecas foram utilizados na construç
 - **Linguagem:** TypeScript
 - **Estilização:** Tailwind CSS
 - **Biblioteca UI:** shadcn/ui
+- **Hospedagem:** Vercel
 
 ### 🖥️ Back-end
 
@@ -121,47 +113,88 @@ As seguintes ferramentas, frameworks e bibliotecas foram utilizados na construç
 - **ORM:** Micronaut Data + Hibernate JPA
 - **Autenticação:** JWT
 - **Upload de Imagens:** Cloudinary
-
-### 📱 Mobile (Opcional)
-
-- **Framework:** [Ex: React Native, Flutter, Kotlin Multiplatform]
-- **Ferramentas:** [Ex: Expo, Android Studio, Xcode]
+- **Hospedagem:** Render
 
 ### ⚙️ Infraestrutura & DevOps
 
 - **Containerização:** Docker
-- **Orquestração:** [Ex: Kubernetes (K8s)]
-- **Cloud:** [Ex: AWS (EC2, RDS, S3), Vercel, Heroku, Google Cloud]
-- **CI/CD:** [Ex: GitHub Actions, Jenkins, SonarQube]
+- **Orquestração Local:** Docker Compose
+- **Deploy em Nuvem:** Vercel (client) e Render (server)
+- **Banco em Desenvolvimento:** PostgreSQL 16 em container Docker
 
 ---
 
 ## 🏗 Arquitetura
 
-Descreva aqui a **arquitetura completa do sistema**, explicando como as camadas, módulos e componentes foram organizados. Informe também **por que** essa arquitetura foi escolhida e **quais problemas ela ajuda a resolver**.
+O projeto adota uma arquitetura em camadas, no formato de monólito modular, com responsabilidades bem separadas entre interface, regras de negócio e persistência.
 
-Você pode incluir:
+### Arquitetura em camadas
 
-- **Visão geral da arquitetura** (ex.: camadas, módulos, microsserviços, monólito modular, hexagonal, MVC etc.)
-- **Principais componentes** e o papel de cada um
-- **Padrões de design adotados** (ex.: Repository, Service Layer, DTOs, Factory, Observer)
-- **Fluxo de dados** entre as partes do sistema
-- **Tecnologias utilizadas em cada camada**
-- **Decisões arquiteturais importantes**
-- **Trade-offs** ou limitações relevantes
+1. Camada de Apresentação (Front-end)
+- Aplicação Next.js com TypeScript.
+- Responsável pelas telas públicas e privadas, autenticação no cliente e consumo da API.
+
+2. Camada de Interface HTTP (Controllers)
+- Implementada no back-end Micronaut em `server/src/main/java/br/pucminas/controller`.
+- Expõe endpoints REST para autenticação, usuários, veículos, pedidos e vínculos.
+
+3. Camada de Aplicação/Negócio (Services)
+- Implementada em `server/src/main/java/br/pucminas/service`.
+- Centraliza regras de negócio, validações e orquestração dos fluxos do sistema.
+
+4. Camada de Acesso a Dados (Repositories)
+- Implementada em `server/src/main/java/br/pucminas/repository` com Micronaut Data + Hibernate.
+- Encapsula consultas e persistência das entidades.
+
+5. Camada de Domínio e Contratos
+- Entidades JPA em `server/src/main/java/br/pucminas/model`.
+- DTOs de entrada e saída em `server/src/main/java/br/pucminas/dto`.
+- Exceções e tratamento de erro em `server/src/main/java/br/pucminas/exception`.
+
+6. Camada de Segurança
+- Implementada em `server/src/main/java/br/pucminas/security`.
+- Realiza autenticação/autorização com JWT (quando `SECURITY_ENABLED=true`).
+
+### Banco de dados e infraestrutura
+
+- O sistema utiliza um único banco de dados PostgreSQL (16), executado em container Docker.
+- O banco é orquestrado via Docker Compose pelo serviço `db`.
+- A persistência local é mantida no volume nomeado `rentcars-db-data`.
+
+### Fluxo resumido
+
+1. O usuário interage com a interface web (Next.js).
+2. A interface envia requisições para a API Micronaut.
+3. O controller encaminha a operação para a camada de serviço.
+4. O serviço aplica regras de negócio e utiliza repositórios.
+5. O repositório persiste/consulta dados no PostgreSQL.
+6. A resposta retorna ao front-end em formato de DTO.
+
+Essa organização facilita manutenção, testes e evolução do projeto, reduzindo acoplamento entre interface, regras de negócio e persistência.
 
 ### Exemplos de diagramas
 
-Para melhor visualização e entendimento da estrutura do sistema, os diagramas principais estão organizados lado a lado.
+Os diagramas abaixo refletem os artefatos atuais do projeto.
 
-|                                                              Diagrama de Arquitetura                                                              |                                                            Detalhe da Arquitetura                                                            |
-| :-----------------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------: |
-|                                                              **Visão Geral (Macro)**                                                              |                                                        **Camada de Serviço (Micro)**                                                         |
-|    <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Visão Geral do Sistema" width="120px" height="120px">     | <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Componentes ou Serviço X" width="120px" height="120px"> |
-|                                                          **Modelo de Dados (Entidades)**                                                          |                                                          **Fluxo de Autenticação**                                                           |
-| <img src="https://joaopauloaramuni.github.io/image/saramunilogo.png" alt="Diagrama de Entidade-Relacionamento (DER)" width="120px" height="120px"> |    <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Sequência de Login" width="120px" height="120px">    |
-|                                                            **Infraestrutura (Cloud)**                                                             |                                                           **API Gateway (Rotas)**                                                            |
-|     <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Diagrama de Deploy na AWS/Vercel" width="120px" height="120px">      |       <img src="https://joaopauloaramuni.github.io/image/aramunilogo.png" alt="Mapa de Endpoints da API" width="120px" height="120px">       |
+### Diagrama de Classes
+
+![Diagrama de Classes](docs/diagrams/class-diagram/class-diagram.png)
+
+### Diagrama de Componentes
+
+![Diagrama de Componentes](docs/diagrams/component-diagram/component-diagram.png)
+
+### Diagrama de Implantacao
+
+![Diagrama de Implantacao](docs/diagrams/deployment-diagram/Diagrama%20de%20implantacao.png)
+
+### Diagrama de Pacotes
+
+![Diagrama de Pacotes](docs/diagrams/package-diagram/package-diagram.png)
+
+### Diagrama de Caso de Uso
+
+![Diagrama de Caso de Uso](docs/diagrams/use-case/use-case.png)
 
 ---
 
@@ -192,7 +225,7 @@ O arquivo `.env` precisa conter as seguintes variáveis:
 | `DB_PASSWORD`                    | Senha do banco de dados.                         | `postgres123`            | `postgres`    |
 | `DB_PORT_HOST`                   | Porta exposta do PostgreSQL na máquina host.     | `5432`                   | `5432`        |
 | `APP_PORT`                       | Porta onde a aplicação Micronaut será executada. | `8080`                   | `8080`        |
-| `SECURITY_ENABLED`               | Ativar/desativar segurança JWT.                  | `false` ou `true`        | `false`       |
+| `SECURITY_ENABLED`               | Ativar/desativar segurança JWT.                  | `false` ou `true`        | `true`       |
 | `JWT_GENERATOR_SIGNATURE_SECRET` | Chave secreta para assinatura de tokens JWT.     | `sua_chave_secreta_aqui` | (Obrigatório) |
 | `CLOUDINARY_CLOUD_NAME`          | Nome da cloud no Cloudinary (upload de imagens). | `my_cloud`               | (Obrigatório) |
 | `CLOUDINARY_API_KEY`             | Chave de API do Cloudinary.                      | `123456789012345`        | (Obrigatório) |
@@ -211,7 +244,7 @@ DB_PORT_HOST=5432
 APP_PORT=8080
 
 # Security Configuration
-SECURITY_ENABLED=false
+SECURITY_ENABLED=true
 JWT_GENERATOR_SIGNATURE_SECRET=my-secret-key-change-in-production
 
 # Cloudinary Configuration (upload de imagens)
@@ -244,7 +277,7 @@ DB_USER=postgres
 DB_PASSWORD=postgres123
 DB_PORT_HOST=5432
 APP_PORT=8080
-SECURITY_ENABLED=false
+SECURITY_ENABLED=true
 JWT_GENERATOR_SIGNATURE_SECRET=minha-chave-secreta
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
@@ -257,7 +290,9 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ### 💾 Banco de Dados (PostgreSQL)
 
-O projeto utiliza **PostgreSQL 16** como banco de dados. O banco é automaticamente inicializado e gerenciado via **Docker Compose**.
+O projeto utiliza **um único banco PostgreSQL 16**, inicializado e gerenciado via **Docker Compose** (serviço `db`).
+
+O volume `rentcars-db-data` mantém os dados entre reinicializações dos containers. Em caso de reset completo do banco, use `docker compose down -v`.
 
 **Schema do Banco:**
 O Micronaut gerencia o schema automaticamente via **Hibernate** (`hbm2ddl.auto=update`), criando e atualizando as tabelas conforme necessário no startup da aplicação.
