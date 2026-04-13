@@ -20,5 +20,6 @@ public record RentalRequestResponse(
                 UUID companyId,
                 String companyName,
                 String companyApproval,
-                String bankApproval) {
+                String bankApproval,
+                boolean creditRequested) {
 }

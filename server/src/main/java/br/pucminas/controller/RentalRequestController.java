@@ -34,7 +34,8 @@ public class RentalRequestController {
     public HttpResponse<RentalRequestResponse> requestRental(@Valid @Body CreateRentalRequest request,
             Principal principal) {
         return HttpResponse.created(
-                rentalRequestService.requestRental(request.vehicleId(), request.bankId(), principal.getName()));
+                rentalRequestService.requestRental(request.vehicleId(), request.bankId(),
+                        request.creditRequested(), principal.getName()));
     }
 
     @Put("/company-approval")
