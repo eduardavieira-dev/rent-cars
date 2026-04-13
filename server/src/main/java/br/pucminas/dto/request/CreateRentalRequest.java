@@ -10,5 +10,6 @@ import java.util.UUID;
 @Introspected
 public record CreateRentalRequest(
         @NotNull UUID vehicleId,
-        @NotNull UUID bankId) {
+        @NotNull UUID bankId,
+        boolean creditRequested) {
 }

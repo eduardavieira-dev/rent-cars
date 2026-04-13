@@ -33,7 +33,8 @@ public class RentalRequestService {
     }
 
     @Transactional
-    public RentalRequestResponse requestRental(UUID vehicleId, UUID bankId, String clientEmail) {
+    public RentalRequestResponse requestRental(UUID vehicleId, UUID bankId, boolean creditRequested,
+            String clientEmail) {
         Client client = resolveClient(clientEmail);
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
@@ -52,7 +53,7 @@ public class RentalRequestService {
         vehicle.setStatus(VehicleStatus.UNDER_REVIEW);
         vehicleRepository.update(vehicle);
 
-        RentalRequest rentalRequest = new RentalRequest(vehicle, client, bank);
+        RentalRequest rentalRequest = new RentalRequest(vehicle, client, bank, creditRequested);
         return toResponse(rentalRequestRepository.save(rentalRequest));
     }
 
@@ -178,6 +179,7 @@ public class RentalRequestService {
                 company.getId(),
                 company.getCorporateName(),
                 rentalRequest.getCompanyApproval().name(),
-                rentalRequest.getBankApproval().name());
+                rentalRequest.getBankApproval().name(),
+                rentalRequest.isCreditRequested());
     }
 }

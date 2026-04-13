@@ -1,6 +1,7 @@
 'use client';
 
-import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle, FileText, Loader2, XCircle } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -196,6 +197,17 @@ export default function ReviewOrdersPage() {
                                     {approvalLabel(myApprovalStatus(request))}
                                 </span>
                             )}
+                            {isCompany &&
+                                request.companyApproval === 'APPROVED' &&
+                                request.bankApproval === 'APPROVED' && (
+                                    <Link
+                                        href={`/contratos/novo?rentalRequestId=${request.id}`}
+                                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex cursor-pointer items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                                    >
+                                        <FileText size={14} />
+                                        Registrar contrato
+                                    </Link>
+                                )}
                         </div>
                     </div>
                 ))}

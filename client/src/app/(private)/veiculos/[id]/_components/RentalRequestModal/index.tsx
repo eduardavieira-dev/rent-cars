@@ -32,6 +32,7 @@ export function RentalRequestModal({
 }: RentalRequestModalProps) {
     const [banks, setBanks] = useState<BankOption[]>([]);
     const [selectedBankId, setSelectedBankId] = useState('');
+    const [creditRequested, setCreditRequested] = useState(false);
     const [isLoadingBanks, setIsLoadingBanks] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,6 +73,7 @@ export function RentalRequestModal({
             await api.post('/rental-requests', {
                 vehicleId,
                 bankId: selectedBankId,
+                creditRequested,
             });
 
             toast.success('Solicitação de aluguel enviada com sucesso!');
@@ -145,6 +147,21 @@ export function RentalRequestModal({
                             </select>
                         )}
                     </div>
+
+                    <label className="border-border/70 bg-secondary/40 flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3">
+                        <input
+                            type="checkbox"
+                            checked={creditRequested}
+                            onChange={(event) => setCreditRequested(event.target.checked)}
+                            className="mt-0.5 h-4 w-4 cursor-pointer accent-[var(--color-primary)]"
+                        />
+                        <span className="space-y-1">
+                            <span className="block text-sm font-medium">Solicitar crédito ao banco</span>
+                            <span className="text-muted-foreground block text-xs">
+                                Caso aprovado, o banco poderá conceder um contrato de crédito com taxa e prazo definidos.
+                            </span>
+                        </span>
+                    </label>
 
                     <div className="border-border/70 bg-secondary/40 space-y-1 rounded-lg border px-4 py-3">
                         <p className="text-xs font-medium">Como funciona?</p>

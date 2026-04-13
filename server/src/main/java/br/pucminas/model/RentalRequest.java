@@ -36,15 +36,19 @@ public class RentalRequest {
     @Column(name = "bank_approval", nullable = false)
     private ApprovalStatus bankApproval;
 
+    @Column(name = "credit_requested", nullable = false)
+    private boolean creditRequested;
+
     protected RentalRequest() {
     }
 
-    public RentalRequest(Vehicle vehicle, Client client, Bank bank) {
+    public RentalRequest(Vehicle vehicle, Client client, Bank bank, boolean creditRequested) {
         this.vehicle = vehicle;
         this.client = client;
         this.bank = bank;
         this.companyApproval = ApprovalStatus.PENDING;
         this.bankApproval = ApprovalStatus.PENDING;
+        this.creditRequested = creditRequested;
     }
 
     public UUID getId() {
@@ -89,5 +93,13 @@ public class RentalRequest {
 
     public void setBankApproval(ApprovalStatus bankApproval) {
         this.bankApproval = bankApproval;
+    }
+
+    public boolean isCreditRequested() {
+        return creditRequested;
+    }
+
+    public void setCreditRequested(boolean creditRequested) {
+        this.creditRequested = creditRequested;
     }
 }
