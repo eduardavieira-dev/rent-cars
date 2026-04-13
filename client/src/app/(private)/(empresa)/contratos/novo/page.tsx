@@ -25,9 +25,13 @@ export default function NewContractPage() {
     const [vehicle, setVehicle] = useState<Vehicle | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const [signatureDate, setSignatureDate] = useState(
-        () => new Date().toISOString().slice(0, 10)
-    );
+    const [signatureDate, setSignatureDate] = useState(() => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    });
     const [value, setValue] = useState('');
     const [ownership, setOwnership] = useState<OwnershipType>('CLIENT');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -101,7 +105,8 @@ export default function NewContractPage() {
             <section className="space-y-4">
                 <h1 className="text-2xl font-bold">Pedido de aluguel não encontrado</h1>
                 <p className="text-muted-foreground text-sm">
-                    Abra a página "Analisar pedidos" e use a ação "Registrar contrato" em um pedido aprovado.
+                    Abra a página "Analisar pedidos" e use a ação "Registrar contrato" em um pedido
+                    aprovado.
                 </p>
             </section>
         );
@@ -124,7 +129,8 @@ export default function NewContractPage() {
                     {rental.vehicleBrand} {rental.vehicleModel}
                 </p>
                 <p className="text-muted-foreground text-sm">
-                    Placa: {rental.vehiclePlate} • Cliente: {rental.clientName} • Banco: {rental.bankName}
+                    Placa: {rental.vehiclePlate} • Cliente: {rental.clientName} • Banco:{' '}
+                    {rental.bankName}
                 </p>
                 {rental.creditRequested && (
                     <p className="text-muted-foreground mt-1 text-xs">
@@ -143,7 +149,7 @@ export default function NewContractPage() {
             </div>
 
             {!fullyApproved && (
-                <div className="border-border/70 bg-red-500/10 text-red-400 rounded-2xl border p-4 text-sm">
+                <div className="border-border/70 rounded-2xl border bg-red-500/10 p-4 text-sm text-red-400">
                     Este pedido ainda não foi aprovado pela empresa e pelo banco.
                 </div>
             )}

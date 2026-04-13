@@ -58,5 +58,6 @@ export function formatCurrency(value: number): string {
 
 export function formatDate(date: string | null): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('pt-BR');
+    const [year, month, day] = date.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString('pt-BR');
 }

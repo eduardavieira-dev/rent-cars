@@ -13,4 +13,6 @@ COPY --from=build /app/target/*.jar /app/app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENV TZ=America/Sao_Paulo
+
+ENTRYPOINT ["java", "-Duser.timezone=America/Sao_Paulo", "-jar", "/app/app.jar"]
