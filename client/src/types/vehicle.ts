@@ -29,14 +29,5 @@ export interface RentalRequestResponse {
     companyName: string;
     companyApproval: ApprovalStatus;
     bankApproval: ApprovalStatus;
-}
-
-export interface Contract {
-    id: string;
-    vehicleId: string;
-    vehicleLabel: string;
-    clientEmail: string;
-    startDate: string;
-    endDate: string;
-    monthlyPrice: number;
+    creditRequested: boolean;
 }
