@@ -29,12 +29,15 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
     const { hasRole, logout } = useAuth();
 
     const isClient = hasRole('CLIENT');
-    const isAgent = hasRole('BANK') || hasRole('COMPANY');
+    const isBank = hasRole('BANK');
+    const isCompany = hasRole('COMPANY');
+    const isAgent = isBank || isCompany;
 
     const roleItems: MenuItem[] = [];
 
     if (isClient) {
         roleItems.push({ href: '/meus-pedidos', label: 'Meus pedidos', icon: ClipboardList });
+        roleItems.push({ href: '/meus-contratos', label: 'Meus contratos', icon: FileText });
         roleItems.push({ href: '/meus-rendimentos', label: 'Meus rendimentos', icon: Banknote });
     }
 
@@ -49,6 +52,10 @@ export function AppSidebar({ isOpen, onClose }: AppSidebarProps) {
             icon: ClipboardList,
         });
         roleItems.push({ href: '/contratos', label: 'Contratos', icon: FileText });
+    }
+
+    if (isBank) {
+        roleItems.push({ href: '/contratos-credito', label: 'Contratos de crédito', icon: Banknote });
     }
 
     const menuItems: MenuItem[] = [
