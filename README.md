@@ -25,7 +25,6 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 
 ## 📚 Índice
 
-- [Links Úteis](#-links-úteis)
 - [Sobre o Projeto](#-sobre-o-projeto)
 - [Funcionalidades Principais](#-funcionalidades-principais)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
@@ -50,17 +49,6 @@ Seu desenvolvimento tem como objetivo aplicar, na prática, conceitos fundamenta
 - [Contribuição](#-contribuição)
 - [Agradecimentos](#-agradecimentos)
 - [Licença](#-licença)
-
----
-
-## 🔗 Links Úteis
-
-- 🌐 **Demo Online:** [Acesse a Aplicação Web](link-da-demo-web)
-  > 💻 **Descrição:** Link para a aplicação em ambiente de produção (Ex: hospedado na Vercel, Netlify ou AWS S3).
-- 📱 **Download Mobile:** [App Store](link-app-store) | [Google Play](link-google-play) | [APK Direto](link-para-apk-direto)
-  > 📱 **Descrição:** Links diretos para download nas lojas de aplicativos (se aplicável) e para o arquivo de instalação direta no Android (APK).
-- 📖 **Documentação:** [Leia a Wiki/Docs](link-para-docs)
-  > 📚 **Descrição:** Acesso à documentação técnica completa do projeto (Ex: Swagger/OpenAPI para API, ou Wiki interna).
 
 ---
 
@@ -231,6 +219,20 @@ O arquivo `.env` precisa conter as seguintes variáveis:
 | `CLOUDINARY_API_KEY`             | Chave de API do Cloudinary.                      | `123456789012345`        | (Obrigatório) |
 | `CLOUDINARY_API_SECRET`          | Segredo de API do Cloudinary.                    | `abcdefghijk`            | (Obrigatório) |
 
+#### Front-end (Next.js)
+
+No front-end, crie um arquivo `.env.local` dentro da pasta `client/` com a variável abaixo:
+
+| Variável              | Descrição                                  | Exemplo                 |
+| :-------------------- | :----------------------------------------- | :---------------------- |
+| `NEXT_PUBLIC_API_URL` | URL base da API consumida pelo front-end.  | `http://localhost:8080` |
+
+**Exemplo de `client/.env.local`:**
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
 **Exemplo de arquivo `.env`:**
 
 ```bash
@@ -262,8 +264,8 @@ Clone o repositório e configure o arquivo de variáveis de ambiente.
 1.  **Clone o Repositório:**
 
 ```bash
-git clone <URL_DO_SEU_REPOSITÓRIO>
-cd <pasta-do-projeto>
+git clone https://github.com/eduardavieira-dev/rent-cars.git
+cd rent-cars
 ```
 
 2.  **Crie o arquivo `.env`:**
@@ -934,10 +936,7 @@ Guia para contribuições ao projeto.
 4.  Faça o `push` para a branch (`git push origin feature/minha-feature`).
 5.  Abra um **Pull Request (PR)**.
 
-> [!IMPORTANT]
-> 📝 **Regras:** Por favor, verifique o arquivo [`CONTRIBUTING.md`](./CONTRIBUTING.md) para detalhes sobre nosso guia de estilo de código e o processo de submissão de PRs.
 
----
 
 ## 🙏 Agradecimentos
 
